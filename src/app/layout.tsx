@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
+import Providers from '@/components/Providers';
 import './globals.css';
 
 const inter = Inter({
@@ -15,41 +16,45 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'FRIGOTERM | Soluții Frigorifice și HVAC',
+  title: 'PROTERM | Soluții HVAC Complete',
   description:
-    'FRIGOTERM — expertul tău în sisteme frigorifice, climatizare și soluții HVAC pentru industrie și comerț. Proiectare, instalare, service autorizat.',
+    'PROTERM — expertul tău în sisteme HVAC, climatizare și soluții frigorifice pentru industrie și comerț. Proiectare, instalare, service autorizat.',
   keywords: [
-    'frigorifice',
-    'climatizare',
     'HVAC',
+    'climatizare',
+    'aer condiționat',
     'refrigerare industrială',
-    'service frigorific',
+    'service HVAC',
     'instalare aer condiționat',
-    'frigoterm',
+    'proterm',
+    'Daikin',
+    'Midea',
+    'Gree',
+    'LG',
   ],
+  icons: {
+    icon: '/logo-proterm.jpg',
+    apple: '/logo-proterm.jpg',
+  },
   openGraph: {
-    title: 'FRIGOTERM | Soluții Frigorifice și HVAC',
-    description:
-      'Expertul tău în sisteme frigorifice, climatizare și soluții HVAC.',
-    url: 'https://frigoterm.ro',
-    siteName: 'FRIGOTERM',
+    title: 'PROTERM | Soluții HVAC Complete',
+    description: 'Expertul tău în sisteme HVAC, climatizare și soluții frigorifice.',
+    url: 'https://proterm.ro',
+    siteName: 'PROTERM',
     locale: 'ro_RO',
     type: 'website',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ro" className={`${inter.variable} ${spaceGrotesk.variable}`}>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
