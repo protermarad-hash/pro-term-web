@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-white text-dark font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-semibold rounded-lg shadow-accent hover:bg-accent-600 transition-all duration-200 hover:-translate-y-0.5;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center gap-2 px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition-all duration-200;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-dark font-heading;
+  }
+
+  .section-subtitle {
+    @apply text-lg text-dark-300 mt-4 max-w-2xl;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl p-6 shadow-card hover:shadow-card-hover transition-shadow duration-300;
+  }
+}
