@@ -2,25 +2,23 @@ import { ArrowRight, Shield, Zap, Award } from 'lucide-react';
 import Link from 'next/link';
 
 const stats = [
-  { value: '15+',  label: 'Ani experiență' },
-  { value: '500+', label: 'Proiecte finalizate' },
-  { value: '24/7', label: 'Servicii urgență' },
-  { value: '100%', label: 'Clienți satisfăcuți' },
+  { value: '25+',   label: 'Ani de experiență' },
+  { value: '500+',  label: 'Proiecte finalizate' },
+  { value: '1999',  label: 'Fondată în Arad' },
+  { value: '2 ani', label: 'Garanție extinsă' },
 ];
 
 const badges = [
-  { icon: Shield, text: 'Garanție 2 ani' },
-  { icon: Zap,    text: 'Intervenție rapidă' },
-  { icon: Award,  text: 'Autorizat ISCIR' },
+  { icon: Shield, text: 'Autorizat ANRE & ISCIR' },
+  { icon: Zap,    text: 'Industrial & Civil' },
+  { icon: Award,  text: 'Garanție 2 ani' },
 ];
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden bg-dark">
-      {/* Background gradient */}
       <div className="absolute inset-0 bg-hero-gradient opacity-95" />
 
-      {/* Grid pattern */}
       <div
         className="absolute inset-0 opacity-10"
         style={{
@@ -32,47 +30,41 @@ export default function Hero() {
         }}
       />
 
-      {/* Glow blobs */}
       <div className="absolute top-1/3 -right-40 w-96 h-96 bg-brand/20 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 -left-32 w-80 h-80 bg-primary/30 rounded-full blur-3xl" />
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
         <div className="max-w-3xl">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
             <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
             <span className="text-white/90 text-sm font-medium">
-              Lider în soluții HVAC din 2008
+              Soluții HVAC complete din 1999 · 25+ ani experiență
             </span>
           </div>
 
-          {/* Title */}
           <h1 className="text-4xl md:text-6xl font-bold text-white font-heading leading-tight mb-6">
             Soluții HVAC{' '}
-            <span className="text-brand">Complete</span>
+            <span className="text-brand">Profesionale</span>
             <br />
-            pentru Afacerea Ta
+            pentru Industrie și Locuințe
           </h1>
 
-          {/* Subtitle */}
           <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-10 max-w-2xl">
-            Proiectare, instalare și service autorizat pentru sisteme de climatizare,
-            ventilație și refrigerare. Răspundem în{' '}
-            <strong className="text-accent">4 ore</strong> la urgențe, 24/7.
+            Cu peste <strong className="text-white">25 de ani de experiență</strong> în instalații
+            industriale și civile, PRO TERM este partenerul tău de încredere în sisteme de
+            climatizare, ventilație și încălzire.
           </p>
 
-          {/* CTAs */}
           <div className="flex flex-wrap gap-4 mb-14">
             <Link href="/produse" className="btn-primary text-base px-8 py-4">
               Vezi produse
               <ArrowRight size={20} />
             </Link>
-            <a href="tel:+40700000000" className="btn-outline text-base px-8 py-4">
-              Urgență: 0700 000 000
-            </a>
+            <Link href="/#contact" className="btn-outline text-base px-8 py-4">
+              Solicită consultanță gratuită
+            </Link>
           </div>
 
-          {/* Trust badges */}
           <div className="flex flex-wrap gap-4 mb-14">
             {badges.map(({ icon: Icon, text }) => (
               <div
@@ -86,7 +78,6 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl md:max-w-none">
           {stats.map((stat) => (
             <div
@@ -100,7 +91,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Wave */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path

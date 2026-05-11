@@ -19,21 +19,23 @@ export default function Footer() {
     <footer className="bg-dark text-white">
       <div className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-10">
-          {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-4">
               <Image
                 src="/logo-proterm.jpg"
-                alt="PROTERM"
+                alt="PRO TERM"
                 width={160}
                 height={48}
                 className="h-10 w-auto object-contain brightness-200"
               />
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed mb-2 max-w-xs">
-              Soluții HVAC Complete pentru industrie și comerț.
+            <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
+              PRO TERM SRL — fondată în 1999, cu peste 25 de ani de experiență în sisteme
+              HVAC industriale și civile.
             </p>
-            <p className="text-white/40 text-xs mb-6">15 ani de experiență · 500+ proiecte</p>
+            <p className="text-white/40 text-xs mb-6">
+              Soluții HVAC Complete · Arad, România
+            </p>
 
             <div className="space-y-2">
               <a
@@ -44,20 +46,19 @@ export default function Footer() {
                 0700 000 000
               </a>
               <a
-                href="mailto:office@proterm.ro"
+                href="mailto:office@pro-term.ro"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
-                office@proterm.ro
+                office@pro-term.ro
               </a>
               <span className="flex items-center gap-2 text-white/70 text-sm">
                 <MapPin size={15} className="text-primary-300" />
-                Str. Exemplu nr. 1, Arad
+                Arad, România
               </span>
             </div>
           </div>
 
-          {/* Links */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-4">
@@ -67,7 +68,7 @@ export default function Footer() {
                 {links.map((link) => (
                   <li key={link}>
                     <Link
-                      href="#"
+                      href={link === 'Despre noi' ? '/despre' : '#'}
                       className="text-white/60 hover:text-white text-sm transition-colors"
                     >
                       {link}
@@ -83,10 +84,10 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} PROTERM SRL. Toate drepturile rezervate.
+            © {new Date().getFullYear()} PRO TERM SRL. Toate drepturile rezervate.
           </p>
           <p className="text-white/30 text-xs">
-            CUI: RO12345678 · J02/123/2008
+            Fondată în 1999 · Arad, România
           </p>
         </div>
       </div>

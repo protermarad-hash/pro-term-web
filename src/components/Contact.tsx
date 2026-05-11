@@ -13,13 +13,13 @@ const contactInfo = [
   {
     icon: Mail,
     label: 'Email',
-    value: 'office@frigoterm.ro',
-    href: 'mailto:office@frigoterm.ro',
+    value: 'office@pro-term.ro',
+    href: 'mailto:office@pro-term.ro',
   },
   {
     icon: MapPin,
     label: 'Adresă',
-    value: 'Str. Exemplu nr. 1, București',
+    value: 'Arad, România',
     href: '#',
   },
   {
@@ -94,7 +94,7 @@ export default function Contact() {
             {/* Emergency box */}
             <div className="rounded-2xl bg-accent p-5 text-white">
               <div className="font-bold font-heading text-lg mb-1">
-                Urgență frigorifică?
+                Urgență HVAC?
               </div>
               <p className="text-white/80 text-sm mb-3">
                 Sunăm înapoi în maxim 30 de minute, non-stop.
