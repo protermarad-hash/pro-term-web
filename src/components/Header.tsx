@@ -14,6 +14,9 @@ const navLinks = [
   { label: 'Contact',     href: '/#contact' },
 ];
 
+const contactPhone = '0749 025 610';
+const contactPhoneHref = 'tel:+40749025610';
+
 export default function Header() {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
@@ -62,13 +65,13 @@ export default function Header() {
         {/* Right actions */}
         <div className="hidden md:flex items-center gap-3">
           <a
-            href="tel:+40700000000"
+            href={contactPhoneHref}
             className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
               scrolled ? 'text-primary' : 'text-white'
             }`}
           >
             <Phone size={15} />
-            0700 000 000
+            {contactPhone}
           </a>
 
           {/* Cart icon */}
@@ -131,11 +134,11 @@ export default function Header() {
               </Link>
             ))}
             <a
-              href="tel:+40700000000"
+              href={contactPhoneHref}
               className="flex items-center gap-2 text-primary font-semibold py-2"
             >
               <Phone size={16} />
-              0700 000 000
+              {contactPhone}
             </a>
             <Link href="/#contact" className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
               Ofertă gratuită
