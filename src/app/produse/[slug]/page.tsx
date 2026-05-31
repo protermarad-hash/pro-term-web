@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingCart, Star, CheckCircle2, ArrowLeft, Zap } from 'lucide-react';
+import { ShoppingCart, Star, CheckCircle2, Zap, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
@@ -13,10 +13,55 @@ import {
   BRAND_GRADIENT,
   CATEGORY_LABEL,
   STOCK_LABEL,
+  type Product,
 } from '@/lib/products';
 
+const GREE_OFFICIAL_URLS = {
+  clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
+  fairy: 'https://www.gree.ro/gama-produse/rezidentiale/gama-fairy-lclh/',
+  pulsar: 'https://www.gree.ro/gama-produse/rezidentiale/pulsar/',
+  bora: 'https://www.gree.ro/gama-produse/rezidentiale/gama-bora-a4-silver/',
+  soyal: 'https://www.gree.ro/gama-produse/rezidentiale/soyal/',
+  cosmo: 'https://www.gree.ro/gama-produse/rezidentiale/cosmo/',
+};
+
+function cleanCustomerText(text: string): string {
+  return text
+    .replace(/\s*Preț calculat[^.]*\./gi, '')
+    .replace(/\s*Pret calculat[^.]*\./gi, '')
+    .replace(/\s*Lista furnizorului este fără TVA\.?/gi, '')
+    .trim();
+}
+
+function isPublicSpec(label: string, value: string): boolean {
+  const internalText = `${label} ${value}`.toLowerCase();
+  return ![
+    'preț calculat',
+    'pret calculat',
+    'coloana albă',
+    'coloana alba',
+    'adaos',
+    'furnizorului',
+    'timbru verde',
+  ].some((term) => internalText.includes(term));
+}
+
+function getOfficialUrl(product: Product): string | null {
+  if (product.brand !== 'Gree') return null;
+  const text = `${product.name} ${product.slug} ${product.smartbillCode ?? ''}`.toLowerCase();
+
+  if (text.includes('clivia')) return GREE_OFFICIAL_URLS.clivia;
+  if (text.includes('fairy')) return GREE_OFFICIAL_URLS.fairy;
+  if (text.includes('pulsar')) return GREE_OFFICIAL_URLS.pulsar;
+  if (text.includes('bora')) return GREE_OFFICIAL_URLS.bora;
+  if (text.includes('soyal')) return GREE_OFFICIAL_URLS.soyal;
+  if (text.includes('cosmo')) return GREE_OFFICIAL_URLS.cosmo;
+
+  return null;
+}
+
 export default function ProductPage() {
-  const { slug }  = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug: string }>();
   const { addToCart } = useCart();
 
   const product = getProductBySlug(slug);
@@ -44,6 +89,9 @@ export default function ProductPage() {
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
   const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const customerDescription = cleanCustomerText(product.description);
+  const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
+  const officialUrl = getOfficialUrl(product);
 
   return (
     <>
@@ -126,7 +174,7 @@ export default function ProductPage() {
                 <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
               </div>
 
-              <p className="text-dark-300 leading-relaxed mb-6">{product.description}</p>
+              <p className="text-dark-300 leading-relaxed mb-6">{customerDescription}</p>
 
               <ul className="space-y-2 mb-6">
                 {product.features.map((f) => (
@@ -178,34 +226,62 @@ export default function ProductPage() {
 
                 <p className="text-xs text-dark-300 mt-3 flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-green-500" />
-                  Stocul și prețurile vor fi sincronizate cu SmartBill după conectarea API-ului.
+                  Stocul se confirmă la plasarea comenzii.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="card mb-14">
-            <h2 className="text-xl font-bold font-heading text-dark mb-5">
-              Specificații tehnice
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <tbody>
-                  {product.specs.map((spec, i) => (
-                    <tr
-                      key={spec.label}
-                      className={i % 2 === 0 ? 'bg-light-200' : 'bg-white'}
-                    >
-                      <td className="py-3 px-4 text-dark-300 font-medium w-1/2 rounded-l-lg">
-                        {spec.label}
-                      </td>
-                      <td className="py-3 px-4 text-dark font-semibold rounded-r-lg">
-                        {spec.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="grid lg:grid-cols-3 gap-8 mb-14">
+            <div className="card lg:col-span-2">
+              <h2 className="text-xl font-bold font-heading text-dark mb-5">
+                Specificații tehnice
+              </h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {publicSpecs.map((spec, i) => (
+                      <tr
+                        key={spec.label}
+                        className={i % 2 === 0 ? 'bg-light-200' : 'bg-white'}
+                      >
+                        <td className="py-3 px-4 text-dark-300 font-medium w-1/2 rounded-l-lg">
+                          {spec.label}
+                        </td>
+                        <td className="py-3 px-4 text-dark font-semibold rounded-r-lg">
+                          {spec.value}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="card">
+              <h2 className="text-xl font-bold font-heading text-dark mb-4">
+                Documentație produs
+              </h2>
+              <div className="space-y-3">
+                {officialUrl ? (
+                  <a
+                    href={officialUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all"
+                  >
+                    <ExternalLink size={18} />
+                    Pagina oficială producător
+                  </a>
+                ) : (
+                  <p className="text-sm text-dark-300">
+                    Documentația produsului se oferă la cerere.
+                  </p>
+                )}
+                <p className="text-xs text-dark-300">
+                  PRO TERM este dealer și oferă consultanță pentru alegerea corectă a echipamentului.
+                </p>
+              </div>
             </div>
           </div>
 
