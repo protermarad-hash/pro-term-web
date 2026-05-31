@@ -7,8 +7,31 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { products, type Brand, type Category, CATEGORY_LABEL } from '@/lib/products';
 
-const BRANDS: Brand[]    = ['Daikin', 'Midea', 'Gree', 'LG'];
-const CATEGORIES: Category[] = ['split', 'multi-split', 'caseta', 'portabil'];
+const BRANDS: Brand[] = [
+  'Midea',
+  'Gree',
+  'Yamato',
+  'Fujitsu',
+  'Yukon',
+  'Habitat',
+  'Bosch',
+  'Vaillant',
+  'Immergas',
+  'Viessmann',
+  'Generic',
+];
+
+const CATEGORIES: Category[] = [
+  'aer-conditionat',
+  'centrale-termice',
+  'pompe-caldura',
+  'accesorii-montaj-ac',
+  'teava-fitinguri',
+  'condens-drenaj',
+  'termostate-automatizari',
+  'service-montaj',
+];
+
 const BTU_OPTIONS = [9000, 12000, 18000, 24000];
 
 type SortKey = 'pret-asc' | 'pret-desc' | 'rating' | 'recenzii';
@@ -24,7 +47,7 @@ export default function ProdusePage() {
   const [selectedBrands,     setSelectedBrands]     = useState<Set<Brand>>(new Set());
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
   const [selectedBTU,        setSelectedBTU]        = useState<Set<number>>(new Set());
-  const [maxPrice,           setMaxPrice]           = useState(8000);
+  const [showQuoteOnly,      setShowQuoteOnly]      = useState(false);
   const [sort,               setSort]               = useState<SortKey>('rating');
   const [filtersOpen,        setFiltersOpen]        = useState(false);
 
@@ -38,8 +61,8 @@ export default function ProdusePage() {
     let list = products.filter((p) => {
       if (selectedBrands.size     > 0 && !selectedBrands.has(p.brand))        return false;
       if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false;
-      if (selectedBTU.size        > 0 && !selectedBTU.has(p.btu))             return false;
-      if (p.price > maxPrice)                                                  return false;
+      if (selectedBTU.size        > 0 && (!p.btu || !selectedBTU.has(p.btu)))  return false;
+      if (showQuoteOnly && p.price > 0)                                        return false;
       return true;
     });
 
@@ -50,24 +73,23 @@ export default function ProdusePage() {
       case 'recenzii':  list = [...list].sort((a, b) => b.reviews - a.reviews);break;
     }
     return list;
-  }, [selectedBrands, selectedCategories, selectedBTU, maxPrice, sort]);
+  }, [selectedBrands, selectedCategories, selectedBTU, showQuoteOnly, sort]);
 
   function resetFilters() {
     setSelectedBrands(new Set());
     setSelectedCategories(new Set());
     setSelectedBTU(new Set());
-    setMaxPrice(8000);
+    setShowQuoteOnly(false);
   }
 
   const hasFilters =
     selectedBrands.size > 0 ||
     selectedCategories.size > 0 ||
     selectedBTU.size > 0 ||
-    maxPrice < 8000;
+    showQuoteOnly;
 
   const FilterPanel = () => (
     <div className="space-y-6">
-      {/* Brand */}
       <div>
         <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">Brand</h3>
         {BRANDS.map((b) => (
@@ -83,10 +105,24 @@ export default function ProdusePage() {
         ))}
       </div>
 
-      {/* Capacitate */}
+      <div>
+        <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">Categorie</h3>
+        {CATEGORIES.map((c) => (
+          <label key={c} className="flex items-center gap-2 cursor-pointer py-1">
+            <input
+              type="checkbox"
+              checked={selectedCategories.has(c)}
+              onChange={() => setSelectedCategories(toggle(selectedCategories, c))}
+              className="w-4 h-4 accent-primary"
+            />
+            <span className="text-sm text-dark-300">{CATEGORY_LABEL[c]}</span>
+          </label>
+        ))}
+      </div>
+
       <div>
         <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">
-          Capacitate (BTU)
+          Capacitate AC (BTU)
         </h3>
         {BTU_OPTIONS.map((btu) => (
           <label key={btu} className="flex items-center gap-2 cursor-pointer py-1">
@@ -103,41 +139,17 @@ export default function ProdusePage() {
         ))}
       </div>
 
-      {/* Categorie */}
       <div>
-        <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">Categorie</h3>
-        {CATEGORIES.map((c) => (
-          <label key={c} className="flex items-center gap-2 cursor-pointer py-1">
-            <input
-              type="checkbox"
-              checked={selectedCategories.has(c)}
-              onChange={() => setSelectedCategories(toggle(selectedCategories, c))}
-              className="w-4 h-4 accent-primary"
-            />
-            <span className="text-sm text-dark-300">{CATEGORY_LABEL[c]}</span>
-          </label>
-        ))}
-      </div>
-
-      {/* Preț maxim */}
-      <div>
-        <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">
-          Preț maxim:{' '}
-          <span className="text-primary">{maxPrice.toLocaleString('ro-RO')} RON</span>
-        </h3>
-        <input
-          type="range"
-          min={1000}
-          max={8000}
-          step={100}
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
-          className="w-full accent-primary"
-        />
-        <div className="flex justify-between text-xs text-dark-300 mt-1">
-          <span>1.000 RON</span>
-          <span>8.000 RON</span>
-        </div>
+        <h3 className="text-sm font-bold text-dark uppercase tracking-wide mb-3">Disponibilitate</h3>
+        <label className="flex items-center gap-2 cursor-pointer py-1">
+          <input
+            type="checkbox"
+            checked={showQuoteOnly}
+            onChange={() => setShowQuoteOnly((v) => !v)}
+            className="w-4 h-4 accent-primary"
+          />
+          <span className="text-sm text-dark-300">Produse cu ofertă personalizată</span>
+        </label>
       </div>
 
       {hasFilters && (
@@ -156,30 +168,25 @@ export default function ProdusePage() {
       <Header />
       <main className="pt-24 pb-20 bg-light-200 min-h-screen">
         <div className="container mx-auto px-4">
-          {/* Page header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold font-heading text-dark">
-              Aparate de Aer Condiționat
+              Magazin HVAC PRO TERM
             </h1>
             <p className="text-dark-300 mt-1">
-              {filtered.length} produse disponibile · Daikin, Midea, Gree, LG
+              {filtered.length} produse și categorii · Aer condiționat, centrale, pompe de căldură și accesorii
             </p>
           </div>
 
           <div className="flex gap-8">
-            {/* Sidebar — desktop */}
-            <aside className="hidden lg:block w-60 flex-shrink-0">
+            <aside className="hidden lg:block w-64 flex-shrink-0">
               <div className="card sticky top-24">
                 <h2 className="font-bold font-heading text-dark mb-4">Filtre</h2>
                 <FilterPanel />
               </div>
             </aside>
 
-            {/* Main */}
             <div className="flex-1">
-              {/* Toolbar */}
               <div className="flex items-center justify-between mb-6 gap-4">
-                {/* Mobile filter button */}
                 <button
                   onClick={() => setFiltersOpen(true)}
                   className="lg:hidden flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-dark-300 hover:border-primary transition-colors"
@@ -193,7 +200,6 @@ export default function ProdusePage() {
                   )}
                 </button>
 
-                {/* Sort */}
                 <div className="flex items-center gap-2 ml-auto">
                   <span className="text-sm text-dark-300 hidden sm:block">Sortare:</span>
                   <div className="relative">
@@ -211,7 +217,6 @@ export default function ProdusePage() {
                 </div>
               </div>
 
-              {/* Grid */}
               {filtered.length === 0 ? (
                 <div className="text-center py-20">
                   <p className="text-dark-300 text-lg">Niciun produs nu corespunde filtrelor.</p>
@@ -234,7 +239,6 @@ export default function ProdusePage() {
         </div>
       </main>
 
-      {/* Mobile filter drawer */}
       <>
         <div
           className={`fixed inset-0 bg-dark/50 z-40 lg:hidden transition-opacity ${
