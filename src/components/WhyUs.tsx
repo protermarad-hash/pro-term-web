@@ -1,4 +1,4 @@
-import { Calendar, BadgeCheck, MapPin, Headphones, Lightbulb, UsersRound } from 'lucide-react';
+import { Calendar, BadgeCheck, MapPin, Headphones, Lightbulb, UsersRound, FileCheck2 } from 'lucide-react';
 
 const reasons = [
   {
@@ -27,6 +27,15 @@ const reasons = [
     color:   'text-brand',
     bgGrad:  'from-brand/5 to-brand/10',
     border:  'border-brand/20',
+  },
+  {
+    icon: FileCheck2,
+    title: 'ISO 9001 și F-Gas / AGFR',
+    description:
+      'Certificarea ISO 9001 susține managementul calității, iar certificatul F-Gas / AGFR acoperă lucrările cu agenți frigorifici.',
+    color:   'text-primary',
+    bgGrad:  'from-primary/5 to-primary/10',
+    border:  'border-primary/20',
   },
   {
     icon: MapPin,
@@ -66,10 +75,10 @@ export default function WhyUs() {
             De ce PRO TERM
           </span>
           <h2 className="section-title mt-2">
-            Experiență mare, echipă restrânsă, suport direct.
+            Experiență mare, echipă restrânsă, lucru certificat.
           </h2>
           <p className="section-subtitle mx-auto text-center">
-            Pentru echipamente HVAC contează alegerea corectă, montajul și suportul după vânzare. De aceea combinăm magazinul online cu recomandare tehnică reală.
+            Pentru echipamente HVAC contează alegerea corectă, montajul, conformitatea și suportul după vânzare. De aceea combinăm magazinul online cu recomandare tehnică reală.
           </p>
         </div>
 
@@ -108,6 +117,9 @@ export default function WhyUs() {
               </span>
             ))}
           </div>
+          <p className="mt-5 text-sm font-medium text-dark-300">
+            Certificări: ISO 9001 · F-Gas / AGFR
+          </p>
         </div>
       </div>
     </section>
