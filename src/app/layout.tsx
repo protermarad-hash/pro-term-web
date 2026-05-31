@@ -16,16 +16,18 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'PROTERM | Soluții HVAC Complete',
+  title: 'PROTERM | Magazin online HVAC, climatizare și service în Arad',
   description:
-    'PROTERM — expertul tău în sisteme HVAC, climatizare și soluții frigorifice pentru industrie și comerț. Proiectare, instalare, service autorizat.',
+    'PROTERM — magazin online pentru aparate de aer condiționat și soluții HVAC. Produse, montaj, service, mentenanță și consultanță tehnică în Arad.',
   keywords: [
-    'HVAC',
-    'climatizare',
-    'aer condiționat',
-    'refrigerare industrială',
+    'magazin HVAC Arad',
+    'aer condiționat Arad',
+    'aparate aer condiționat',
+    'montaj aer condiționat Arad',
     'service HVAC',
-    'instalare aer condiționat',
+    'climatizare',
+    'refrigerare industrială',
+    'refrigerare comercială',
     'proterm',
     'Daikin',
     'Midea',
@@ -37,8 +39,8 @@ export const metadata: Metadata = {
     apple: '/logo-proterm.jpg',
   },
   openGraph: {
-    title: 'PROTERM | Soluții HVAC Complete',
-    description: 'Expertul tău în sisteme HVAC, climatizare și soluții frigorifice.',
+    title: 'PROTERM | Magazin online HVAC și servicii în Arad',
+    description: 'Cumpără produse HVAC sau cere ofertă pentru montaj, service și consultanță tehnică.',
     url: 'https://proterm.ro',
     siteName: 'PROTERM',
     locale: 'ro_RO',
