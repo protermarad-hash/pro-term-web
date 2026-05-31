@@ -7,7 +7,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/lib/cart-context';
-import { getProductBySlug, getRelatedProducts, BRAND_GRADIENT, CATEGORY_LABEL } from '@/lib/products';
+import {
+  getProductBySlug,
+  getRelatedProducts,
+  BRAND_GRADIENT,
+  CATEGORY_LABEL,
+  STOCK_LABEL,
+} from '@/lib/products';
 
 export default function ProductPage() {
   const { slug }  = useParams<{ slug: string }>();
@@ -35,14 +41,15 @@ export default function ProductPage() {
   }
 
   const related = getRelatedProducts(product);
+  const hasPrice = product.price > 0;
+  const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
+  const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
 
   return (
     <>
       <Header />
       <main className="pt-24 pb-20 bg-light-200">
         <div className="container mx-auto px-4">
-
-          {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-dark-300 mb-6">
             <Link href="/" className="hover:text-primary transition-colors">Acasă</Link>
             <span>/</span>
@@ -51,26 +58,22 @@ export default function ProductPage() {
             <span className="text-dark font-medium truncate">{product.name}</span>
           </div>
 
-          {/* Main product section */}
           <div className="grid lg:grid-cols-2 gap-10 mb-14">
-
-            {/* Image */}
             <div>
               <div
                 className={`aspect-square rounded-3xl bg-gradient-to-br ${BRAND_GRADIENT[product.brand]} flex flex-col items-center justify-center relative overflow-hidden`}
               >
-                <span className="text-white/10 font-bold text-9xl font-heading select-none absolute">
+                <span className="text-white/10 font-bold text-8xl font-heading select-none absolute text-center px-6">
                   {product.brand}
                 </span>
 
                 <div className="relative z-10 text-center text-white">
-                  <div className="text-6xl font-bold font-heading opacity-60 mb-2">
-                    {product.btu.toLocaleString('ro-RO')}
+                  <div className="text-4xl md:text-5xl font-bold font-heading opacity-70 mb-2">
+                    {capacity}
                   </div>
-                  <div className="text-white/80 text-xl">BTU</div>
+                  <div className="text-white/80 text-lg">{CATEGORY_LABEL[product.category]}</div>
                 </div>
 
-                {/* Badges */}
                 <div className="absolute top-4 left-4 flex flex-col gap-2">
                   {product.isNew && (
                     <span className="bg-brand text-white text-xs font-bold uppercase px-3 py-1 rounded-full">
@@ -90,22 +93,21 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Info */}
             <div>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
                   {product.brand}
                 </span>
                 <span className="text-sm text-dark-300">
                   {CATEGORY_LABEL[product.category]}
                 </span>
+                <span className="text-sm text-dark-300">· {stockLabel}</span>
               </div>
 
               <h1 className="text-3xl font-bold font-heading text-dark mb-3">
                 {product.name}
               </h1>
 
-              {/* Rating */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -124,10 +126,8 @@ export default function ProductPage() {
                 <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
               </div>
 
-              {/* Description */}
               <p className="text-dark-300 leading-relaxed mb-6">{product.description}</p>
 
-              {/* Features */}
               <ul className="space-y-2 mb-6">
                 {product.features.map((f) => (
                   <li key={f} className="flex items-start gap-2">
@@ -137,11 +137,10 @@ export default function ProductPage() {
                 ))}
               </ul>
 
-              {/* Price + CTA */}
               <div className="border-t border-gray-100 pt-6">
                 <div className="flex items-baseline gap-3 mb-4">
                   <span className="text-4xl font-bold font-heading text-dark">
-                    {product.price.toLocaleString('ro-RO')} RON
+                    {hasPrice ? `${product.price.toLocaleString('ro-RO')} RON` : product.priceLabel ?? 'Cere ofertă'}
                   </span>
                   {product.originalPrice && (
                     <span className="text-lg text-dark-300 line-through">
@@ -150,32 +149,41 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => addToCart(product)}
-                    className="flex-1 btn-primary justify-center py-4"
-                  >
-                    <ShoppingCart size={20} />
-                    Adaugă în coș
-                  </button>
+                <div className="flex gap-3 flex-col sm:flex-row">
+                  {hasPrice ? (
+                    <button
+                      onClick={() => addToCart(product)}
+                      className="flex-1 btn-primary justify-center py-4"
+                    >
+                      <ShoppingCart size={20} />
+                      Adaugă în coș
+                    </button>
+                  ) : (
+                    <Link
+                      href="/#contact"
+                      className="flex-1 btn-primary justify-center py-4"
+                    >
+                      <Zap size={20} />
+                      Cere ofertă
+                    </Link>
+                  )}
                   <Link
                     href="/#contact"
-                    className="flex items-center gap-2 px-5 py-4 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-all"
+                    className="flex items-center justify-center gap-2 px-5 py-4 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-all"
                   >
                     <Zap size={18} />
-                    Ofertă
+                    Consultanță
                   </Link>
                 </div>
 
                 <p className="text-xs text-dark-300 mt-3 flex items-center gap-1">
                   <CheckCircle2 size={13} className="text-green-500" />
-                  Stoc disponibil · Livrare 24–48h · Garanție 2 ani
+                  Stocul și prețurile vor fi sincronizate cu SmartBill după conectarea API-ului.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Specs table */}
           <div className="card mb-14">
             <h2 className="text-xl font-bold font-heading text-dark mb-5">
               Specificații tehnice
@@ -201,7 +209,6 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {/* Related products */}
           {related.length > 0 && (
             <div>
               <h2 className="text-2xl font-bold font-heading text-dark mb-6">
