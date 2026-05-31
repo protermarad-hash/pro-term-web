@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 const stats = [
   { value: '25+', label: 'ani experiență' },
-  { value: '40+', label: 'produse în catalog' },
+  { value: '6', label: 'specialiști în echipă' },
   { value: 'Arad', label: 'montaj & service local' },
 ];
 
@@ -25,7 +25,7 @@ export default function Hero() {
           <div>
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur">
               <BadgeCheck size={16} className="text-accent-200" />
-              Dealer HVAC · Vânzare, montaj și service în Arad
+              Dealer HVAC · Echipă de 6 specialiști · Arad
             </div>
 
             <h1 className="max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
@@ -33,7 +33,7 @@ export default function Hero() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/78 md:text-xl">
-              Alege echipamente Gree, Yamato, Midea și alte branduri, cere ofertă cu montaj sau comandă direct. PRO TERM îți oferă consultanță tehnică, instalare și suport local.
+              Alege echipamente Gree, Yamato, Midea și alte branduri, cere ofertă cu montaj sau comandă direct. PRO TERM îți oferă consultanță tehnică și suport direct de la o echipă locală cu experiență.
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
