@@ -1,17 +1,17 @@
-import { ArrowRight, Shield, Zap, Award } from 'lucide-react';
+import { ArrowRight, Shield, Zap, Award, ShoppingCart } from 'lucide-react';
 import Link from 'next/link';
 
 const stats = [
   { value: '25+',   label: 'Ani de experiență' },
-  { value: '500+',  label: 'Proiecte finalizate' },
-  { value: '1999',  label: 'Fondată în Arad' },
-  { value: '2 ani', label: 'Garanție extinsă' },
+  { value: '500+',  label: 'Lucrări finalizate' },
+  { value: '1999',  label: 'Activăm în Arad' },
+  { value: '2h',    label: 'Răspuns rapid la ofertă' },
 ];
 
 const badges = [
-  { icon: Shield, text: 'Autorizat ANRE & ISCIR' },
-  { icon: Zap,    text: 'Industrial & Civil' },
-  { icon: Award,  text: 'Garanție 2 ani' },
+  { icon: Shield, text: 'Montaj autorizat & consultanță tehnică' },
+  { icon: ShoppingCart, text: 'Magazin online cu produse HVAC' },
+  { icon: Award, text: 'Service, garanție și suport local' },
 ];
 
 export default function Hero() {
@@ -34,34 +34,32 @@ export default function Hero() {
       <div className="absolute bottom-1/4 -left-32 w-80 h-80 bg-primary/30 rounded-full blur-3xl" />
 
       <div className="relative container mx-auto px-4 pt-24 pb-16">
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
             <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
             <span className="text-white/90 text-sm font-medium">
-              Soluții HVAC complete din 1999 · 25+ ani experiență
+              Magazin online HVAC · Produse, montaj și service în Arad
             </span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white font-heading leading-tight mb-6">
-            Soluții HVAC{' '}
-            <span className="text-brand">Profesionale</span>
-            <br />
-            pentru Industrie și Locuințe
+            Aparate de aer condiționat și soluții HVAC{' '}
+            <span className="text-brand">cu montaj inclus la cerere</span>
           </h1>
 
           <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-10 max-w-2xl">
-            Cu peste <strong className="text-white">25 de ani de experiență</strong> în instalații
-            industriale și civile, PRO TERM este partenerul tău de încredere în sisteme de
-            climatizare, ventilație și încălzire.
+            Cumpără online echipamente HVAC sau cere rapid o ofertă personalizată pentru
+            climatizare, refrigerare, montaj și service. PROTERM îți oferă consultanță tehnică,
+            produse potrivite și suport local în Arad.
           </p>
 
           <div className="flex flex-wrap gap-4 mb-14">
             <Link href="/produse" className="btn-primary text-base px-8 py-4">
-              Vezi produse
+              Vezi magazinul online
               <ArrowRight size={20} />
             </Link>
             <Link href="/#contact" className="btn-outline text-base px-8 py-4">
-              Solicită consultanță gratuită
+              Cere ofertă cu montaj
             </Link>
           </div>
 
