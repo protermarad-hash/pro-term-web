@@ -30,27 +30,27 @@ export default function Footer() {
               />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
-              PRO TERM SRL — fondată în 1999, cu peste 25 de ani de experiență în sisteme
-              HVAC industriale și civile.
+              SC PRO TERM SRL — soluții HVAC, climatizare, refrigerare, montaj și service
+              pentru locuințe, spații comerciale și industrie.
             </p>
             <p className="text-white/40 text-xs mb-6">
-              Soluții HVAC Complete · Arad, România
+              Herman Sebastian · Arad, România
             </p>
 
             <div className="space-y-2">
               <a
-                href="tel:+40700000000"
+                href="tel:+40749025610"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Phone size={15} className="text-accent" />
-                0700 000 000
+                0749 025 610
               </a>
               <a
-                href="mailto:office@pro-term.ro"
+                href="mailto:proterm.arad@gmail.com"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
-                office@pro-term.ro
+                proterm.arad@gmail.com
               </a>
               <span className="flex items-center gap-2 text-white/70 text-sm">
                 <MapPin size={15} className="text-primary-300" />
@@ -84,10 +84,10 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} PRO TERM SRL. Toate drepturile rezervate.
+            © {new Date().getFullYear()} SC PRO TERM SRL. Toate drepturile rezervate.
           </p>
           <p className="text-white/30 text-xs">
-            Fondată în 1999 · Arad, România
+            Arad, România
           </p>
         </div>
       </div>
