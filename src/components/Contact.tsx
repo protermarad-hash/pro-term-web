@@ -1,20 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Send, Clock } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, Clock, UserRound } from 'lucide-react';
 
 const contactInfo = [
   {
+    icon: UserRound,
+    label: 'Persoană contact',
+    value: 'Herman Sebastian',
+    href: null,
+  },
+  {
     icon: Phone,
     label: 'Telefon',
-    value: '0700 000 000',
-    href: 'tel:+40700000000',
+    value: '0749 025 610',
+    href: 'tel:+40749025610',
   },
   {
     icon: Mail,
     label: 'Email',
-    value: 'office@pro-term.ro',
-    href: 'mailto:office@pro-term.ro',
+    value: 'proterm.arad@gmail.com',
+    href: 'mailto:proterm.arad@gmail.com',
   },
   {
     icon: MapPin,
@@ -98,11 +104,11 @@ export default function Contact() {
                 Sunăm înapoi pentru recomandare de produs, montaj sau intervenție.
               </p>
               <a
-                href="tel:+40700000000"
+                href="tel:+40749025610"
                 className="flex items-center gap-2 font-bold text-white"
               >
                 <Phone size={18} />
-                0700 000 000
+                0749 025 610
               </a>
             </div>
           </div>
