@@ -1,69 +1,69 @@
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, PackageCheck } from 'lucide-react';
+import { ArrowRight, CheckCircle2, PackageCheck, Store } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { products } from '@/lib/products';
 
 const featuredProducts = products
   .filter((product) => product.isBestseller || product.isNew)
-  .slice(0, 3);
+  .slice(0, 6);
 
 const shopBenefits = [
-  'Produse selectate pentru locuințe, birouri și spații comerciale',
-  'Poți comanda online sau poți cere ofertă cu montaj',
-  'Consultanță pentru alegerea capacității potrivite',
+  'Prețuri vizibile pentru produsele din listă',
+  'Ofertă cu montaj și accesorii la cerere',
+  'Recomandare tehnică înainte de comandă',
+  'Branduri potrivite pentru locuințe și spații comerciale',
 ];
 
 export default function FeaturedProducts() {
   return (
-    <section id="magazin" className="py-20 bg-light-200">
+    <section id="magazin" className="relative overflow-hidden bg-light-200 py-20">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
       <div className="container mx-auto px-4">
-        <div className="grid lg:grid-cols-[0.85fr_1.15fr] gap-10 items-start">
-          <div className="lg:sticky lg:top-28">
-            <span className="text-accent font-semibold text-sm uppercase tracking-widest">
+        <div className="mb-10 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-sm font-bold uppercase tracking-widest text-accent">
+              <Store size={15} />
               Magazin online
             </span>
-            <h2 className="section-title mt-2">
-              Produse HVAC pregătite pentru comandă sau ofertă cu montaj
+            <h2 className="section-title mt-4">
+              Produse HVAC selectate pentru comandă, ofertă și montaj.
             </h2>
-            <p className="section-subtitle text-left mt-4">
-              Începe cu cele mai căutate echipamente, compară prețurile și cere rapid
-              recomandare tehnică înainte de achiziție.
+            <p className="section-subtitle">
+              Începem cu gamele cerute cel mai des: aer condiționat Gree și Yamato, accesorii, centrale și soluții tehnice pentru locuințe sau spații comerciale.
+            </p>
+          </div>
+
+          <Link href="/produse" className="btn-primary w-fit whitespace-nowrap">
+            Vezi tot catalogul
+            <ArrowRight size={18} />
+          </Link>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+          <aside className="rounded-3xl border border-slate-100 bg-white p-6 shadow-card lg:sticky lg:top-28 lg:self-start">
+            <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white">
+              <PackageCheck size={24} />
+            </div>
+            <h3 className="font-heading text-xl font-bold text-dark">Magazin + consultanță</h3>
+            <p className="mt-2 text-sm leading-relaxed text-dark-300">
+              Pentru echipamente tehnice, prețul produsului este doar o parte din decizie. Te ajutăm să alegi capacitatea, accesoriile și soluția de montaj.
             </p>
 
-            <div className="space-y-3 mt-6">
+            <div className="mt-6 space-y-3">
               {shopBenefits.map((benefit) => (
                 <div key={benefit} className="flex items-start gap-3">
-                  <CheckCircle2 size={20} className="text-secondary mt-0.5 flex-shrink-0" />
-                  <span className="text-dark-300 text-sm leading-relaxed">{benefit}</span>
+                  <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-secondary" />
+                  <span className="text-sm leading-relaxed text-dark-300">{benefit}</span>
                 </div>
               ))}
             </div>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/produse" className="btn-primary">
-                Vezi toate produsele
-                <ArrowRight size={18} />
-              </Link>
-              <Link href="/#contact" className="btn-outline border-primary text-primary hover:bg-primary hover:text-white">
-                Cere ofertă rapidă
-              </Link>
-            </div>
+            <Link href="/#contact" className="mt-6 flex w-full items-center justify-center rounded-xl border-2 border-primary px-4 py-3 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-white">
+              Cere recomandare
+            </Link>
+          </aside>
 
-            <div className="mt-8 rounded-2xl bg-white border border-primary/10 p-5 shadow-card">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <PackageCheck size={20} className="text-primary" />
-                </div>
-                <h3 className="font-bold font-heading text-dark">Magazin + service local</h3>
-              </div>
-              <p className="text-sm text-dark-300 leading-relaxed">
-                Pentru echipamentele tehnice, poți adăuga produsul în coș sau poți solicita
-                verificare pentru montaj, dimensionare și disponibilitate.
-              </p>
-            </div>
-          </div>
-
-          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {featuredProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
