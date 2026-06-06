@@ -4,14 +4,24 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 
 const footerLinks = {
   Servicii: [
-    'Climatizare & HVAC',
-    'Refrigerare comercială',
-    'Refrigerare industrială',
-    'Camere frigorifice',
-    'Service & mentenanță',
+    { label: 'Climatizare & HVAC', href: '/#servicii' },
+    { label: 'Aer condiționat', href: '/produse' },
+    { label: 'Centrale termice', href: '/produse' },
+    { label: 'Pompe de căldură', href: '/produse' },
+    { label: 'Service & mentenanță', href: '/#contact' },
   ],
-  Companie: ['Despre noi', 'Echipa noastră', 'Certificări', 'Parteneri', 'Blog'],
-  Legal: ['Termeni și condiții', 'Politica de confidențialitate', 'GDPR', 'Cookies'],
+  Companie: [
+    { label: 'Despre noi', href: '/despre' },
+    { label: 'Produse', href: '/produse' },
+    { label: 'Certificări', href: '/#avantaje' },
+    { label: 'Contact', href: '/#contact' },
+  ],
+  Legal: [
+    { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
+    { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
+    { label: 'Politica de retur', href: '/politica-retur' },
+    { label: 'Politica cookies', href: '/politica-cookies' },
+  ],
 };
 
 export default function Footer() {
@@ -30,11 +40,10 @@ export default function Footer() {
               />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
-              SC PRO TERM SRL — soluții HVAC, climatizare, refrigerare, montaj și service
-              pentru locuințe, spații comerciale și industrie.
+              SC PRO TERM SRL — dealer oficial și service zonal Gree, Midea și Yamato. Soluții HVAC, climatizare, montaj, service și mentenanță în Arad.
             </p>
             <p className="text-white/40 text-xs mb-6">
-              Herman Sebastian · Arad, România
+              Herman Sebastian · Arad, România · ISO 9001 · F-Gas / AGFR
             </p>
 
             <div className="space-y-2">
@@ -46,11 +55,11 @@ export default function Footer() {
                 0749 025 610
               </a>
               <a
-                href="mailto:proterm.arad@gmail.com"
+                href="mailto:office@pro-term.ro"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
-                proterm.arad@gmail.com
+                office@pro-term.ro
               </a>
               <span className="flex items-center gap-2 text-white/70 text-sm">
                 <MapPin size={15} className="text-primary-300" />
@@ -66,12 +75,12 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2">
                 {links.map((link) => (
-                  <li key={link}>
+                  <li key={link.href}>
                     <Link
-                      href={link === 'Despre noi' ? '/despre' : '#'}
+                      href={link.href}
                       className="text-white/60 hover:text-white text-sm transition-colors"
                     >
-                      {link}
+                      {link.label}
                     </Link>
                   </li>
                 ))}
