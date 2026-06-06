@@ -16,9 +16,9 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: 'PROTERM | Magazin online HVAC, climatizare și service în Arad',
+  title: 'PRO TERM | Magazin online HVAC, climatizare și service în Arad',
   description:
-    'PROTERM — magazin online pentru aparate de aer condiționat și soluții HVAC. Produse, montaj, service, mentenanță și consultanță tehnică în Arad.',
+    'PRO TERM — magazin online pentru aparate de aer condiționat și soluții HVAC. Dealer oficial și service zonal Gree, Midea și Yamato în Arad.',
   keywords: [
     'magazin HVAC Arad',
     'aer condiționat Arad',
@@ -26,23 +26,21 @@ export const metadata: Metadata = {
     'montaj aer condiționat Arad',
     'service HVAC',
     'climatizare',
-    'refrigerare industrială',
-    'refrigerare comercială',
-    'proterm',
-    'Daikin',
-    'Midea',
-    'Gree',
-    'LG',
+    'Gree Arad',
+    'Midea Arad',
+    'Yamato Arad',
+    'pro term',
+    'pro-term.ro',
   ],
   icons: {
     icon: '/logo-proterm.jpg',
     apple: '/logo-proterm.jpg',
   },
   openGraph: {
-    title: 'PROTERM | Magazin online HVAC și servicii în Arad',
+    title: 'PRO TERM | Magazin online HVAC și servicii în Arad',
     description: 'Cumpără produse HVAC sau cere ofertă pentru montaj, service și consultanță tehnică.',
-    url: 'https://proterm.ro',
-    siteName: 'PROTERM',
+    url: 'https://pro-term.ro',
+    siteName: 'PRO TERM',
     locale: 'ro_RO',
     type: 'website',
   },
