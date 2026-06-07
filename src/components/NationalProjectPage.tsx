@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Building2, CheckCircle2, ClipboardCheck, MapPinned, MessageCircle, Wrench, Zap } from 'lucide-react';
+import { Building2, CheckCircle2, ClipboardCheck, MapPinned, MessageCircle, Zap } from 'lucide-react';
 
 const phone = '40749025610';
 
@@ -23,6 +23,29 @@ const sectors = [
   'hale și spații tehnice',
   'unități HoReCa',
   'spații rezidențiale complexe',
+];
+
+const faqs = [
+  {
+    question: 'Ce informații trebuie trimise pentru o ofertă de proiect HVAC?',
+    answer: 'Sunt utile localitatea, destinația spațiului, suprafața, înălțimea, compartimentarea, planuri sau poze, cerințele de temperatură, programul de funcționare, termenul dorit și dacă există deja echipamente montate.',
+  },
+  {
+    question: 'Vă deplasați în România pentru proiecte mari?',
+    answer: 'Da. Pentru proiecte comerciale sau industriale suficient de complexe, PRO TERM poate analiza deplasarea la nivel național, în funcție de dimensiunea lucrării, calendar, acces și cerințele tehnice.',
+  },
+  {
+    question: 'Lucrați cu sisteme VRV/VRF?',
+    answer: 'Pentru proiectele care necesită astfel de soluții, putem analiza sisteme cu mai multe unități, inclusiv soluții de tip VRV/VRF, în funcție de spațiu, buget și cerințele tehnice.',
+  },
+  {
+    question: 'Oferta se poate face doar din poze?',
+    answer: 'Pentru o estimare inițială, pozele și detaliile tehnice pot ajuta. Pentru ofertă finală, proiectele mari pot necesita analiză suplimentară, discuție tehnică sau verificare la locație.',
+  },
+  {
+    question: 'Oferiți și mentenanță după montaj?',
+    answer: 'Da. Pentru proiecte comerciale și industriale, se pot discuta revizii periodice, mentenanță preventivă și service pentru menținerea funcționării corecte a echipamentelor.',
+  },
 ];
 
 export default function NationalProjectPage() {
@@ -98,6 +121,26 @@ export default function NationalProjectPage() {
               {sectors.map((sector) => (
                 <div key={sector} className="rounded-2xl border border-slate-100 bg-light-200 p-5 font-bold text-dark">
                   {sector}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-8 lg:grid-cols-3">
+            <div>
+              <span className="text-sm font-bold uppercase tracking-widest text-accent">Întrebări frecvente</span>
+              <h2 className="mt-2 font-heading text-3xl font-bold text-dark">FAQ proiecte HVAC mari</h2>
+              <p className="mt-3 text-sm leading-relaxed text-dark-300">Răspunsuri utile pentru beneficiari comerciali sau industriali care doresc o ofertă tehnică.</p>
+            </div>
+            <div className="space-y-4 lg:col-span-2">
+              {faqs.map((item) => (
+                <div key={item.question} className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+                  <h3 className="font-heading text-lg font-bold text-dark">{item.question}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-dark-300">{item.answer}</p>
                 </div>
               ))}
             </div>
