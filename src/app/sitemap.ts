@@ -8,6 +8,7 @@ const routes = [
   '/despre',
   '/informatii-legale',
   '/termeni-si-conditii',
+  '/livrare-si-plata',
   '/politica-confidentialitate',
   '/politica-retur',
   '/politica-cookies',
