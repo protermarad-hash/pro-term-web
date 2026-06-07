@@ -24,6 +24,29 @@ const solutions = [
   'Intervenții locale în vestul țării și proiecte mari analizate la nivel național',
 ];
 
+const faqs = [
+  {
+    question: 'Ce tip de climatizare este potrivit pentru un spațiu comercial?',
+    answer: 'Depinde de suprafață, compartimentare, numărul de persoane, expunere solară, program de funcționare și destinația spațiului. Pentru spații mici pot fi suficiente soluții split sau multi-split, iar pentru proiecte mai mari se pot analiza sisteme centralizate sau VRV/VRF.',
+  },
+  {
+    question: 'Ce diferență este între o lucrare rezidențială și una comercială?',
+    answer: 'O lucrare comercială are de obicei cerințe mai stricte privind fiabilitatea, programul de funcționare, accesul pentru mentenanță, consumul energetic și continuitatea activității. De aceea, dimensionarea și planificarea sunt mai importante.',
+  },
+  {
+    question: 'Puteți face și mentenanță periodică pentru spații comerciale?',
+    answer: 'Da. Pentru spații comerciale și industriale se pot stabili revizii periodice, curățări, verificări de funcționare și intervenții preventive pentru reducerea riscului de defectare în sezon.',
+  },
+  {
+    question: 'Ce trebuie să trimit pentru o ofertă?',
+    answer: 'Trimite localitatea, tipul spațiului, suprafața, înălțimea, poze sau planuri, numărul estimat de persoane, programul de funcționare, cerințele de temperatură și dacă există deja echipamente instalate.',
+  },
+  {
+    question: 'Se poate lucra etapizat?',
+    answer: 'Da. Pentru proiecte comerciale sau industriale, lucrarea se poate împărți pe etape, în funcție de acces, programul beneficiarului, livrarea echipamentelor și condițiile tehnice din locație.',
+  },
+];
+
 export default function CommercialIndustrialPage() {
   const whatsappUrl = buildWhatsAppUrl('Bună ziua, doresc detalii pentru climatizare comercială sau industrială.');
 
@@ -87,6 +110,26 @@ export default function CommercialIndustrialPage() {
                   <h3 className="font-heading text-xl font-bold text-dark">Service și mentenanță</h3>
                   <p className="mt-2 text-sm leading-relaxed text-dark-300">Revizii și intervenții pentru menținerea performanței echipamentelor HVAC.</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-16">
+          <div className="container mx-auto px-4">
+            <div className="grid gap-8 lg:grid-cols-3">
+              <div>
+                <span className="text-sm font-bold uppercase tracking-widest text-accent">Întrebări frecvente</span>
+                <h2 className="mt-2 font-heading text-3xl font-bold text-dark">FAQ climatizare comercială și industrială</h2>
+                <p className="mt-3 text-sm leading-relaxed text-dark-300">Întrebări utile pentru magazine, birouri, hale și alte spații comerciale sau industriale.</p>
+              </div>
+              <div className="space-y-4 lg:col-span-2">
+                {faqs.map((item) => (
+                  <div key={item.question} className="rounded-2xl border border-slate-100 bg-light-200 p-5 shadow-sm">
+                    <h3 className="font-heading text-lg font-bold text-dark">{item.question}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-dark-300">{item.answer}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
