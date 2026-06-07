@@ -53,6 +53,7 @@ export interface Product {
   stockStatus?: StockStatus;
   stockQty?: number;
   imageUrl?: string;
+  galleryImages?: string[];
 }
 
 export const BRAND_GRADIENT: Record<Brand, string> = {
