@@ -17,9 +17,11 @@ const footerLinks = {
     { label: 'Contact', href: '/#contact' },
   ],
   Legal: [
+    { label: 'Informații legale comerciant', href: '/informatii-legale' },
     { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
     { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
     { label: 'Politica de retur', href: '/politica-retur' },
+    { label: 'Formular de retragere', href: '/formular-retragere' },
     { label: 'Politica cookies', href: '/politica-cookies' },
   ],
 };
@@ -40,10 +42,10 @@ export default function Footer() {
               />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
-              SC PRO TERM SRL — dealer oficial și service zonal Gree, Midea și Yamato. Soluții HVAC, climatizare, montaj, service și mentenanță în Arad.
+              SC PRO TERM SRL — soluții HVAC, climatizare, montaj, service și mentenanță în Arad, Timișoara și proiecte naționale.
             </p>
             <p className="text-white/40 text-xs mb-6">
-              Herman Sebastian · Arad, România · ISO 9001 · F-Gas / AGFR
+              Herman Sebastian · Arad, România · suport tehnic HVAC
             </p>
 
             <div className="space-y-2">
@@ -87,6 +89,24 @@ export default function Footer() {
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <h4 className="text-sm font-bold uppercase tracking-widest text-white/50">Protecția consumatorilor</h4>
+          <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-3">
+            <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              PROTECȚIA CONSUMATORILOR - A.N.P.C.
+            </a>
+            <a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              Soluționare alternativă litigii - SAL
+            </a>
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              Soluționare online litigii - SOL/ODR
+            </a>
+          </div>
+          <p className="mt-3 text-xs text-white/40">
+            Telefonul Consumatorilor: 0219551 · CJPC Arad: Str. Revoluției nr. 50, Arad · Tel. 0257/257.049 · reclamatii.arad@opc.ro
+          </p>
         </div>
       </div>
 
