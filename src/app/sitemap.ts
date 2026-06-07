@@ -22,6 +22,7 @@ const routes = [
   '/servicii/curatare-ac-arad',
   '/servicii/curatare-ac-timisoara',
   '/servicii/proiecte-hvac-romania',
+  '/servicii/climatizare-comerciala-industriala-romania',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
