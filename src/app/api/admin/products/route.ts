@@ -62,7 +62,6 @@ function buildPayload(body: Record<string, unknown>) {
     stock_status: String(body.stockStatus ?? body.stock_status ?? 'on-request'),
     stock_qty: body.stockQty ?? body.stock_qty ? Number(body.stockQty ?? body.stock_qty) : null,
     image_url: imageUrl,
-    gallery_images: galleryImages,
     active: body.active !== false,
     updated_at: new Date().toISOString(),
   };
