@@ -5,11 +5,17 @@ import { ShoppingCart, Star } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, STOCK_LABEL } from '@/lib/products';
 
+function getDiscountPercent(product: Product) {
+  if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
+  return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+}
+
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
   const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const discountPercent = getDiscountPercent(product);
 
   return (
     <div className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
@@ -27,6 +33,11 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
 
           <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {discountPercent && (
+              <span className="bg-red-600 text-white text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-sm">
+                -{discountPercent}% reducere
+              </span>
+            )}
             {product.isNew && (
               <span className="bg-brand text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded-full shadow-sm">
                 Nou
@@ -83,6 +94,11 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
 
         <div className="mt-auto border-t border-slate-100 pt-4">
+          {discountPercent && (
+            <div className="mb-2 inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-extrabold text-red-700">
+              Economisești {(product.originalPrice! - product.price).toLocaleString('ro-RO')} RON
+            </div>
+          )}
           <div className="flex items-baseline gap-2 mb-3">
             <span className="text-2xl font-bold text-dark font-heading">
               {hasPrice ? `${product.price.toLocaleString('ro-RO')} RON` : product.priceLabel ?? 'Cere ofertă'}
