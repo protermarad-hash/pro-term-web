@@ -22,21 +22,23 @@ export default function LegalInfoPage() {
 
               <h2>1. Date comerciant</h2>
               <ul>
-                <li><strong>Denumire:</strong> SC PRO TERM SRL</li>
-                <li><strong>Sediu / punct de lucru:</strong> Arad, România</li>
+                <li><strong>Denumire:</strong> PRO TERM SRL</li>
+                <li><strong>Formă juridică:</strong> Societate cu răspundere limitată</li>
+                <li><strong>Sediu social:</strong> Jud. Arad, Municipiul Arad, Aleea Neptun nr. 4, bl. Y3, etaj 7, ap. 31</li>
+                <li><strong>Cod unic de înregistrare:</strong> 11355602</li>
+                <li><strong>Nr. ordine Registrul Comerțului:</strong> J199900003027</li>
+                <li><strong>EUID:</strong> ROONRC.J199900003027</li>
+                <li><strong>Data înregistrării:</strong> 14.01.1999</li>
+                <li><strong>Activitate principală CAEN:</strong> 4322 - Lucrări de instalații sanitare, de încălzire și de aer condiționat</li>
                 <li><strong>Reprezentant:</strong> Herman Sebastian</li>
                 <li><strong>Telefon:</strong> <a href="tel:+40749025610">0749 025 610</a></li>
                 <li><strong>E-mail:</strong> <a href="mailto:office@pro-term.ro">office@pro-term.ro</a></li>
                 <li><strong>Website:</strong> pro-term.ro</li>
               </ul>
 
-              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-                <strong>De completat pentru conformitate completă:</strong> CUI, număr de ordine în Registrul Comerțului, sediul social complet și, unde este cazul, date despre autorizații/certificări aplicabile activității. Aceste informații trebuie preluate din actele firmei/certificatul constatator.
-              </div>
-
               <h2>2. Activitate</h2>
               <p>
-                PRO TERM comercializează echipamente HVAC, aparate de aer condiționat, pompe de căldură, centrale termice, accesorii și servicii conexe de consultanță, montaj, service și mentenanță.
+                PRO TERM comercializează echipamente HVAC, aparate de aer condiționat, pompe de căldură, centrale termice, accesorii și servicii conexe de consultanță, montaj, service și mentenanță. Activitatea principală declarată este CAEN 4322 - lucrări de instalații sanitare, de încălzire și de aer condiționat.
               </p>
 
               <h2>3. Prețuri, TVA și livrare</h2>
@@ -62,8 +64,10 @@ export default function LegalInfoPage() {
               <h2>6. Documente conexe</h2>
               <ul>
                 <li><Link href="/termeni-si-conditii">Termeni și condiții</Link></li>
+                <li><Link href="/livrare-si-plata">Livrare și plată</Link></li>
                 <li><Link href="/politica-confidentialitate">Politica de confidențialitate / GDPR</Link></li>
                 <li><Link href="/politica-retur">Politica de retur</Link></li>
+                <li><Link href="/formular-retragere">Formular de retragere</Link></li>
                 <li><Link href="/politica-cookies">Politica cookies</Link></li>
               </ul>
             </div>
