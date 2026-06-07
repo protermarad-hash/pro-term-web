@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { CheckCircle2, MapPin, MessageCircle, ShieldCheck, Wrench } from 'lucide-react';
 
+type ServiceType = 'montaj' | 'service' | 'igienizare' | 'revizie';
+
 export type ServiceCityPageProps = {
   city: 'Arad' | 'Timișoara';
-  service: 'montaj' | 'service';
+  service: ServiceType;
 };
 
 const phone = '40749025610';
@@ -12,7 +14,7 @@ function buildWhatsAppUrl(message: string) {
   return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
 
-const serviceContent = {
+const serviceContent: Record<ServiceType, { label: string; intro: string; points: string[] }> = {
   montaj: {
     label: 'Montaj aer condiționat',
     intro: 'Instalare aparate de aer condiționat pentru locuințe, birouri și spații comerciale, cu recomandare tehnică, montaj corect și probă de funcționare.',
@@ -22,6 +24,16 @@ const serviceContent = {
     label: 'Service aer condiționat',
     intro: 'Diagnostic, verificare, revizie, igienizare și suport tehnic pentru aparate de aer condiționat și echipamente HVAC.',
     points: ['Diagnostic pentru aparate care nu funcționează corect', 'Revizie și verificare funcționare', 'Igienizare unitate interioară', 'Recomandări pentru mentenanță preventivă'],
+  },
+  igienizare: {
+    label: 'Igienizare aer condiționat',
+    intro: 'Curățare și igienizare pentru unitatea interioară a aparatului de aer condiționat, recomandată pentru aer mai curat și funcționare eficientă.',
+    points: ['Curățare filtre și componente accesibile', 'Igienizare unitate interioară', 'Verificare evacuare condens', 'Recomandări pentru utilizare și întreținere'],
+  },
+  revizie: {
+    label: 'Revizie aer condiționat',
+    intro: 'Verificare periodică pentru aparate de aer condiționat, înainte de sezon sau când randamentul este scăzut.',
+    points: ['Verificare funcționare generală', 'Control evacuare condens', 'Verificare stare filtre și schimbătoare', 'Recomandări pentru prevenirea defectelor'],
   },
 };
 
