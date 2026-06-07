@@ -9,6 +9,8 @@ const footerLinks = {
     { label: 'Centrale termice', href: '/produse' },
     { label: 'Pompe de căldură', href: '/produse' },
     { label: 'Service & mentenanță', href: '/#contact' },
+    { label: 'Proiecte HVAC România', href: '/servicii/proiecte-hvac-romania' },
+    { label: 'Climatizare comercială și industrială', href: '/servicii/climatizare-comerciala-industriala-romania' },
   ],
   Companie: [
     { label: 'Despre noi', href: '/despre' },
@@ -19,6 +21,7 @@ const footerLinks = {
   Legal: [
     { label: 'Informații legale comerciant', href: '/informatii-legale' },
     { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
+    { label: 'Livrare și plată', href: '/livrare-si-plata' },
     { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
     { label: 'Politica de retur', href: '/politica-retur' },
     { label: 'Formular de retragere', href: '/formular-retragere' },
