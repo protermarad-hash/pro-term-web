@@ -324,7 +324,7 @@ export default function AdminPage() {
 
               <label>
                 <span className="mb-1 block text-sm font-bold text-dark">Cod SmartBill</span>
-                <input value={form.smartBillCode} onChange={(e) => updateField('smartbillCode', e.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="GWH12AGBXB-K6DNA1A" />
+                <input value={form.smartbillCode} onChange={(e) => updateField('smartbillCode', e.target.value)} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="GWH12AGBXB-K6DNA1A" />
               </label>
 
               <label>
