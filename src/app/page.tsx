@@ -1,6 +1,7 @@
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import FeaturedProducts from '@/components/FeaturedProducts';
+import PartnerBanners from '@/components/PartnerBanners';
 import Services from '@/components/Services';
 import About from '@/components/About';
 import WhyUs from '@/components/WhyUs';
@@ -14,6 +15,7 @@ export default function Home() {
       <main>
         <Hero />
         <FeaturedProducts />
+        <PartnerBanners />
         <Services />
         <About />
         <WhyUs />
