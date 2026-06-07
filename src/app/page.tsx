@@ -6,6 +6,7 @@ import Services from '@/components/Services';
 import About from '@/components/About';
 import WhyUs from '@/components/WhyUs';
 import Contact from '@/components/Contact';
+import ConsumerProtectionNotice from '@/components/ConsumerProtectionNotice';
 import Footer from '@/components/Footer';
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
         <Services />
         <About />
         <WhyUs />
+        <ConsumerProtectionNotice />
         <Contact />
       </main>
       <Footer />
