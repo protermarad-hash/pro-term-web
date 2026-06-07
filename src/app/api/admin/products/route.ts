@@ -1,6 +1,16 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseServiceClient, slugify } from '@/lib/supabase';
 
+function getMissingSupabaseEnv() {
+  return [
+    ['NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL],
+    ['NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY],
+    ['SUPABASE_SERVICE_ROLE_KEY', process.env.SUPABASE_SERVICE_ROLE_KEY],
+  ]
+    .filter(([, value]) => !value)
+    .map(([name]) => name);
+}
+
 function splitLines(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).filter(Boolean);
   return String(value ?? '')
@@ -25,10 +35,14 @@ function parseSpecs(value: unknown): { label: string; value: string }[] {
 }
 
 export async function GET() {
+  const missing = getMissingSupabaseEnv();
   const supabase = getSupabaseServiceClient();
 
   if (!supabase) {
-    return NextResponse.json({ error: 'Supabase nu este configurat.' }, { status: 500 });
+    return NextResponse.json(
+      { error: `Supabase nu este configurat. Lipsesc: ${missing.join(', ') || 'cheile server'}.` },
+      { status: 500 },
+    );
   }
 
   const { data, error } = await supabase
@@ -44,10 +58,14 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const missing = getMissingSupabaseEnv();
   const supabase = getSupabaseServiceClient();
 
   if (!supabase) {
-    return NextResponse.json({ error: 'Supabase nu este configurat.' }, { status: 500 });
+    return NextResponse.json(
+      { error: `Supabase nu este configurat. Lipsesc: ${missing.join(', ') || 'cheile server'}.` },
+      { status: 500 },
+    );
   }
 
   const body = await request.json();
