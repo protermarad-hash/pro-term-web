@@ -1,11 +1,16 @@
 import Link from 'next/link';
 import { CheckCircle2, MapPin, MessageCircle, ShieldCheck, Wrench } from 'lucide-react';
-import { buildWhatsAppUrl } from '@/components/WhatsAppFloat';
 
 export type ServiceCityPageProps = {
   city: 'Arad' | 'Timișoara';
   service: 'montaj' | 'service';
 };
+
+const phone = '40749025610';
+
+function buildWhatsAppUrl(message: string) {
+  return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+}
 
 const serviceContent = {
   montaj: {
