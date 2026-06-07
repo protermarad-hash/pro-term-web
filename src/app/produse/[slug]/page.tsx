@@ -1,15 +1,15 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Star, CheckCircle2, Zap, ExternalLink } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/lib/cart-context';
 import {
-  getProductBySlug,
-  getRelatedProducts,
   BRAND_GRADIENT,
   CATEGORY_LABEL,
   STOCK_LABEL,
@@ -60,21 +60,74 @@ function getOfficialUrl(product: Product): string | null {
   return null;
 }
 
+function getDiscountPercent(product: Product) {
+  if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
+  return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+}
+
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const { addToCart } = useCart();
+  const [product, setProduct] = useState<Product | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const product = getProductBySlug(slug);
+  useEffect(() => {
+    let active = true;
 
-  if (!product) {
+    async function loadProduct() {
+      setLoading(true);
+      setNotFound(false);
+
+      try {
+        const response = await fetch(`/api/products/${slug}?t=${Date.now()}`, { cache: 'no-store' });
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (active) setNotFound(true);
+          return;
+        }
+
+        if (active) {
+          setProduct(data.product);
+          setRelated(data.related ?? []);
+          setSelectedImage(data.product?.imageUrl ?? data.product?.galleryImages?.[0] ?? null);
+        }
+      } catch {
+        if (active) setNotFound(true);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    loadProduct();
+
+    return () => {
+      active = false;
+    };
+  }, [slug]);
+
+  if (loading) {
     return (
       <>
         <Header />
-        <main className="min-h-screen flex items-center justify-center pt-24">
+        <main className="flex min-h-screen items-center justify-center pt-24">
+          <p className="font-heading text-2xl font-bold text-dark">Se încarcă produsul...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!product || notFound) {
+    return (
+      <>
+        <Header />
+        <main className="flex min-h-screen items-center justify-center pt-24">
           <div className="text-center">
-            <p className="text-2xl font-bold text-dark font-heading mb-4">
-              Produs negăsit
-            </p>
+            <p className="mb-4 font-heading text-2xl font-bold text-dark">Produs negăsit</p>
             <Link href="/produse" className="btn-primary">
               Înapoi la produse
             </Link>
@@ -85,88 +138,100 @@ export default function ProductPage() {
     );
   }
 
-  const related = getRelatedProducts(product);
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
   const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
   const customerDescription = cleanCustomerText(product.description);
   const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
   const officialUrl = getOfficialUrl(product);
+  const discountPercent = getDiscountPercent(product);
+  const galleryImages = Array.from(new Set([product.imageUrl, ...(product.galleryImages ?? [])].filter(Boolean))) as string[];
 
   return (
     <>
       <Header />
-      <main className="pt-24 pb-20 bg-light-200">
+      <main className="bg-light-200 pb-20 pt-24">
         <div className="container mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm text-dark-300 mb-6">
-            <Link href="/" className="hover:text-primary transition-colors">Acasă</Link>
+          <div className="mb-6 flex items-center gap-2 text-sm text-dark-300">
+            <Link href="/" className="transition-colors hover:text-primary">Acasă</Link>
             <span>/</span>
-            <Link href="/produse" className="hover:text-primary transition-colors">Produse</Link>
+            <Link href="/produse" className="transition-colors hover:text-primary">Produse</Link>
             <span>/</span>
-            <span className="text-dark font-medium truncate">{product.name}</span>
+            <span className="truncate font-medium text-dark">{product.name}</span>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-10 mb-14">
+          <div className="mb-14 grid gap-10 lg:grid-cols-2">
             <div>
-              <div
-                className={`aspect-square rounded-3xl bg-gradient-to-br ${BRAND_GRADIENT[product.brand]} flex flex-col items-center justify-center relative overflow-hidden`}
-              >
-                <span className="text-white/10 font-bold text-8xl font-heading select-none absolute text-center px-6">
-                  {product.brand}
-                </span>
+              <div className={`relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br ${BRAND_GRADIENT[product.brand]}`}>
+                {selectedImage ? (
+                  <Image
+                    src={selectedImage}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="bg-white object-contain p-8"
+                    unoptimized
+                  />
+                ) : (
+                  <>
+                    <span className="absolute px-6 text-center font-heading text-8xl font-bold text-white/10 select-none">
+                      {product.brand}
+                    </span>
+                    <div className="relative z-10 text-center text-white">
+                      <div className="mb-2 font-heading text-4xl font-bold opacity-70 md:text-5xl">
+                        {capacity}
+                      </div>
+                      <div className="text-lg text-white/80">{CATEGORY_LABEL[product.category]}</div>
+                    </div>
+                  </>
+                )}
 
-                <div className="relative z-10 text-center text-white">
-                  <div className="text-4xl md:text-5xl font-bold font-heading opacity-70 mb-2">
-                    {capacity}
-                  </div>
-                  <div className="text-white/80 text-lg">{CATEGORY_LABEL[product.category]}</div>
-                </div>
-
-                <div className="absolute top-4 left-4 flex flex-col gap-2">
-                  {product.isNew && (
-                    <span className="bg-brand text-white text-xs font-bold uppercase px-3 py-1 rounded-full">
-                      Nou
+                <div className="absolute left-4 top-4 flex flex-col gap-2">
+                  {discountPercent && (
+                    <span className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-extrabold uppercase text-white shadow-sm">
+                      -{discountPercent}% reducere
                     </span>
                   )}
-                  {product.isBestseller && (
-                    <span className="bg-accent text-white text-xs font-bold uppercase px-3 py-1 rounded-full">
-                      Bestseller
-                    </span>
-                  )}
+                  {product.isNew && <span className="rounded-full bg-brand px-3 py-1 text-xs font-bold uppercase text-white">Nou</span>}
+                  {product.isBestseller && <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase text-white">Bestseller</span>}
                 </div>
 
-                <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm text-white font-bold px-3 py-1 rounded-lg">
+                <span className="absolute right-4 top-4 rounded-lg bg-white/20 px-3 py-1 font-bold text-white backdrop-blur-sm">
                   {product.energyClass}
                 </span>
               </div>
+
+              {galleryImages.length > 1 && (
+                <div className="mt-4 grid grid-cols-4 gap-3">
+                  {galleryImages.map((image) => (
+                    <button
+                      key={image}
+                      onClick={() => setSelectedImage(image)}
+                      className={`relative aspect-square overflow-hidden rounded-xl border bg-white ${selectedImage === image ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200'}`}
+                    >
+                      <Image src={image} alt={product.name} fill sizes="120px" className="object-contain p-2" unoptimized />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                  {product.brand}
-                </span>
-                <span className="text-sm text-dark-300">
-                  {CATEGORY_LABEL[product.category]}
-                </span>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{product.brand}</span>
+                <span className="text-sm text-dark-300">{CATEGORY_LABEL[product.category]}</span>
                 <span className="text-sm text-dark-300">· {stockLabel}</span>
               </div>
 
-              <h1 className="text-3xl font-bold font-heading text-dark mb-3">
-                {product.name}
-              </h1>
+              <h1 className="mb-3 font-heading text-3xl font-bold text-dark">{product.name}</h1>
 
-              <div className="flex items-center gap-2 mb-4">
+              <div className="mb-4 flex items-center gap-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
                       key={star}
                       size={16}
-                      className={
-                        star <= Math.round(product.rating)
-                          ? 'text-accent fill-accent'
-                          : 'text-gray-300 fill-gray-300'
-                      }
+                      className={star <= Math.round(product.rating) ? 'fill-accent text-accent' : 'fill-gray-300 text-gray-300'}
                     />
                   ))}
                 </div>
@@ -174,20 +239,25 @@ export default function ProductPage() {
                 <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
               </div>
 
-              <p className="text-dark-300 leading-relaxed mb-6">{customerDescription}</p>
+              <p className="mb-6 leading-relaxed text-dark-300">{customerDescription}</p>
 
-              <ul className="space-y-2 mb-6">
-                {product.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2">
-                    <CheckCircle2 size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-dark-300">{f}</span>
+              <ul className="mb-6 space-y-2">
+                {product.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0 text-primary" />
+                    <span className="text-sm text-dark-300">{feature}</span>
                   </li>
                 ))}
               </ul>
 
               <div className="border-t border-gray-100 pt-6">
-                <div className="flex items-baseline gap-3 mb-4">
-                  <span className="text-4xl font-bold font-heading text-dark">
+                {discountPercent && product.originalPrice && (
+                  <div className="mb-3 inline-flex rounded-full bg-red-50 px-4 py-2 text-sm font-extrabold text-red-700">
+                    Ofertă specială: -{discountPercent}% · Economisești {(product.originalPrice - product.price).toLocaleString('ro-RO')} RON
+                  </div>
+                )}
+                <div className="mb-4 flex items-baseline gap-3">
+                  <span className="font-heading text-4xl font-bold text-dark">
                     {hasPrice ? `${product.price.toLocaleString('ro-RO')} RON` : product.priceLabel ?? 'Cere ofertă'}
                   </span>
                   {product.originalPrice && (
@@ -197,34 +267,25 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                <div className="flex gap-3 flex-col sm:flex-row">
+                <div className="flex flex-col gap-3 sm:flex-row">
                   {hasPrice ? (
-                    <button
-                      onClick={() => addToCart(product)}
-                      className="flex-1 btn-primary justify-center py-4"
-                    >
+                    <button onClick={() => addToCart(product)} className="btn-primary flex-1 justify-center py-4">
                       <ShoppingCart size={20} />
                       Adaugă în coș
                     </button>
                   ) : (
-                    <Link
-                      href="/#contact"
-                      className="flex-1 btn-primary justify-center py-4"
-                    >
+                    <Link href="/#contact" className="btn-primary flex-1 justify-center py-4">
                       <Zap size={20} />
                       Cere ofertă
                     </Link>
                   )}
-                  <Link
-                    href="/#contact"
-                    className="flex items-center justify-center gap-2 px-5 py-4 border-2 border-primary text-primary font-semibold rounded-lg hover:bg-primary hover:text-white transition-all"
-                  >
+                  <Link href="/#contact" className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white">
                     <Zap size={18} />
                     Consultanță
                   </Link>
                 </div>
 
-                <p className="text-xs text-dark-300 mt-3 flex items-center gap-1">
+                <p className="mt-3 flex items-center gap-1 text-xs text-dark-300">
                   <CheckCircle2 size={13} className="text-green-500" />
                   Stocul se confirmă la plasarea comenzii.
                 </p>
@@ -232,25 +293,16 @@ export default function ProductPage() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-14">
+          <div className="mb-14 grid gap-8 lg:grid-cols-3">
             <div className="card lg:col-span-2">
-              <h2 className="text-xl font-bold font-heading text-dark mb-5">
-                Specificații tehnice
-              </h2>
+              <h2 className="mb-5 font-heading text-xl font-bold text-dark">Specificații tehnice</h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <tbody>
-                    {publicSpecs.map((spec, i) => (
-                      <tr
-                        key={spec.label}
-                        className={i % 2 === 0 ? 'bg-light-200' : 'bg-white'}
-                      >
-                        <td className="py-3 px-4 text-dark-300 font-medium w-1/2 rounded-l-lg">
-                          {spec.label}
-                        </td>
-                        <td className="py-3 px-4 text-dark font-semibold rounded-r-lg">
-                          {spec.value}
-                        </td>
+                    {publicSpecs.map((spec, index) => (
+                      <tr key={`${spec.label}-${index}`} className={index % 2 === 0 ? 'bg-light-200' : 'bg-white'}>
+                        <td className="w-1/2 rounded-l-lg px-4 py-3 font-medium text-dark-300">{spec.label}</td>
+                        <td className="rounded-r-lg px-4 py-3 font-semibold text-dark">{spec.value}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -259,41 +311,26 @@ export default function ProductPage() {
             </div>
 
             <div className="card">
-              <h2 className="text-xl font-bold font-heading text-dark mb-4">
-                Documentație produs
-              </h2>
+              <h2 className="mb-4 font-heading text-xl font-bold text-dark">Documentație produs</h2>
               <div className="space-y-3">
                 {officialUrl ? (
-                  <a
-                    href={officialUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border-2 border-primary text-primary font-semibold hover:bg-primary hover:text-white transition-all"
-                  >
+                  <a href={officialUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-white">
                     <ExternalLink size={18} />
                     Pagina oficială producător
                   </a>
                 ) : (
-                  <p className="text-sm text-dark-300">
-                    Documentația produsului se oferă la cerere.
-                  </p>
+                  <p className="text-sm text-dark-300">Documentația produsului se oferă la cerere.</p>
                 )}
-                <p className="text-xs text-dark-300">
-                  PRO TERM este dealer și oferă consultanță pentru alegerea corectă a echipamentului.
-                </p>
+                <p className="text-xs text-dark-300">PRO TERM este dealer și oferă consultanță pentru alegerea corectă a echipamentului.</p>
               </div>
             </div>
           </div>
 
           {related.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold font-heading text-dark mb-6">
-                Produse similare
-              </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                {related.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
+              <h2 className="mb-6 font-heading text-2xl font-bold text-dark">Produse similare</h2>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {related.map((item) => <ProductCard key={item.id} product={item} />)}
               </div>
             </div>
           )}
