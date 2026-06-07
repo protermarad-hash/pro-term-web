@@ -21,6 +21,7 @@ const routes = [
   '/servicii/revizie-ac-timisoara',
   '/servicii/curatare-ac-arad',
   '/servicii/curatare-ac-timisoara',
+  '/servicii/proiecte-hvac-romania',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
