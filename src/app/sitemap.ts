@@ -6,6 +6,12 @@ const routes = [
   '',
   '/produse',
   '/despre',
+  '/informatii-legale',
+  '/termeni-si-conditii',
+  '/politica-confidentialitate',
+  '/politica-retur',
+  '/politica-cookies',
+  '/formular-retragere',
   '/servicii/montaj-aer-conditionat-arad',
   '/servicii/montaj-aer-conditionat-timisoara',
   '/servicii/service-aer-conditionat-arad',
@@ -23,6 +29,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: now,
     changeFrequency: route === '' || route === '/produse' ? 'daily' : 'weekly',
-    priority: route === '' ? 1 : route === '/produse' ? 0.9 : 0.75,
+    priority: route === '' ? 1 : route === '/produse' ? 0.9 : route.startsWith('/servicii') ? 0.75 : 0.65,
   }));
 }
