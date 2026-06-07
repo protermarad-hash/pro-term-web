@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Snowflake, Wind, Wrench, Factory, Thermometer, RefreshCw } from 'lucide-react';
+import { Snowflake, Wind, Wrench, Factory, Thermometer, RefreshCw, Building2 } from 'lucide-react';
 
 const services = [
   {
@@ -57,6 +57,10 @@ const localSeoLinks = [
   { label: 'Montaj aer condiționat Timișoara', href: '/servicii/montaj-aer-conditionat-timisoara' },
   { label: 'Service aer condiționat Arad', href: '/servicii/service-aer-conditionat-arad' },
   { label: 'Service aer condiționat Timișoara', href: '/servicii/service-aer-conditionat-timisoara' },
+  { label: 'Revizie AC Arad', href: '/servicii/revizie-ac-arad' },
+  { label: 'Revizie AC Timișoara', href: '/servicii/revizie-ac-timisoara' },
+  { label: 'Curățare AC Arad', href: '/servicii/curatare-ac-arad' },
+  { label: 'Curățare AC Timișoara', href: '/servicii/curatare-ac-timisoara' },
 ];
 
 export default function Services() {
@@ -103,7 +107,7 @@ export default function Services() {
             Servicii locale în Arad și Timișoara
           </h3>
           <p className="mt-2 text-sm text-dark-300">
-            Pagini dedicate pentru montaj și service aer condiționat, optimizate local pentru clienții din vestul țării.
+            Pagini dedicate pentru montaj, service, revizie și curățare aer condiționat, optimizate local pentru clienții din vestul țării.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {localSeoLinks.map((item) => (
@@ -112,6 +116,27 @@ export default function Services() {
               </Link>
             ))}
           </div>
+        </div>
+
+        <div className="mt-12 rounded-3xl bg-primary p-8 text-white shadow-card md:flex md:items-center md:justify-between md:gap-8">
+          <div className="flex gap-4">
+            <div className="hidden h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 md:flex">
+              <Building2 size={28} />
+            </div>
+            <div>
+              <span className="text-sm font-bold uppercase tracking-widest text-white/70">Proiecte mari în România</span>
+              <h3 className="mt-2 font-heading text-2xl font-bold">
+                Preluăm proiecte HVAC comerciale și industriale la nivel național
+              </h3>
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/80">
+                Pentru lucrări mari de climatizare, sisteme VRV/VRF, spații comerciale, hale, birouri sau proiecte cu mai multe echipamente,
+                echipa PRO TERM se poate deplasa în România, în funcție de complexitatea și planificarea proiectului.
+              </p>
+            </div>
+          </div>
+          <a href="#contact" className="mt-6 inline-flex rounded-lg bg-white px-6 py-3 font-bold text-primary transition hover:bg-light-200 md:mt-0">
+            Discută proiectul
+          </a>
         </div>
 
         <div className="mt-14 bg-card-gradient border border-primary/10 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
