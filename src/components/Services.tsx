@@ -61,6 +61,7 @@ const localSeoLinks = [
   { label: 'Revizie AC Timișoara', href: '/servicii/revizie-ac-timisoara' },
   { label: 'Curățare AC Arad', href: '/servicii/curatare-ac-arad' },
   { label: 'Curățare AC Timișoara', href: '/servicii/curatare-ac-timisoara' },
+  { label: 'Proiecte HVAC România', href: '/servicii/proiecte-hvac-romania' },
 ];
 
 export default function Services() {
@@ -104,10 +105,10 @@ export default function Services() {
 
         <div className="mt-12 rounded-3xl bg-light-200 p-6 shadow-card">
           <h3 className="font-heading text-xl font-bold text-dark">
-            Servicii locale în Arad și Timișoara
+            Servicii locale și proiecte naționale
           </h3>
           <p className="mt-2 text-sm text-dark-300">
-            Pagini dedicate pentru montaj, service, revizie și curățare aer condiționat, optimizate local pentru clienții din vestul țării.
+            Pagini dedicate pentru montaj, service, revizie, curățare aer condiționat și proiecte HVAC comerciale/industriale.
           </p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {localSeoLinks.map((item) => (
@@ -134,9 +135,9 @@ export default function Services() {
               </p>
             </div>
           </div>
-          <a href="#contact" className="mt-6 inline-flex rounded-lg bg-white px-6 py-3 font-bold text-primary transition hover:bg-light-200 md:mt-0">
-            Discută proiectul
-          </a>
+          <Link href="/servicii/proiecte-hvac-romania" className="mt-6 inline-flex rounded-lg bg-white px-6 py-3 font-bold text-primary transition hover:bg-light-200 md:mt-0">
+            Vezi proiecte HVAC
+          </Link>
         </div>
 
         <div className="mt-14 bg-card-gradient border border-primary/10 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
