@@ -25,6 +25,7 @@ export interface DbProduct {
   stock_status: string;
   stock_qty: number | null;
   image_url: string | null;
+  gallery_images?: string[] | null;
   active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -61,6 +62,9 @@ export function getSupabaseServiceClient() {
 }
 
 export function dbProductToProduct(p: DbProduct): Product {
+  const galleryImages = Array.isArray(p.gallery_images) ? p.gallery_images.filter(Boolean) : [];
+  const imageUrl = p.image_url ?? galleryImages[0] ?? undefined;
+
   return {
     id: p.id,
     slug: p.slug,
@@ -84,7 +88,8 @@ export function dbProductToProduct(p: DbProduct): Product {
     manageStock: p.manage_stock,
     stockStatus: p.stock_status as Product['stockStatus'],
     stockQty: p.stock_qty ?? undefined,
-    imageUrl: p.image_url ?? undefined,
+    imageUrl,
+    galleryImages,
   };
 }
 
