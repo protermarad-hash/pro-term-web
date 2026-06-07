@@ -4,10 +4,22 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Star, CheckCircle2, Zap, ExternalLink } from 'lucide-react';
+import {
+  ShoppingCart,
+  Star,
+  CheckCircle2,
+  Zap,
+  ExternalLink,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  Truck,
+  Wrench,
+} from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import { buildWhatsAppUrl } from '@/components/WhatsAppFloat';
 import { useCart } from '@/lib/cart-context';
 import {
   BRAND_GRADIENT,
@@ -24,6 +36,8 @@ const GREE_OFFICIAL_URLS = {
   soyal: 'https://www.gree.ro/gama-produse/rezidentiale/soyal/',
   cosmo: 'https://www.gree.ro/gama-produse/rezidentiale/cosmo/',
 };
+
+const phoneHref = 'tel:+40749025610';
 
 function cleanCustomerText(text: string): string {
   return text
@@ -63,6 +77,11 @@ function getOfficialUrl(product: Product): string | null {
 function getDiscountPercent(product: Product) {
   if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
+}
+
+function isServiceProduct(product: Product) {
+  const text = `${product.name} ${product.category}`.toLowerCase();
+  return text.includes('montaj') || text.includes('service') || text.includes('igienizare') || product.category === 'service-montaj';
 }
 
 export default function ProductPage() {
@@ -146,6 +165,9 @@ export default function ProductPage() {
   const officialUrl = getOfficialUrl(product);
   const discountPercent = getDiscountPercent(product);
   const galleryImages = Array.from(new Set([product.imageUrl, ...(product.galleryImages ?? [])].filter(Boolean))) as string[];
+  const serviceProduct = isServiceProduct(product);
+  const whatsappMessage = `Bună ziua, sunt interesat de ${product.name}. Vă rog să îmi trimiteți detalii/ofertă.`;
+  const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
 
   return (
     <>
@@ -239,18 +261,38 @@ export default function ProductPage() {
                 <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
               </div>
 
-              <p className="mb-6 leading-relaxed text-dark-300">{customerDescription}</p>
+              <p className="mb-6 leading-relaxed text-dark-300">{customerDescription || 'Pentru detalii, disponibilitate și recomandarea potrivită spațiului tău, contactează echipa PRO TERM.'}</p>
 
-              <ul className="mb-6 space-y-2">
-                {product.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0 text-primary" />
-                    <span className="text-sm text-dark-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mb-6 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-2xl bg-white p-4 shadow-card">
+                  <ShieldCheck className="mb-2 text-primary" size={22} />
+                  <p className="text-sm font-bold text-dark">Garanție & suport</p>
+                  <p className="mt-1 text-xs text-dark-300">Asistență după vânzare / instalare</p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 shadow-card">
+                  <Wrench className="mb-2 text-primary" size={22} />
+                  <p className="text-sm font-bold text-dark">Montaj disponibil</p>
+                  <p className="mt-1 text-xs text-dark-300">Echipă locală în Arad</p>
+                </div>
+                <div className="rounded-2xl bg-white p-4 shadow-card">
+                  <Truck className="mb-2 text-primary" size={22} />
+                  <p className="text-sm font-bold text-dark">Livrare / ofertă</p>
+                  <p className="mt-1 text-xs text-dark-300">Confirmare rapidă telefonic</p>
+                </div>
+              </div>
 
-              <div className="border-t border-gray-100 pt-6">
+              {product.features.length > 0 && (
+                <ul className="mb-6 space-y-2">
+                  {product.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0 text-primary" />
+                      <span className="text-sm text-dark-300">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-card">
                 {discountPercent && product.originalPrice && (
                   <div className="mb-3 inline-flex rounded-full bg-red-50 px-4 py-2 text-sm font-extrabold text-red-700">
                     Ofertă specială: -{discountPercent}% · Economisești {(product.originalPrice - product.price).toLocaleString('ro-RO')} RON
@@ -267,27 +309,31 @@ export default function ProductPage() {
                   )}
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row">
+                <div className="grid gap-3 sm:grid-cols-2">
                   {hasPrice ? (
-                    <button onClick={() => addToCart(product)} className="btn-primary flex-1 justify-center py-4">
+                    <button onClick={() => addToCart(product)} className="btn-primary justify-center py-4">
                       <ShoppingCart size={20} />
                       Adaugă în coș
                     </button>
                   ) : (
-                    <Link href="/#contact" className="btn-primary flex-1 justify-center py-4">
+                    <Link href="/#contact" className="btn-primary justify-center py-4">
                       <Zap size={20} />
                       Cere ofertă
                     </Link>
                   )}
-                  <Link href="/#contact" className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white">
-                    <Zap size={18} />
-                    Consultanță
-                  </Link>
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-4 font-semibold text-white transition-all hover:bg-green-600">
+                    <MessageCircle size={18} />
+                    Întreabă pe WhatsApp
+                  </a>
+                  <a href={phoneHref} className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white sm:col-span-2">
+                    <Phone size={18} />
+                    Sună pentru confirmare: 0749 025 610
+                  </a>
                 </div>
 
                 <p className="mt-3 flex items-center gap-1 text-xs text-dark-300">
                   <CheckCircle2 size={13} className="text-green-500" />
-                  Stocul se confirmă la plasarea comenzii.
+                  Prețul, stocul și disponibilitatea montajului se confirmă înainte de livrare/intervenție.
                 </p>
               </div>
             </div>
@@ -296,22 +342,26 @@ export default function ProductPage() {
           <div className="mb-14 grid gap-8 lg:grid-cols-3">
             <div className="card lg:col-span-2">
               <h2 className="mb-5 font-heading text-xl font-bold text-dark">Specificații tehnice</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <tbody>
-                    {publicSpecs.map((spec, index) => (
-                      <tr key={`${spec.label}-${index}`} className={index % 2 === 0 ? 'bg-light-200' : 'bg-white'}>
-                        <td className="w-1/2 rounded-l-lg px-4 py-3 font-medium text-dark-300">{spec.label}</td>
-                        <td className="rounded-r-lg px-4 py-3 font-semibold text-dark">{spec.value}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              {publicSpecs.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {publicSpecs.map((spec, index) => (
+                        <tr key={`${spec.label}-${index}`} className={index % 2 === 0 ? 'bg-light-200' : 'bg-white'}>
+                          <td className="w-1/2 rounded-l-lg px-4 py-3 font-medium text-dark-300">{spec.label}</td>
+                          <td className="rounded-r-lg px-4 py-3 font-semibold text-dark">{spec.value}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-dark-300">Specificațiile se confirmă în funcție de model și ofertă.</p>
+              )}
             </div>
 
             <div className="card">
-              <h2 className="mb-4 font-heading text-xl font-bold text-dark">Documentație produs</h2>
+              <h2 className="mb-4 font-heading text-xl font-bold text-dark">Documentație & consultanță</h2>
               <div className="space-y-3">
                 {officialUrl ? (
                   <a href={officialUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-white">
@@ -321,10 +371,37 @@ export default function ProductPage() {
                 ) : (
                   <p className="text-sm text-dark-300">Documentația produsului se oferă la cerere.</p>
                 )}
-                <p className="text-xs text-dark-300">PRO TERM este dealer și oferă consultanță pentru alegerea corectă a echipamentului.</p>
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-3 font-semibold text-white transition-all hover:bg-green-600">
+                  <MessageCircle size={18} />
+                  Cere detalii pe WhatsApp
+                </a>
+                <p className="text-xs text-dark-300">PRO TERM oferă consultanță pentru alegerea corectă a echipamentului și pentru condițiile de montaj.</p>
               </div>
             </div>
           </div>
+
+          {serviceProduct && (
+            <div className="mb-14 grid gap-6 lg:grid-cols-3">
+              <div className="card">
+                <h2 className="mb-3 font-heading text-xl font-bold text-dark">Ce include serviciul</h2>
+                <p className="text-sm leading-relaxed text-dark-300">
+                  Serviciul include lucrările standard prezentate în descriere și materialele menționate la produs, în limita condițiilor normale de montaj.
+                </p>
+              </div>
+              <div className="card">
+                <h2 className="mb-3 font-heading text-xl font-bold text-dark">Ce poate costa suplimentar</h2>
+                <p className="text-sm leading-relaxed text-dark-300">
+                  Traseele suplimentare, străpungerile extra, mascarea traseului, modificările electrice sau lucrările speciale se tarifează separat, după caz.
+                </p>
+              </div>
+              <div className="card">
+                <h2 className="mb-3 font-heading text-xl font-bold text-dark">Condiții de lucru</h2>
+                <p className="text-sm leading-relaxed text-dark-300">
+                  Clientul trebuie să asigure accesul la zona de montaj și să comunice eventuale trasee ascunse de apă, gaz, canalizare sau electricitate.
+                </p>
+              </div>
+            </div>
+          )}
 
           {related.length > 0 && (
             <div>
