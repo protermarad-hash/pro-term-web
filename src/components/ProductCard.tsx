@@ -90,6 +90,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {capacity}
           </span>
         </div>
+        <p className="px-0.5 pt-1 text-[10px] text-gray-400">* Imaginile au caracter informativ</p>
       </Link>
 
       <div className="flex flex-1 flex-col">
