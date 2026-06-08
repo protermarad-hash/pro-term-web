@@ -13,6 +13,7 @@ const routes = [
   '/politica-retur',
   '/politica-cookies',
   '/formular-retragere',
+  '/servicii',
   '/servicii/montaj',
   '/servicii/montaj-aer-conditionat-arad',
   '/servicii/montaj-aer-conditionat-timisoara',

@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth-context';
 import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 
 const navLinks = [
-  { label: 'Servicii',       href: '/#servicii' },
+  { label: 'Servicii',       href: '/servicii' },
   { label: 'Produse',        href: '/produse' },
   { label: 'Calculator BTU', href: '/calculator-btu' },
   { label: 'Blog',           href: '/blog' },
