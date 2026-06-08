@@ -41,7 +41,9 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       const hasMontaj = items.some((i) => isMontajSlug(i.product.slug));
       const shouldShowUpsell =
         isNewItem &&
-        action.product.category === 'aer-conditionat' &&
+        ['aer-conditionat', 'aer conditionat'].includes(
+          action.product.category?.toLowerCase().trim() ?? ''
+        ) &&
         !hasMontaj;
 
       return {
