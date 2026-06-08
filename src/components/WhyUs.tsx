@@ -1,56 +1,65 @@
-import { Calendar, Building2, BadgeCheck, MapPin, Headphones, Lightbulb } from 'lucide-react';
+import { Calendar, BadgeCheck, MapPin, Headphones, Lightbulb, UsersRound, FileCheck2 } from 'lucide-react';
 
 const reasons = [
   {
     icon: Calendar,
-    title: 'Fondată în 1999 — 25+ ani',
+    title: 'Experiență din 1999',
     description:
-      'Peste 25 de ani de activitate continuă înseamnă experiență acumulată în mii de proiecte, de la instalații rezidențiale la obiective industriale de mari dimensiuni.',
+      'Peste 25 de ani de activitate în domeniul HVAC înseamnă soluții alese mai atent, montaj mai bine planificat și recomandări bazate pe experiență practică.',
     color:   'text-accent',
     bgGrad:  'from-accent/5 to-accent/10',
     border:  'border-accent/20',
   },
   {
-    icon: Building2,
-    title: 'Industrial și Civil',
+    icon: UsersRound,
+    title: 'Echipă de 6 specialiști',
     description:
-      'Proiectăm și instalăm sisteme HVAC atât pentru hale și spații industriale complexe, cât și pentru clădiri de birouri, locuințe și spații comerciale.',
+      'Lucrezi cu o echipă locală, restrânsă, unde comunicarea este directă și fiecare lucrare este urmărită cu atenție de la ofertă până la service.',
     color:   'text-primary',
     bgGrad:  'from-primary/5 to-primary/10',
     border:  'border-primary/20',
   },
   {
     icon: BadgeCheck,
-    title: 'Autorizat ANRE & ISCIR',
+    title: 'Dealer oficial Gree, Midea și Yamato',
     description:
-      'Echipa noastră deține autorizațiile ANRE și ISCIR necesare pentru lucrări la instalații sub presiune, frigorifice și electrice. Toate lucrările sunt documentate și certificate.',
+      'Pentru aceste branduri oferim vânzare, suport, recomandare de produs și service zonal, cu informații tehnice corecte și actualizate.',
     color:   'text-brand',
     bgGrad:  'from-brand/5 to-brand/10',
     border:  'border-brand/20',
   },
   {
-    icon: MapPin,
-    title: 'Proiecte în toată România',
+    icon: FileCheck2,
+    title: 'ISO 9001 și F-Gas / AGFR',
     description:
-      'Operăm pe întreg teritoriul României, cu echipe mobile rapid deployabile. De la Arad — baza noastră — până la orice localitate din țară.',
+      'Certificarea ISO 9001 susține managementul calității, iar certificatul F-Gas / AGFR acoperă lucrările cu agenți frigorifici.',
+    color:   'text-primary',
+    bgGrad:  'from-primary/5 to-primary/10',
+    border:  'border-primary/20',
+  },
+  {
+    icon: MapPin,
+    title: 'Suport local în Arad',
+    description:
+      'Suntem aproape de client pentru verificări, montaj, intervenții și recomandări. Pentru proiecte speciale, discutăm punctual disponibilitatea.',
     color:   'text-accent',
     bgGrad:  'from-accent/5 to-accent/10',
     border:  'border-accent/20',
   },
   {
     icon: Headphones,
-    title: 'Service post-vânzare garantat',
+    title: 'Service după vânzare',
     description:
-      'Fiecare instalație beneficiază de garanție de 2 ani și acces la service preventiv și corectiv. Intervenim rapid la orice defecțiune, cu piese originale din stoc propriu.',
+      'După achiziție, poți apela la noi pentru montaj, verificări, mentenanță și suport tehnic pentru echipamentele comercializate.',
     color:   'text-primary',
     bgGrad:  'from-primary/5 to-primary/10',
     border:  'border-primary/20',
   },
   {
     icon: Lightbulb,
-    title: 'Consultanță tehnică gratuită',
+    title: 'Consultanță înainte de cumpărare',
     description:
-      'Înainte de orice contract, oferim o evaluare tehnică gratuită la sediul tău. Inginerii noștri dimensionează corect sistemul și îți prezintă mai multe variante de soluții.',
+      'Te ajutăm să alegi corect capacitatea aparatului, accesoriile necesare și varianta potrivită pentru spațiul tău, nu doar produsul cel mai ieftin.',
     color:   'text-brand',
     bgGrad:  'from-brand/5 to-brand/10',
     border:  'border-brand/20',
@@ -62,15 +71,14 @@ export default function WhyUs() {
     <section id="avantaje" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
-          <span className="text-brand font-semibold text-sm uppercase tracking-widest">
+          <span className="text-accent font-semibold text-sm uppercase tracking-widest">
             De ce PRO TERM
           </span>
           <h2 className="section-title mt-2">
-            25 de ani în serviciul tău
+            Experiență mare, echipă restrânsă, lucru certificat.
           </h2>
           <p className="section-subtitle mx-auto text-center">
-            Nu suntem doar furnizori — suntem parteneri pe termen lung, cu angajament față de
-            calitate și performanță dovedită din 1999.
+            Pentru echipamente HVAC contează alegerea corectă, montajul, conformitatea și suportul după vânzare. De aceea combinăm magazinul online cu recomandare tehnică reală.
           </p>
         </div>
 
@@ -98,19 +106,20 @@ export default function WhyUs() {
           })}
         </div>
 
-        <div className="mt-16 text-center">
+        <div className="mt-16 text-center rounded-3xl border border-slate-100 bg-light-200 p-8">
           <p className="text-dark-300 text-sm uppercase tracking-widest font-medium mb-6">
-            Parteneri principali de echipamente
+            Branduri principale pentru care oferim vânzare și suport zonal
           </p>
-          <div className="flex flex-wrap justify-center gap-8 opacity-40">
-            {['DAIKIN', 'MIDEA', 'GREE', 'LG', 'CARRIER', 'TRANE', 'MITSUBISHI'].map(
-              (brand) => (
-                <span key={brand} className="font-bold text-dark-300 text-lg tracking-tight">
-                  {brand}
-                </span>
-              )
-            )}
+          <div className="flex flex-wrap justify-center gap-8">
+            {['GREE', 'MIDEA', 'YAMATO'].map((brand) => (
+              <span key={brand} className="font-bold text-primary text-2xl tracking-tight">
+                {brand}
+              </span>
+            ))}
           </div>
+          <p className="mt-5 text-sm font-medium text-dark-300">
+            Certificări: ISO 9001 · F-Gas / AGFR
+          </p>
         </div>
       </div>
     </section>

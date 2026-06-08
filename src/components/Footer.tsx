@@ -1,27 +1,31 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, Mail, MapPin, Truck } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 
 const footerLinks = {
   Servicii: [
-    { label: 'Montaj aer condiționat', href: '#' },
-    { label: 'Service HVAC Arad', href: '#' },
-    { label: 'Service HVAC Timiș', href: '#' },
-    { label: 'Sisteme VRV comerciale', href: '#' },
-    { label: 'Mentenanță preventivă', href: '#' },
+    { label: 'Climatizare & HVAC', href: '/#servicii' },
+    { label: 'Aer condiționat', href: '/produse' },
+    { label: 'Centrale termice', href: '/produse' },
+    { label: 'Pompe de căldură', href: '/produse' },
+    { label: 'Service & mentenanță', href: '/#contact' },
+    { label: 'Proiecte HVAC România', href: '/servicii/proiecte-hvac-romania' },
+    { label: 'Climatizare comercială și industrială', href: '/servicii/climatizare-comerciala-industriala-romania' },
   ],
   Companie: [
     { label: 'Despre noi', href: '/despre' },
-    { label: 'Proiecte realizate', href: '/#proiecte' },
-    { label: 'Certificări', href: '/despre#certificari' },
     { label: 'Produse', href: '/produse' },
+    { label: 'Certificări', href: '/#avantaje' },
     { label: 'Contact', href: '/#contact' },
   ],
   Legal: [
-    { label: 'Termeni și condiții', href: '#' },
-    { label: 'Politica de confidențialitate', href: '#' },
-    { label: 'GDPR', href: '#' },
-    { label: 'Cookies', href: '#' },
+    { label: 'Informații legale comerciant', href: '/informatii-legale' },
+    { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
+    { label: 'Livrare și plată', href: '/livrare-si-plata' },
+    { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
+    { label: 'Politica de retur', href: '/politica-retur' },
+    { label: 'Formular de retragere', href: '/formular-retragere' },
+    { label: 'Politica cookies', href: '/politica-cookies' },
   ],
 };
 
@@ -34,34 +38,18 @@ export default function Footer() {
             <Link href="/" className="inline-block mb-4">
               <Image
                 src="/logo-proterm.jpg"
-                alt="PRO TERM SRL"
+                alt="PRO TERM"
                 width={160}
                 height={48}
                 className="h-10 w-auto object-contain brightness-200"
               />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
-              PRO TERM SRL — fondată în 1999 în Arad. Dealer autorizat Gree, Midea și Yamato.
-              Instalare și service HVAC autorizat.
+              SC PRO TERM SRL — soluții HVAC, climatizare, montaj, service și mentenanță în Arad, Timișoara și proiecte naționale.
             </p>
-
-            {/* Coverage zone */}
-            <div className="mt-4 mb-5 space-y-1.5">
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <MapPin size={13} className="text-brand flex-shrink-0" />
-                <span>
-                  <span className="text-white/80 font-semibold">Montaj & service:</span>{' '}
-                  Arad și Timiș
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-white/50">
-                <Truck size={13} className="text-primary-300 flex-shrink-0" />
-                <span>
-                  <span className="text-white/80 font-semibold">Livrări produse:</span>{' '}
-                  Toată România
-                </span>
-              </div>
-            </div>
+            <p className="text-white/40 text-xs mb-6">
+              Herman Sebastian · Arad, România · suport tehnic HVAC
+            </p>
 
             <div className="space-y-2">
               <a
@@ -72,12 +60,16 @@ export default function Footer() {
                 0749 025 610
               </a>
               <a
-                href="mailto:proterm.arad@gmail.com"
+                href="mailto:office@pro-term.ro"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
-                proterm.arad@gmail.com
+                office@pro-term.ro
               </a>
+              <span className="flex items-center gap-2 text-white/70 text-sm">
+                <MapPin size={15} className="text-primary-300" />
+                Arad, România
+              </span>
             </div>
           </div>
 
@@ -87,13 +79,13 @@ export default function Footer() {
                 {category}
               </h4>
               <ul className="space-y-2">
-                {links.map(({ label, href }) => (
-                  <li key={label}>
+                {links.map((link) => (
+                  <li key={link.href}>
                     <Link
-                      href={href}
+                      href={link.href}
                       className="text-white/60 hover:text-white text-sm transition-colors"
                     >
-                      {label}
+                      {link.label}
                     </Link>
                   </li>
                 ))}
@@ -101,15 +93,33 @@ export default function Footer() {
             </div>
           ))}
         </div>
+
+        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <h4 className="text-sm font-bold uppercase tracking-widest text-white/50">Protecția consumatorilor</h4>
+          <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-3">
+            <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              PROTECȚIA CONSUMATORILOR - A.N.P.C.
+            </a>
+            <a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              Soluționare alternativă litigii - SAL
+            </a>
+            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="hover:text-white">
+              Soluționare online litigii - SOL/ODR
+            </a>
+          </div>
+          <p className="mt-3 text-xs text-white/40">
+            Telefonul Consumatorilor: 0219551 · CJPC Arad: Str. Revoluției nr. 50, Arad · Tel. 0257/257.049 · reclamatii.arad@opc.ro
+          </p>
+        </div>
       </div>
 
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-white/40 text-sm">
-            © {new Date().getFullYear()} PRO TERM SRL. Toate drepturile rezervate.
+            © {new Date().getFullYear()} SC PRO TERM SRL. Toate drepturile rezervate.
           </p>
-          <p className="text-white/30 text-xs text-center">
-            Montaj & service: Arad și Timiș · Livrări: toată România · Fondată 1999
+          <p className="text-white/30 text-xs">
+            Arad, România
           </p>
         </div>
       </div>

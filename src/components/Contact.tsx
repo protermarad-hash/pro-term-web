@@ -1,9 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Send, Clock, Truck } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, Clock, UserRound } from 'lucide-react';
 
 const contactInfo = [
+  {
+    icon: UserRound,
+    label: 'Persoană contact',
+    value: 'Herman Sebastian',
+    href: null,
+  },
   {
     icon: Phone,
     label: 'Telefon',
@@ -18,15 +24,9 @@ const contactInfo = [
   },
   {
     icon: MapPin,
-    label: 'Montaj & service',
-    value: 'Județele Arad și Timiș',
-    href: null,
-  },
-  {
-    icon: Truck,
-    label: 'Livrări produse',
-    value: 'Toată România',
-    href: null,
+    label: 'Adresă',
+    value: 'Arad, România',
+    href: '#',
   },
   {
     icon: Clock,
@@ -62,17 +62,16 @@ export default function Contact() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
           <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-            Contact
+            Ofertă rapidă
           </span>
-          <h2 className="section-title mt-2">Solicită o Ofertă Gratuită</h2>
+          <h2 className="section-title mt-2">Cere ofertă pentru produs, montaj sau service</h2>
           <p className="section-subtitle mx-auto text-center">
-            Montaj și service în Arad și Timiș. Livrare echipamente în toată România.
-            Te contactăm în maxim 2 ore în zilele lucrătoare.
+            Spune-ne ce produs te interesează, suprafața spațiului și dacă ai nevoie de montaj.
+            Te contactăm rapid cu recomandarea potrivită.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-10 max-w-5xl mx-auto">
-          {/* Contact info */}
           <div className="lg:col-span-2 space-y-4">
             {contactInfo.map(({ icon: Icon, label, value, href }) => (
               <div key={label} className="card flex items-start gap-4">
@@ -83,7 +82,7 @@ export default function Contact() {
                   <div className="text-xs text-dark-300 font-medium uppercase tracking-wide">
                     {label}
                   </div>
-                  {href ? (
+                  {href && href !== '#' ? (
                     <a
                       href={href}
                       className="text-dark font-semibold text-sm hover:text-primary transition-colors"
@@ -97,14 +96,12 @@ export default function Contact() {
               </div>
             ))}
 
-            {/* Emergency box */}
             <div className="rounded-2xl bg-accent p-5 text-white">
               <div className="font-bold font-heading text-lg mb-1">
-                Urgență HVAC?
+                Ai nevoie de ajutor la alegere?
               </div>
               <p className="text-white/80 text-sm mb-3">
-                Sunăm înapoi în maxim 30 de minute, non-stop.
-                Acoperim județele Arad și Timiș.
+                Sunăm înapoi pentru recomandare de produs, montaj sau intervenție.
               </p>
               <a
                 href="tel:+40749025610"
@@ -116,7 +113,6 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Form */}
           <div className="lg:col-span-3 card">
             {sent ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -124,10 +120,10 @@ export default function Contact() {
                   <Send size={28} className="text-secondary" />
                 </div>
                 <h3 className="text-xl font-bold font-heading text-dark mb-2">
-                  Mesaj trimis cu succes!
+                  Solicitarea a fost înregistrată!
                 </h3>
                 <p className="text-dark-300">
-                  Te vom contacta în cel mai scurt timp.
+                  Te vom contacta pentru confirmarea produsului, disponibilitate și montaj.
                 </p>
               </div>
             ) : (
@@ -179,7 +175,7 @@ export default function Contact() {
 
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1">
-                    Serviciu dorit
+                    Ce te interesează?
                   </label>
                   <select
                     name="service"
@@ -187,38 +183,37 @@ export default function Contact() {
                     onChange={handleChange}
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
                   >
-                    <option value="">Selectează serviciul...</option>
-                    <option>Montaj aer condiționat (Arad/Timiș)</option>
-                    <option>Service & mentenanță (Arad/Timiș)</option>
-                    <option>Sistem VRV comercial/industrial</option>
-                    <option>Climatizare spațiu comercial</option>
-                    <option>Comandă produse (livrare națională)</option>
-                    <option>Colaborare antreprenor — proiect național</option>
-                    <option>Alt serviciu</option>
+                    <option value="">Selectează opțiunea...</option>
+                    <option>Vreau să comand un produs</option>
+                    <option>Produs + montaj</option>
+                    <option>Recomandare aparat aer condiționat</option>
+                    <option>Service / mentenanță</option>
+                    <option>Refrigerare comercială sau industrială</option>
+                    <option>Altă solicitare</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-dark-300 mb-1">
-                    Detalii
+                    Detalii produs / spațiu
                   </label>
                   <textarea
                     name="message"
                     rows={4}
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Descrie pe scurt ce ai nevoie: suprafața, tipul spațiului, județul..."
+                    placeholder="Ex: apartament 2 camere, 45 mp, Arad; mă interesează aparat 12.000 BTU cu montaj."
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
                   />
                 </div>
 
                 <button type="submit" className="btn-primary w-full justify-center">
                   <Send size={18} />
-                  Trimite solicitarea
+                  Trimite cererea de ofertă
                 </button>
 
                 <p className="text-xs text-dark-300 text-center">
-                  Datele tale sunt în siguranță. Nu trimitem spam.
+                  Datele tale sunt folosite doar pentru a răspunde solicitării.
                 </p>
               </form>
             )}

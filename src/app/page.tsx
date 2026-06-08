@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
+import FeaturedProducts from '@/components/FeaturedProducts';
+import PartnerBanners from '@/components/PartnerBanners';
 import Services from '@/components/Services';
 import About from '@/components/About';
 import ProiecteRealizate from '@/components/ProiecteRealizate';
 import WhyUs from '@/components/WhyUs';
 import Contact from '@/components/Contact';
+import ConsumerProtectionNotice from '@/components/ConsumerProtectionNotice';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
@@ -27,10 +30,13 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <FeaturedProducts />
+        <PartnerBanners />
         <Services />
         <About />
         <ProiecteRealizate />
         <WhyUs />
+        <ConsumerProtectionNotice />
         <Contact />
       </main>
       <Footer />

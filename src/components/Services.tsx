@@ -1,19 +1,20 @@
-import { Snowflake, Wind, Wrench, Factory, Thermometer, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { Snowflake, Wind, Wrench, Factory, Thermometer, RefreshCw, Building2 } from 'lucide-react';
 
 const services = [
   {
     icon: Snowflake,
-    title: 'Refrigerare Comercială',
+    title: 'Aparate de aer condiționat',
     description:
-      'Vitrine frigorifice, camere frigorifice și sisteme de răcire pentru supermarketuri, restaurante și depozite alimentare.',
+      'Vânzare, recomandare, montaj și punere în funcțiune pentru echipamente split, multi-split și soluții comerciale.',
     color: 'text-secondary',
     bg: 'bg-secondary/10',
   },
   {
     icon: Factory,
-    title: 'Refrigerare Industrială',
+    title: 'Refrigerare comercială și industrială',
     description:
-      'Soluții la scară largă pentru industria alimentară, farmaceutică și logistică. Sisteme cu amoniac, CO₂ și agenți frigorifici HFO.',
+      'Camere frigorifice, vitrine, depozite frigorifice și sisteme de răcire pentru magazine, restaurante și spații industriale.',
     color: 'text-primary',
     bg: 'bg-primary/10',
   },
@@ -21,53 +22,63 @@ const services = [
     icon: Wind,
     title: 'Climatizare & HVAC',
     description:
-      'Proiectare și instalare sisteme de climatizare pentru birouri, spații comerciale și clădiri industriale. VRF, chiller, unități centrale.',
+      'Soluții HVAC pentru locuințe, birouri, spații comerciale și clădiri industriale: proiectare, instalare și optimizare.',
     color: 'text-accent',
     bg: 'bg-accent/10',
   },
   {
     icon: Thermometer,
-    title: 'Camere Frigorifice',
+    title: 'Dimensionare și consultanță',
     description:
-      'Construcție și izolare camere frigorifice și congelatoare la comandă. Panouri sandwich premium, uși glisante și batante.',
+      'Te ajutăm să alegi capacitatea potrivită în funcție de suprafață, izolație, destinația spațiului și buget.',
     color: 'text-secondary',
     bg: 'bg-secondary/10',
   },
   {
     icon: Wrench,
-    title: 'Service & Mentenanță',
+    title: 'Montaj, service & mentenanță',
     description:
-      'Service autorizat 24/7 pentru toate tipurile de echipamente frigorifice. Contracte de mentenanță preventivă și corectivă.',
+      'Instalare, revizii, intervenții și mentenanță preventivă pentru echipamente HVAC și sisteme frigorifice.',
     color: 'text-primary',
     bg: 'bg-primary/10',
   },
   {
     icon: RefreshCw,
-    title: 'Recuperare Freon',
+    title: 'Recuperare și încărcare freon',
     description:
-      'Recuperare și reîncărcare agent frigorific conform normelor europene. Personal certificat F-Gas. Documentație completă.',
+      'Lucrări conforme pentru recuperare, verificare și reîncărcare agent frigorific, cu personal calificat.',
     color: 'text-accent',
     bg: 'bg-accent/10',
   },
+];
+
+const localSeoLinks = [
+  { label: 'Montaj aer condiționat Arad', href: '/servicii/montaj-aer-conditionat-arad' },
+  { label: 'Montaj aer condiționat Timișoara', href: '/servicii/montaj-aer-conditionat-timisoara' },
+  { label: 'Service aer condiționat Arad', href: '/servicii/service-aer-conditionat-arad' },
+  { label: 'Service aer condiționat Timișoara', href: '/servicii/service-aer-conditionat-timisoara' },
+  { label: 'Revizie AC Arad', href: '/servicii/revizie-ac-arad' },
+  { label: 'Revizie AC Timișoara', href: '/servicii/revizie-ac-timisoara' },
+  { label: 'Curățare AC Arad', href: '/servicii/curatare-ac-arad' },
+  { label: 'Curățare AC Timișoara', href: '/servicii/curatare-ac-timisoara' },
+  { label: 'Proiecte HVAC România', href: '/servicii/proiecte-hvac-romania' },
 ];
 
 export default function Services() {
   return (
     <section id="servicii" className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        {/* Header */}
         <div className="text-center mb-14">
           <span className="text-accent font-semibold text-sm uppercase tracking-widest">
-            Ce oferim
+            Servicii și suport
           </span>
-          <h2 className="section-title mt-2">Servicii Complete de Refrigerare</h2>
+          <h2 className="section-title mt-2">Nu vindem doar produse. Oferim soluția completă.</h2>
           <p className="section-subtitle mx-auto text-center">
-            De la proiectare la service post-vânzare — acoperim toate nevoile
-            tale frigorifice cu echipă proprie calificată.
+            Alegi produsul din magazin, iar noi te putem ajuta cu recomandarea tehnică,
+            montajul, punerea în funcțiune și service-ul post-vânzare.
           </p>
         </div>
 
-        {/* Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map((service) => {
             const Icon = service.icon;
@@ -92,18 +103,54 @@ export default function Services() {
           })}
         </div>
 
-        {/* CTA bar */}
+        <div className="mt-12 rounded-3xl bg-light-200 p-6 shadow-card">
+          <h3 className="font-heading text-xl font-bold text-dark">
+            Servicii locale și proiecte naționale
+          </h3>
+          <p className="mt-2 text-sm text-dark-300">
+            Pagini dedicate pentru montaj, service, revizie, curățare aer condiționat și proiecte HVAC comerciale/industriale.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {localSeoLinks.map((item) => (
+              <Link key={item.href} href={item.href} className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-primary shadow-sm transition hover:-translate-y-0.5 hover:text-accent">
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-12 rounded-3xl bg-primary p-8 text-white shadow-card md:flex md:items-center md:justify-between md:gap-8">
+          <div className="flex gap-4">
+            <div className="hidden h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white/10 md:flex">
+              <Building2 size={28} />
+            </div>
+            <div>
+              <span className="text-sm font-bold uppercase tracking-widest text-white/70">Proiecte mari în România</span>
+              <h3 className="mt-2 font-heading text-2xl font-bold">
+                Preluăm proiecte HVAC comerciale și industriale la nivel național
+              </h3>
+              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-white/80">
+                Pentru lucrări mari de climatizare, sisteme VRV/VRF, spații comerciale, hale, birouri sau proiecte cu mai multe echipamente,
+                echipa PRO TERM se poate deplasa în România, în funcție de complexitatea și planificarea proiectului.
+              </p>
+            </div>
+          </div>
+          <Link href="/servicii/proiecte-hvac-romania" className="mt-6 inline-flex rounded-lg bg-white px-6 py-3 font-bold text-primary transition hover:bg-light-200 md:mt-0">
+            Vezi proiecte HVAC
+          </Link>
+        </div>
+
         <div className="mt-14 bg-card-gradient border border-primary/10 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h3 className="text-xl font-bold text-dark font-heading">
-              Ai nevoie de un proiect personalizat?
+              Vrei să cumperi produsul potrivit, nu doar cel mai ieftin?
             </h3>
             <p className="text-dark-300 mt-1">
-              Contactează-ne și primești o evaluare tehnică gratuită.
+              Trimite-ne detaliile spațiului și îți recomandăm varianta potrivită.
             </p>
           </div>
           <a href="#contact" className="btn-primary whitespace-nowrap">
-            Cere ofertă gratuită
+            Cere recomandare gratuită
           </a>
         </div>
       </div>
