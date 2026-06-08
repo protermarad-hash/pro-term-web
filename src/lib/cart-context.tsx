@@ -17,6 +17,7 @@ type CartAction =
   | { type: 'ADD'; product: Product }
   | { type: 'REMOVE'; id: string }
   | { type: 'SET_QTY'; id: string; quantity: number }
+  | { type: 'CLEAR' }
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
   | { type: 'HYDRATE'; items: CartItem[] };
@@ -50,6 +51,8 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       return { ...state, isOpen: true };
     case 'CLOSE':
       return { ...state, isOpen: false };
+    case 'CLEAR':
+      return { ...state, items: [], isOpen: false };
     case 'HYDRATE':
       return { ...state, items: action.items };
     default:
@@ -63,6 +66,7 @@ interface CartContextValue {
   addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
   setQuantity: (id: string, quantity: number) => void;
+  clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
   totalItems: number;
@@ -98,6 +102,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         addToCart:      (product)           => dispatch({ type: 'ADD', product }),
         removeFromCart: (id)                => dispatch({ type: 'REMOVE', id }),
         setQuantity:    (id, quantity)      => dispatch({ type: 'SET_QTY', id, quantity }),
+        clearCart:      ()                  => dispatch({ type: 'CLEAR' }),
         openCart:       ()                  => dispatch({ type: 'OPEN' }),
         closeCart:      ()                  => dispatch({ type: 'CLOSE' }),
         totalItems,

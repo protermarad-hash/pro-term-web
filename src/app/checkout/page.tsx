@@ -1,13 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle2, Trash2, ShoppingBag } from 'lucide-react';
+import {
+  ArrowLeft,
+  Banknote,
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  ShoppingBag,
+  Trash2,
+  Truck,
+} from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/lib/cart-context';
+import { useAuth } from '@/lib/auth-context';
 import { BRAND_GRADIENT } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
+import { getSupabaseAnonClient } from '@/lib/supabase';
 
 const JUDETE = [
   'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
@@ -18,73 +30,120 @@ const JUDETE = [
   'Sibiu', 'Suceava', 'Teleorman', 'Timiș', 'Tulcea', 'Vaslui', 'Vâlcea', 'Vrancea',
 ];
 
+type PaymentMethod = 'ramburs' | 'transfer';
+
+const INPUT_CLASS =
+  'w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white';
+
 export default function CheckoutPage() {
-  const { items, removeFromCart, totalItems, totalPrice } = useCart();
-  const [placed, setPlaced] = useState(false);
+  const router = useRouter();
+  const { items, removeFromCart, clearCart, totalItems, totalPrice } = useCart();
+  const { user, loading: authLoading } = useAuth();
+
   const [form, setForm] = useState({
     firstName: '',
-    lastName:  '',
-    email:     '',
-    phone:     '',
-    address:   '',
-    city:      '',
-    county:    '',
-    notes:     '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    city: '',
+    county: '',
+    postalCode: '',
+    notes: '',
   });
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('ramburs');
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  // Pre-fill form from profile if authenticated
+  useEffect(() => {
+    if (authLoading || !user) return;
+    const supabase = getSupabaseAnonClient();
+    if (!supabase) return;
+
+    supabase
+      .from('profiles')
+      .select('nume_complet, telefon, adresa_livrare, oras, judet, cod_postal')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        const parts = (data.nume_complet ?? '').trim().split(' ');
+        const firstName = parts[0] ?? '';
+        const lastName = parts.slice(1).join(' ');
+        setForm((prev) => ({
+          ...prev,
+          firstName: firstName || prev.firstName,
+          lastName: lastName || prev.lastName,
+          email: user.email ?? prev.email,
+          phone: data.telefon ?? prev.phone,
+          address: data.adresa_livrare ?? prev.address,
+          city: data.oras ?? prev.city,
+          county: data.judet ?? prev.county,
+          postalCode: data.cod_postal ?? prev.postalCode,
+        }));
+      });
+  }, [user, authLoading]);
 
   const handle = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
   const shipping = calculateShipping(totalPrice);
   const shippingMessage = getShippingMessage(totalPrice);
   const grandTotal = totalPrice + shipping;
 
-  if (placed) {
-    return (
-      <>
-        <Header />
-        <main className="min-h-screen pt-24 pb-20 bg-light-200 flex items-center justify-center">
-          <div className="card max-w-md w-full mx-4 text-center py-12">
-            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
-              <CheckCircle2 size={40} className="text-green-500" />
-            </div>
-            <h1 className="text-2xl font-bold font-heading text-dark mb-3">
-              Cerere/comandă transmisă cu succes!
-            </h1>
-            <p className="text-dark-300 mb-2">
-              Îți mulțumim, <strong>{form.firstName}</strong>!
-            </p>
-            <p className="text-dark-300 text-sm mb-8">
-              Vei primi o confirmare la{' '}
-              <span className="font-semibold text-primary">{form.email}</span>.
-              Te vom contacta pentru validarea stocului, livrării, plății și, dacă este cazul, a montajului.
-            </p>
-            <div className="flex flex-col gap-3">
-              <Link href="/produse" className="btn-primary justify-center">
-                Continuă cumpărăturile
-              </Link>
-              <Link href="/" className="text-sm text-dark-300 hover:text-dark transition-colors">
-                Înapoi la pagina principală
-              </Link>
-            </div>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    const orderItems = items.map(({ product, quantity }) => ({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      brand: product.brand,
+      price: product.price,
+      quantity,
+      line_total: product.price * quantity,
+    }));
+
+    try {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          userId: user?.id ?? null,
+          items: orderItems,
+          subtotal: totalPrice,
+          paymentMethod,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? 'Eroare la plasarea comenzii. Încearcă din nou.');
+        return;
+      }
+
+      clearCart();
+      router.push(`/comanda-confirmata/${data.orderId}`);
+    } catch {
+      setError('Eroare de rețea. Verifică conexiunea și încearcă din nou.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (items.length === 0) {
     return (
       <>
         <Header />
-        <main className="min-h-screen pt-24 pb-20 bg-light-200 flex items-center justify-center">
-          <div className="card max-w-md w-full mx-4 text-center py-12">
-            <ShoppingBag size={48} className="text-gray-200 mx-auto mb-4" />
-            <h2 className="text-xl font-bold font-heading text-dark mb-3">
-              Coșul tău este gol
-            </h2>
+        <main className="flex min-h-screen items-center justify-center bg-light-200 pb-20 pt-24">
+          <div className="card mx-4 w-full max-w-md py-12 text-center">
+            <ShoppingBag size={48} className="mx-auto mb-4 text-gray-200" />
+            <h2 className="mb-3 font-heading text-xl font-bold text-dark">Coșul tău este gol</h2>
             <Link href="/produse" className="btn-primary">
               Vezi produse
             </Link>
@@ -98,165 +157,244 @@ export default function CheckoutPage() {
   return (
     <>
       <Header />
-      <main className="pt-24 pb-20 bg-light-200">
-        <div className="container mx-auto px-4 max-w-5xl">
+      <main className="bg-light-200 pb-20 pt-24">
+        <div className="container mx-auto max-w-5xl px-4">
           <Link
             href="/produse"
-            className="inline-flex items-center gap-1.5 text-sm text-dark-300 hover:text-dark transition-colors mb-6"
+            className="mb-6 inline-flex items-center gap-1.5 text-sm text-dark-300 transition-colors hover:text-dark"
           >
             <ArrowLeft size={16} />
             Continuă cumpărăturile
           </Link>
 
-          <h1 className="text-3xl font-bold font-heading text-dark mb-8">
-            Finalizează comanda
-          </h1>
+          <h1 className="mb-8 font-heading text-3xl font-bold text-dark">Finalizează comanda</h1>
 
-          <div className="grid lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-3">
-              <form
-                onSubmit={(e) => { e.preventDefault(); setPlaced(true); }}
-                className="card space-y-5"
-              >
-                <h2 className="text-lg font-bold font-heading text-dark border-b border-gray-100 pb-4">
-                  Date de livrare și contact
-                </h2>
+          {error && (
+            <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Prenume *</label>
-                    <input type="text" name="firstName" required value={form.firstName} onChange={handle} placeholder="Ion" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+          <form onSubmit={handleSubmit}>
+            <div className="grid gap-8 lg:grid-cols-5">
+              {/* ── Left column ── */}
+              <div className="space-y-6 lg:col-span-3">
+                {/* Delivery form */}
+                <div className="card space-y-5">
+                  <h2 className="border-b border-gray-100 pb-4 font-heading text-lg font-bold text-dark">
+                    Date de livrare și contact
+                  </h2>
+
+                  {user && (
+                    <p className="rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700">
+                      Date precompletate din profilul tău. Verifică și modifică dacă e nevoie.
+                    </p>
+                  )}
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Prenume *</label>
+                      <input type="text" name="firstName" required value={form.firstName} onChange={handle} placeholder="Ion" className={INPUT_CLASS} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Nume *</label>
+                      <input type="text" name="lastName" required value={form.lastName} onChange={handle} placeholder="Popescu" className={INPUT_CLASS} />
+                    </div>
                   </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Email *</label>
+                      <input type="email" name="email" required value={form.email} onChange={handle} placeholder="email@exemplu.ro" className={INPUT_CLASS} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Telefon *</label>
+                      <input type="tel" name="phone" required value={form.phone} onChange={handle} placeholder="07XX XXX XXX" className={INPUT_CLASS} />
+                    </div>
+                  </div>
+
                   <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Nume *</label>
-                    <input type="text" name="lastName" required value={form.lastName} onChange={handle} placeholder="Popescu" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+                    <label className="mb-1 block text-sm font-medium text-dark-300">Adresă *</label>
+                    <input type="text" name="address" required value={form.address} onChange={handle} placeholder="Str. Exemplu nr. 10, Bloc A, Ap. 5" className={INPUT_CLASS} />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div className="sm:col-span-1">
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Oraș *</label>
+                      <input type="text" name="city" required value={form.city} onChange={handle} placeholder="Arad" className={INPUT_CLASS} />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Județ *</label>
+                      <select name="county" required value={form.county} onChange={handle} className={INPUT_CLASS}>
+                        <option value="">Selectează...</option>
+                        {JUDETE.map((j) => <option key={j} value={j}>{j}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-sm font-medium text-dark-300">Cod poștal</label>
+                      <input type="text" name="postalCode" value={form.postalCode} onChange={handle} placeholder="310001" className={INPUT_CLASS} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="mb-1 block text-sm font-medium text-dark-300">Mențiuni (opțional)</label>
+                    <textarea name="notes" rows={3} value={form.notes} onChange={handle} placeholder="Etaj, interfon, instrucțiuni speciale livrare..." className={`${INPUT_CLASS} resize-none`} />
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Email *</label>
-                    <input type="email" name="email" required value={form.email} onChange={handle} placeholder="email@exemplu.ro" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Telefon *</label>
-                    <input type="tel" name="phone" required value={form.phone} onChange={handle} placeholder="07XX XXX XXX" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
+                {/* Payment methods */}
+                <div className="card space-y-4">
+                  <h2 className="border-b border-gray-100 pb-4 font-heading text-lg font-bold text-dark">
+                    Metodă de plată
+                  </h2>
+
+                  {/* Ramburs */}
+                  <label className={`flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all ${paymentMethod === 'ramburs' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <input type="radio" name="paymentMethod" value="ramburs" checked={paymentMethod === 'ramburs'} onChange={() => setPaymentMethod('ramburs')} className="mt-1 accent-primary" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Truck size={18} className="text-primary" />
+                        <span className="font-semibold text-dark">Plată la livrare (ramburs)</span>
+                      </div>
+                      <p className="mt-1 text-sm text-dark-300">Achitare în numerar curierului la primirea coletului.</p>
+                    </div>
+                  </label>
+
+                  {/* Transfer bancar */}
+                  <label className={`flex cursor-pointer items-start gap-4 rounded-xl border-2 p-4 transition-all ${paymentMethod === 'transfer' ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <input type="radio" name="paymentMethod" value="transfer" checked={paymentMethod === 'transfer'} onChange={() => setPaymentMethod('transfer')} className="mt-1 accent-primary" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Banknote size={18} className="text-primary" />
+                        <span className="font-semibold text-dark">Transfer bancar</span>
+                      </div>
+                      <p className="mt-1 text-sm text-dark-300">IBAN-ul și referința vor fi afișate după plasarea comenzii.</p>
+                    </div>
+                  </label>
+
+                  {/* Card online — disabled */}
+                  <div className="flex cursor-not-allowed items-start gap-4 rounded-xl border-2 border-gray-100 bg-gray-50 p-4 opacity-60">
+                    <input type="radio" disabled className="mt-1" />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <CreditCard size={18} className="text-gray-400" />
+                        <span className="font-semibold text-gray-400">Card online prin Netopia</span>
+                        <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs font-bold text-gray-500">În curând</span>
+                      </div>
+                      <p className="mt-1 text-sm text-gray-400">Plata cu cardul va fi disponibilă în curând.</p>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">Adresă *</label>
-                  <input type="text" name="address" required value={form.address} onChange={handle} placeholder="Str. Exemplu nr. 10, Bloc A, Ap. 5" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Oraș *</label>
-                    <input type="text" name="city" required value={form.city} onChange={handle} placeholder="Arad" className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-dark-300 mb-1">Județ *</label>
-                    <select name="county" required value={form.county} onChange={handle} className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white">
-                      <option value="">Selectează județul...</option>
-                      {JUDETE.map((j) => (<option key={j} value={j}>{j}</option>))}
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-dark-300 mb-1">Mențiuni (opțional)</label>
-                  <textarea name="notes" rows={3} value={form.notes} onChange={handle} placeholder="Etaj, interfon, instrucțiuni speciale livrare, montaj dorit..." className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none" />
-                </div>
-
-                <div className="bg-primary/5 border border-primary/15 rounded-xl p-4 text-sm text-dark-300">
-                  <strong className="text-primary">Informații precontractuale:</strong> prețurile sunt în RON, transportul este afișat în sumar, plata disponibilă este ramburs sau transfer bancar, iar stocul/livrarea/montajul se confirmă de PRO TERM înainte de procesarea finală. Pentru servicii începute în perioada de retragere se poate solicita acord expres separat.
+                {/* Legal notice */}
+                <div className="rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm text-dark-300">
+                  <strong className="text-primary">Informații precontractuale:</strong> Prețurile sunt în RON cu TVA 21% inclus. Stocul și disponibilitatea livrării se confirmă de PRO TERM înainte de procesare. Drept de retragere 14 zile conform OUG 34/2014.
                 </div>
 
                 <label className="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-sm text-dark-300">
                   <input type="checkbox" required className="mt-1" />
                   <span>
-                    Am citit și accept <Link href="/termeni-si-conditii" className="font-semibold text-primary hover:underline">Termenii și condițiile</Link>, <Link href="/politica-retur" className="font-semibold text-primary hover:underline">Politica de retur</Link> și <Link href="/politica-confidentialitate" className="font-semibold text-primary hover:underline">Politica de confidențialitate</Link>.
+                    Am citit și accept{' '}
+                    <Link href="/termeni-si-conditii" className="font-semibold text-primary hover:underline">Termenii și condițiile</Link>,{' '}
+                    <Link href="/politica-retur" className="font-semibold text-primary hover:underline">Politica de retur</Link> și{' '}
+                    <Link href="/politica-confidentialitate" className="font-semibold text-primary hover:underline">Politica de confidențialitate</Link>.
                   </span>
                 </label>
 
-                <button type="submit" className="btn-primary w-full justify-center py-4 text-base">
-                  Comandă cu obligație de plată · {grandTotal.toLocaleString('ro-RO')} RON
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary w-full justify-center py-4 text-base disabled:opacity-60"
+                >
+                  {submitting ? (
+                    <><Loader2 size={20} className="animate-spin" /> Se procesează...</>
+                  ) : (
+                    <>Comandă cu obligație de plată · {grandTotal.toLocaleString('ro-RO')} RON</>
+                  )}
                 </button>
-              </form>
-            </div>
+              </div>
 
-            <div className="lg:col-span-2 space-y-4">
-              <div className="card">
-                <h2 className="text-lg font-bold font-heading text-dark mb-4 border-b border-gray-100 pb-4">
-                  Sumar comandă ({totalItems} {totalItems === 1 ? 'produs' : 'produse'})
-                </h2>
+              {/* ── Right column — order summary ── */}
+              <div className="space-y-4 lg:col-span-2">
+                <div className="card">
+                  <h2 className="mb-4 border-b border-gray-100 pb-4 font-heading text-lg font-bold text-dark">
+                    Sumar comandă ({totalItems} {totalItems === 1 ? 'produs' : 'produse'})
+                  </h2>
 
-                <div className="space-y-3 mb-4">
-                  {items.map(({ product, quantity }) => (
-                    <div key={product.id} className="flex gap-3">
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${BRAND_GRADIENT[product.brand]} flex-shrink-0 flex items-center justify-center`}>
-                        <span className="text-white/70 text-[10px] font-bold">{product.brand.slice(0, 2)}</span>
+                  <div className="mb-4 space-y-3">
+                    {items.map(({ product, quantity }) => (
+                      <div key={product.id} className="flex gap-3">
+                        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br ${BRAND_GRADIENT[product.brand]}`}>
+                          <span className="text-[10px] font-bold text-white/70">{product.brand.slice(0, 2)}</span>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-dark">{product.name}</p>
+                          <p className="text-xs text-dark-300">
+                            Cant.: {quantity} · {product.price.toLocaleString('ro-RO')} RON/buc
+                          </p>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-sm font-bold text-dark">
+                            {(product.price * quantity).toLocaleString('ro-RO')} RON
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(product.id)}
+                            className="text-gray-300 transition-colors hover:text-brand"
+                            aria-label="Șterge"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-dark truncate">{product.name}</p>
-                        <p className="text-xs text-dark-300">Cant.: {quantity} · {product.price.toLocaleString('ro-RO')} RON/buc</p>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="text-sm font-bold text-dark">{(product.price * quantity).toLocaleString('ro-RO')} RON</span>
-                        <button onClick={() => removeFromCart(product.id)} className="text-gray-300 hover:text-brand transition-colors" aria-label="Șterge produsul">
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
+                    ))}
+                  </div>
+
+                  <div className="space-y-2 border-t border-gray-100 pt-4">
+                    <div className="flex justify-between text-sm text-dark-300">
+                      <span>Subtotal produse</span>
+                      <span>{totalPrice.toLocaleString('ro-RO')} RON</span>
+                    </div>
+                    <div className="flex justify-between text-sm text-dark-300">
+                      <span>Transport</span>
+                      <span>
+                        {shipping === 0
+                          ? <span className="font-semibold text-green-600">GRATUIT</span>
+                          : `${shipping.toLocaleString('ro-RO')} RON`
+                        }
+                      </span>
+                    </div>
+                    {shippingMessage && (
+                      <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+                        {shippingMessage}
+                      </p>
+                    )}
+                    {shipping === 0 && totalPrice >= SHIPPING_FREE_THRESHOLD && (
+                      <p className="text-xs font-medium text-green-600">Transport gratuit pentru comenzi peste 2.500 RON!</p>
+                    )}
+                    <div className="mt-1 flex justify-between border-t border-gray-100 pt-3 font-bold text-lg text-dark">
+                      <span>Total (TVA 21% inclus)</span>
+                      <span>{grandTotal.toLocaleString('ro-RO')} RON</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="card space-y-3">
+                  {[
+                    'Garanție legală și comercială conform documentelor produsului',
+                    'Instalare profesională disponibilă în Arad și Timiș',
+                    'Plată ramburs sau transfer bancar',
+                    'Drept de retragere 14 zile pentru consumatori',
+                  ].map((t) => (
+                    <div key={t} className="flex items-start gap-2 text-sm text-dark-300">
+                      <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0 text-green-500" />
+                      {t}
                     </div>
                   ))}
                 </div>
-
-                <div className="border-t border-gray-100 pt-4 space-y-2">
-                  <div className="flex justify-between text-sm text-dark-300">
-                    <span>Subtotal produse</span>
-                    <span>{totalPrice.toLocaleString('ro-RO')} RON</span>
-                  </div>
-                  <div className="flex justify-between text-sm text-dark-300">
-                    <span>Transport</span>
-                    <span>
-                      {shipping === 0
-                        ? <span className="font-semibold text-green-600">GRATUIT</span>
-                        : <span>{shipping.toLocaleString('ro-RO')} RON</span>
-                      }
-                    </span>
-                  </div>
-                  {shippingMessage && (
-                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
-                      {shippingMessage}
-                    </p>
-                  )}
-                  {shipping === 0 && (
-                    <p className="text-xs font-medium text-green-600">
-                      Ai beneficiat de transport gratuit!
-                    </p>
-                  )}
-                  <div className="flex justify-between font-bold text-dark text-lg border-t border-gray-100 pt-3 mt-1">
-                    <span>Total (TVA 21% inclus)</span>
-                    <span>{grandTotal.toLocaleString('ro-RO')} RON</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="card space-y-3">
-                {[
-                  'Garanție legală de conformitate și/sau garanție comercială conform documentelor produsului',
-                  'Instalare profesională disponibilă, unde este cazul',
-                  'Plată ramburs sau transfer bancar, confirmată înainte de procesare',
-                  'Drept de retragere pentru consumatori, în condițiile legale aplicabile',
-                ].map((t) => (
-                  <div key={t} className="flex items-center gap-2 text-sm text-dark-300">
-                    <CheckCircle2 size={15} className="text-green-500 flex-shrink-0" />
-                    {t}
-                  </div>
-                ))}
               </div>
             </div>
-          </div>
+          </form>
         </div>
       </main>
       <Footer />

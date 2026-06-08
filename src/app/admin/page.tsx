@@ -2,12 +2,35 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Copy, ExternalLink, ImagePlus, Pencil, Plus, Save, Trash2, X } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle2,
+  ChevronDown,
+  Copy,
+  ExternalLink,
+  ImagePlus,
+  Package,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Save,
+  ShoppingBag,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/lib/products';
 
 const BRANDS: Brand[] = ['Gree', 'Midea', 'Yamato', 'Fujitsu', 'Yukon', 'Habitat', 'Bosch', 'Vaillant', 'Immergas', 'Viessmann', 'Generic', 'PRO TERM'];
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
 const STOCK_STATUSES: StockStatus[] = ['in-stock', 'low-stock', 'out-of-stock', 'on-request'];
+
+const ORDER_STATUSES = [
+  { value: 'nou', label: 'Nou', color: 'bg-blue-100 text-blue-700' },
+  { value: 'confirmat', label: 'Confirmat', color: 'bg-purple-100 text-purple-700' },
+  { value: 'in-livrare', label: 'În livrare', color: 'bg-amber-100 text-amber-700' },
+  { value: 'livrat', label: 'Livrat', color: 'bg-green-100 text-green-700' },
+  { value: 'anulat', label: 'Anulat', color: 'bg-red-100 text-red-700' },
+] as const;
 
 interface AdminProduct {
   id: string;
@@ -36,6 +59,21 @@ interface AdminProduct {
   gallery_images?: string[] | null;
   active: boolean;
   created_at: string;
+}
+
+interface AdminOrder {
+  id: string;
+  created_at: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  city: string;
+  county: string;
+  total: number;
+  payment_method: string;
+  status: string;
+  items: Array<{ name: string; quantity: number; line_total: number }>;
 }
 
 const initialForm = {
@@ -97,6 +135,184 @@ function productToForm(product: AdminProduct): ProductForm {
     active: product.active !== false,
   };
 }
+
+function orderRef(id: string) {
+  return id.replace(/-/g, '').slice(0, 8).toUpperCase();
+}
+
+function fmt(n: number) {
+  return Number(n).toLocaleString('ro-RO') + ' RON';
+}
+
+// ─── Orders Section ──────────────────────────────────────────────────────────
+
+function OrdersSection() {
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [warning, setWarning] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  async function loadOrders() {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/admin/orders', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.warning) setWarning(data.warning);
+      setOrders(data.orders ?? []);
+    } catch {
+      setWarning('Nu am putut încărca comenzile.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadOrders(); }, []);
+
+  async function changeStatus(orderId: string, newStatus: string) {
+    setUpdatingId(orderId);
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, status: newStatus }),
+      });
+      if (res.ok) {
+        setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
+      }
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  const statusMeta = (v: string) => ORDER_STATUSES.find((s) => s.value === v) ?? { label: v, color: 'bg-gray-100 text-gray-700' };
+
+  return (
+    <section className="mb-10">
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white">
+            <ShoppingBag size={20} />
+          </div>
+          <div>
+            <h2 className="font-heading text-2xl font-bold text-dark">Comenzi recente</h2>
+            <p className="text-sm text-dark-300">Ultimele 50 de comenzi. Schimbă statusul direct din această pagină.</p>
+          </div>
+        </div>
+        <button onClick={loadOrders} className="inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-sm font-semibold text-dark-300 hover:border-primary hover:text-primary">
+          <RefreshCw size={14} />
+          Reîncarcă
+        </button>
+      </div>
+
+      {warning && (
+        <div className="mb-4 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+          {warning}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="rounded-3xl bg-white p-12 text-center shadow-card">
+          <RefreshCw size={24} className="mx-auto mb-3 animate-spin text-primary" />
+          <p className="text-sm text-dark-300">Se încarcă comenzile...</p>
+        </div>
+      ) : orders.length === 0 ? (
+        <div className="rounded-3xl bg-white p-12 text-center shadow-card">
+          <Package size={40} className="mx-auto mb-3 text-gray-200" />
+          <p className="font-semibold text-dark">Nicio comandă încă</p>
+          <p className="mt-1 text-sm text-dark-300">Comenzile plasate de clienți vor apărea aici.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {orders.map((order) => {
+            const sm = statusMeta(order.status);
+            const ref = orderRef(order.id);
+            const isExpanded = expandedId === order.id;
+            return (
+              <div key={order.id} className="rounded-2xl bg-white shadow-card overflow-hidden">
+                <div className="flex flex-wrap items-center gap-3 p-4">
+                  {/* Ref */}
+                  <div className="min-w-[100px]">
+                    <p className="text-xs text-dark-300">Comandă</p>
+                    <p className="font-bold text-dark">#{ref}</p>
+                  </div>
+                  {/* Date */}
+                  <div className="min-w-[100px]">
+                    <p className="text-xs text-dark-300">Data</p>
+                    <p className="text-sm font-semibold text-dark">
+                      {new Date(order.created_at).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    </p>
+                  </div>
+                  {/* Client */}
+                  <div className="flex-1 min-w-[150px]">
+                    <p className="text-xs text-dark-300">Client</p>
+                    <p className="font-semibold text-dark">{order.first_name} {order.last_name}</p>
+                    <p className="text-xs text-dark-300">{order.city}, {order.county}</p>
+                  </div>
+                  {/* Total */}
+                  <div className="min-w-[100px] text-right">
+                    <p className="text-xs text-dark-300">{order.payment_method === 'transfer' ? 'Transfer' : 'Ramburs'}</p>
+                    <p className="font-bold text-dark">{fmt(order.total)}</p>
+                  </div>
+                  {/* Status badge */}
+                  <span className={`rounded-full px-3 py-1 text-xs font-bold ${sm.color}`}>{sm.label}</span>
+                  {/* Status change */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {ORDER_STATUSES.filter((s) => s.value !== order.status).map((s) => (
+                      <button
+                        key={s.value}
+                        onClick={() => changeStatus(order.id, s.value)}
+                        disabled={updatingId === order.id}
+                        className={`rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors hover:opacity-80 disabled:opacity-40 ${s.color}`}
+                      >
+                        {updatingId === order.id ? '...' : `→ ${s.label}`}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Expand toggle */}
+                  <button
+                    onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                    className="ml-auto rounded-lg border p-1.5 text-dark-300 hover:border-primary hover:text-primary"
+                  >
+                    <ChevronDown size={14} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+                </div>
+                {/* Expanded details */}
+                {isExpanded && (
+                  <div className="border-t border-gray-100 bg-gray-50 p-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-dark-300">Produse</p>
+                        <div className="space-y-1">
+                          {order.items.map((item, i) => (
+                            <div key={i} className="flex justify-between text-sm">
+                              <span className="text-dark-300">{item.name} × {item.quantity}</span>
+                              <span className="font-semibold text-dark">{fmt(item.line_total)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-dark-300">Contact</p>
+                        <p className="text-sm text-dark">{order.first_name} {order.last_name}</p>
+                        <p className="text-sm text-dark-300">{order.email}</p>
+                        <p className="text-sm font-semibold text-primary">{order.phone}</p>
+                      </div>
+                    </div>
+                    <p className="mt-3 text-xs text-dark-300">ID complet: <code className="font-mono">{order.id}</code></p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+// ─── Main Admin Page ──────────────────────────────────────────────────────────
 
 export default function AdminPage() {
   const [form, setForm] = useState<ProductForm>(initialForm);
@@ -218,7 +434,7 @@ export default function AdminPage() {
   }
 
   async function deleteProduct(product: AdminProduct) {
-    if (!confirm(`Ștergi produsul „${product.name}”?`)) return;
+    if (!confirm(`Ștergi produsul „${product.name}"?`)) return;
 
     setLoading(true);
     setMessage('');
@@ -244,15 +460,25 @@ export default function AdminPage() {
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-widest text-accent">PRO TERM Admin</p>
-            <h1 className="font-heading text-3xl font-bold text-dark md:text-5xl">Produse magazin</h1>
+            <h1 className="font-heading text-3xl font-bold text-dark md:text-5xl">Panou de control</h1>
             <p className="mt-2 max-w-2xl text-dark-300">
-              Adaugă, editează, duplică sau șterge produse. Imaginile se pot încărca în Supabase Storage.
+              Gestionează comenzi, produse, imagini și conținut din această pagină.
             </p>
           </div>
           <Link href="/produse" className="btn-outline w-fit">
             Vezi catalogul
             <ExternalLink size={18} />
           </Link>
+        </div>
+
+        {/* Orders section */}
+        <OrdersSection />
+
+        {/* Divider */}
+        <div className="mb-8 flex items-center gap-4">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-sm font-bold uppercase tracking-widest text-dark-300">Produse magazin</span>
+          <div className="h-px flex-1 bg-gray-200" />
         </div>
 
         {message && <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">{message}</div>}
