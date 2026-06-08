@@ -312,6 +312,246 @@ function OrdersSection() {
   );
 }
 
+// ─── Blog Section ─────────────────────────────────────────────────────────────
+
+interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  category: string | null;
+  published: boolean;
+  published_at: string | null;
+}
+
+interface BlogForm {
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  imageUrl: string;
+  metaTitle: string;
+  metaDescription: string;
+  tags: string;
+  readTime: string;
+  published: boolean;
+}
+
+const INITIAL_BLOG_FORM: BlogForm = {
+  title: '',
+  slug: '',
+  excerpt: '',
+  content: '',
+  category: 'Ghiduri',
+  imageUrl: '',
+  metaTitle: '',
+  metaDescription: '',
+  tags: '',
+  readTime: '5',
+  published: false,
+};
+
+function slugify(s: string) {
+  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+const BLOG_CATEGORIES = ['Ghiduri', 'Montaj & Service', 'Comparații', 'Noutăți'];
+
+function BlogSection() {
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [form, setForm] = useState<BlogForm>(INITIAL_BLOG_FORM);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [err, setErr] = useState('');
+
+  async function loadPosts() {
+    try {
+      const res = await fetch('/api/admin/blog', { cache: 'no-store' });
+      const data = await res.json();
+      setPosts(data.posts ?? []);
+    } catch { /* silent */ }
+  }
+
+  useEffect(() => { loadPosts(); }, []);
+
+  function updateField(k: keyof BlogForm, v: string | boolean) {
+    setForm((prev) => ({ ...prev, [k]: v }));
+  }
+
+  function handleTitleChange(title: string) {
+    setForm((prev) => ({
+      ...prev,
+      title,
+      slug: prev.slug || slugify(title),
+    }));
+  }
+
+  async function handleSave(published: boolean) {
+    setLoading(true);
+    setMsg('');
+    setErr('');
+    try {
+      const payload = {
+        ...form,
+        published,
+        id: editingId,
+        tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        read_time: parseInt(form.readTime) || 5,
+      };
+      const res = await fetch('/api/admin/blog', {
+        method: editingId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Eroare la salvare');
+      setMsg(published ? 'Articol publicat!' : 'Salvat ca draft.');
+      setForm(INITIAL_BLOG_FORM);
+      setEditingId(null);
+      await loadPosts();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Eroare');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string, title: string) {
+    if (!confirm(`Ștergi articolul "${title}"?`)) return;
+    await fetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
+    await loadPosts();
+  }
+
+  function editPost(post: BlogPost & Record<string, unknown>) {
+    setForm({
+      title: String(post.title ?? ''),
+      slug: String(post.slug ?? ''),
+      excerpt: String(post.excerpt ?? ''),
+      content: String(post.content ?? ''),
+      category: String(post.category ?? 'Ghiduri'),
+      imageUrl: String(post.image_url ?? ''),
+      metaTitle: String(post.meta_title ?? ''),
+      metaDescription: String(post.meta_description ?? ''),
+      tags: Array.isArray(post.tags) ? post.tags.join(', ') : '',
+      readTime: String(post.read_time ?? '5'),
+      published: Boolean(post.published),
+    });
+    setEditingId(String(post.id));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  const INPUT = 'w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-primary';
+
+  return (
+    <section className="mb-10">
+      <div className="mb-5 flex items-center gap-3">
+        <h2 className="font-heading text-2xl font-bold text-dark">Blog SEO</h2>
+        {editingId && (
+          <button onClick={() => { setForm(INITIAL_BLOG_FORM); setEditingId(null); }} className="rounded-lg border px-3 py-1.5 text-xs font-semibold text-dark-300 hover:border-primary hover:text-primary">
+            Articol nou
+          </button>
+        )}
+      </div>
+
+      {msg && <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-800">{msg}</div>}
+      {err && <div className="mb-4 rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-800">{err}</div>}
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_0.6fr]">
+        {/* Form */}
+        <div className="card space-y-4">
+          <h3 className="font-heading text-lg font-bold text-dark">{editingId ? 'Editează articol' : 'Articol nou'}</h3>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Titlu *</label>
+            <input value={form.title} onChange={(e) => handleTitleChange(e.target.value)} className={INPUT} placeholder="Cum alegi aerul condiționat..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Slug (URL)</label>
+            <input value={form.slug} onChange={(e) => updateField('slug', e.target.value)} className={INPUT} placeholder="cum-alegi-aerul-conditionat" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-bold text-dark">Categorie</label>
+              <select value={form.category} onChange={(e) => updateField('category', e.target.value)} className={INPUT}>
+                {BLOG_CATEGORIES.map((c) => <option key={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-bold text-dark">Timp citire (min)</label>
+              <input type="number" min="1" value={form.readTime} onChange={(e) => updateField('readTime', e.target.value)} className={INPUT} />
+            </div>
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Rezumat (excerpt)</label>
+            <textarea value={form.excerpt} onChange={(e) => updateField('excerpt', e.target.value)} rows={3} className={`${INPUT} resize-none`} placeholder="Scurt rezumat pentru SEO și listing..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Conținut (Markdown)</label>
+            <textarea value={form.content} onChange={(e) => updateField('content', e.target.value)} rows={14} className={`${INPUT} resize-y font-mono text-xs`} placeholder="## Titlu&#10;Conținut articol în Markdown..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">URL imagine</label>
+            <input value={form.imageUrl} onChange={(e) => updateField('imageUrl', e.target.value)} className={INPUT} placeholder="https://..." />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Meta title (SEO)</label>
+            <input value={form.metaTitle} onChange={(e) => updateField('metaTitle', e.target.value)} className={INPUT} placeholder="Max 60 caractere" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Meta description (SEO)</label>
+            <textarea value={form.metaDescription} onChange={(e) => updateField('metaDescription', e.target.value)} rows={2} className={`${INPUT} resize-none`} placeholder="120-160 caractere" />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-bold text-dark">Tags (separate prin virgulă)</label>
+            <input value={form.tags} onChange={(e) => updateField('tags', e.target.value)} className={INPUT} placeholder="aer conditionat, BTU, ghid" />
+          </div>
+          <div className="flex gap-3">
+            <button onClick={() => handleSave(false)} disabled={loading} className="flex-1 rounded-xl border-2 border-primary px-4 py-3 text-sm font-bold text-primary hover:bg-primary/5 disabled:opacity-50">
+              {loading ? '...' : 'Salvează draft'}
+            </button>
+            <button onClick={() => handleSave(true)} disabled={loading} className="flex-1 rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white hover:bg-primary-600 disabled:opacity-50">
+              {loading ? '...' : 'Publică articol'}
+            </button>
+          </div>
+        </div>
+
+        {/* List */}
+        <div className="card">
+          <h3 className="mb-4 font-heading text-base font-bold text-dark">Articole ({posts.length})</h3>
+          <div className="space-y-3">
+            {posts.length === 0 ? (
+              <p className="text-sm text-dark-300">Niciun articol. Rulează <code className="font-mono">create-blog-table.sql</code> în Supabase.</p>
+            ) : posts.map((post) => (
+              <div key={post.id} className="rounded-xl border border-gray-100 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-dark">{post.title}</p>
+                    <p className="text-xs text-dark-300">{post.category}</p>
+                  </div>
+                  <span className={`flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${post.published ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                    {post.published ? 'Publicat' : 'Draft'}
+                  </span>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <button onClick={() => editPost(post as BlogPost & Record<string, unknown>)} className="rounded-lg border px-2.5 py-1.5 text-xs font-semibold text-dark-300 hover:border-primary hover:text-primary">
+                    Editează
+                  </button>
+                  <Link href={`/blog/${post.slug}`} target="_blank" className="rounded-lg border px-2.5 py-1.5 text-xs font-semibold text-dark-300 hover:border-primary hover:text-primary">
+                    Previzualizează
+                  </Link>
+                  <button onClick={() => handleDelete(post.id, post.title)} className="rounded-lg border border-red-100 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50">
+                    Șterge
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 
 export default function AdminPage() {
@@ -473,6 +713,16 @@ export default function AdminPage() {
 
         {/* Orders section */}
         <OrdersSection />
+
+        {/* Divider */}
+        <div className="mb-8 flex items-center gap-4">
+          <div className="h-px flex-1 bg-gray-200" />
+          <span className="text-sm font-bold uppercase tracking-widest text-dark-300">Blog SEO</span>
+          <div className="h-px flex-1 bg-gray-200" />
+        </div>
+
+        {/* Blog section */}
+        <BlogSection />
 
         {/* Divider */}
         <div className="mb-8 flex items-center gap-4">

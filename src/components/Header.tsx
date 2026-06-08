@@ -12,6 +12,7 @@ const navLinks = [
   { label: 'Servicii',       href: '/#servicii' },
   { label: 'Produse',        href: '/produse' },
   { label: 'Calculator BTU', href: '/calculator-btu' },
+  { label: 'Blog',           href: '/blog' },
   { label: 'Despre noi',     href: '/despre' },
   { label: 'Avantaje',       href: '/#avantaje' },
   { label: 'Contact',        href: '/#contact' },
