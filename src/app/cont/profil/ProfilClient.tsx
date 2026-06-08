@@ -72,13 +72,14 @@ export default function ProfilClient() {
       .single()
       .then(({ data }) => {
         if (data) {
+          const d = data as Record<string, string | null>;
           setProfile({
-            nume_complet: data.nume_complet ?? '',
-            telefon: data.telefon ?? '',
-            adresa_livrare: data.adresa_livrare ?? '',
-            oras: data.oras ?? '',
-            judet: data.judet ?? '',
-            cod_postal: data.cod_postal ?? '',
+            nume_complet: d.nume_complet ?? '',
+            telefon: d.telefon ?? '',
+            adresa_livrare: d.adresa_livrare ?? '',
+            oras: d.oras ?? '',
+            judet: d.judet ?? '',
+            cod_postal: d.cod_postal ?? '',
           });
         }
         setProfileLoading(false);

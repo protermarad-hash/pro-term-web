@@ -1,5 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import type { Product } from '@/lib/products';
+
+// Browser singleton — ensures onAuthStateChange fires correctly across all callers
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let _anonClient: SupabaseClient<any> | null = null;
 
 export interface DbProduct {
   id: string;
@@ -36,16 +40,24 @@ export function isSupabaseConfigured() {
 }
 
 export function getSupabaseAnonClient() {
+  // Server-side rendering: never create a browser client
+  if (typeof window === 'undefined') return null;
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!url || !anonKey) {
-    return null;
+  if (!url || !anonKey) return null;
+
+  // Return the existing singleton so all callers share the same session state
+  // and onAuthStateChange fires correctly across the app
+  if (!_anonClient) {
+    // persistSession defaults to true — session stored in localStorage
+    // required for router.push redirects to work correctly after login
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _anonClient = createClient(url, anonKey) as SupabaseClient<any>;
   }
 
-  return createClient(url, anonKey, {
-    auth: { persistSession: false },
-  });
+  return _anonClient;
 }
 
 export function getSupabaseServiceClient() {
