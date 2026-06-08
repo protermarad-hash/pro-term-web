@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 const FROM = 'PRO TERM SRL <noreply@pro-term.ro>';
 const TO_BUSINESS = 'proterm.arad@gmail.com';
 
@@ -98,12 +96,15 @@ function row(label: string, value: string): string {
 }
 
 export async function POST(req: NextRequest) {
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
       { error: 'Serviciul de email nu este configurat. Contactați-ne la 0749 025 610.' },
       { status: 503 },
     );
   }
+
+  const resend = new Resend(apiKey);
 
   let data: Record<string, string>;
   try {
