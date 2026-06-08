@@ -22,8 +22,8 @@ export interface DbProduct {
   is_bestseller: boolean;
   energy_class: string;
   description: string;
-  features: string[];
-  specs: { label: string; value: string }[];
+  features: string[] | unknown;
+  specs: { label: string; value: string }[] | Record<string, unknown> | null;
   smartbill_code: string | null;
   manage_stock: boolean;
   stock_status: string;
@@ -73,6 +73,43 @@ export function getSupabaseServiceClient() {
   });
 }
 
+const SPEC_KEY_LABELS: Record<string, string> = {
+  model: 'Model',
+  agent_frigorific: 'Agent frigorific',
+  clasa: 'Clasă energetică',
+  suprafata: 'Suprafață recomandată',
+  design: 'Design',
+  temp_min_incalzire: 'Temp. min. încălzire',
+  rapid_cooling: 'Răcire rapidă',
+  rapid_heating: 'Încălzire rapidă',
+  SEER: 'SEER',
+  SCOP: 'SCOP',
+  btu: 'BTU',
+  capacitate: 'Capacitate',
+  nivel_sonor: 'Nivel sonor',
+  wifi: 'WiFi',
+  timer: 'Timer',
+  filtru: 'Filtru',
+};
+
+function parseSpecs(raw: DbProduct['specs']): { label: string; value: string }[] {
+  if (Array.isArray(raw)) return raw as { label: string; value: string }[];
+  if (raw && typeof raw === 'object') {
+    return Object.entries(raw as Record<string, unknown>)
+      .filter(([, v]) => v !== null && v !== undefined && v !== '')
+      .map(([k, v]) => ({
+        label: SPEC_KEY_LABELS[k] ?? k,
+        value: String(v),
+      }));
+  }
+  return [];
+}
+
+function parseFeatures(raw: DbProduct['features']): string[] {
+  if (Array.isArray(raw)) return raw.map(String).filter(Boolean);
+  return [];
+}
+
 export function dbProductToProduct(p: DbProduct): Product {
   const galleryImages = Array.isArray(p.gallery_images) ? p.gallery_images.filter(Boolean) : [];
   const imageUrl = p.image_url ?? galleryImages[0] ?? undefined;
@@ -94,8 +131,8 @@ export function dbProductToProduct(p: DbProduct): Product {
     isBestseller: p.is_bestseller,
     energyClass: p.energy_class,
     description: p.description,
-    features: Array.isArray(p.features) ? p.features : [],
-    specs: Array.isArray(p.specs) ? p.specs : [],
+    features: parseFeatures(p.features),
+    specs: parseSpecs(p.specs),
     smartbillCode: p.smartbill_code ?? undefined,
     manageStock: p.manage_stock,
     stockStatus: p.stock_status as Product['stockStatus'],
