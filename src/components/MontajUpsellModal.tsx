@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X, Wrench, CheckCircle2, ShieldCheck, Clock } from 'lucide-react';
+import { X, Wrench, CheckCircle2, Clock } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { getMontajForBtu, type MontajOption } from '@/lib/montaj';
 import type { Product } from '@/lib/products';
@@ -63,10 +63,7 @@ export default function MontajUpsellModal() {
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/20">
               <Wrench size={20} className="text-white" />
             </div>
-            <div>
-              <p className="font-heading text-sm font-bold text-white">Adaugă montajul profesional</p>
-              <p className="text-xs text-blue-200">Disponibil în Arad și Timiș</p>
-            </div>
+            <p className="font-heading text-sm font-bold text-white">Adaugă montajul profesional</p>
           </div>
           <button
             onClick={dismissUpsell}
@@ -75,6 +72,14 @@ export default function MontajUpsellModal() {
           >
             <X size={18} />
           </button>
+        </div>
+
+        {/* Geographic restriction banner */}
+        <div className="flex items-center justify-center gap-2 bg-orange-500 px-4 py-2.5">
+          <span className="text-base leading-none">⚠️</span>
+          <p className="font-bold text-white text-sm">
+            Disponibil DOAR în județul Arad și Timiș
+          </p>
         </div>
 
         <div className="p-5">
@@ -150,10 +155,6 @@ export default function MontajUpsellModal() {
             </button>
           </div>
 
-          <p className="mt-3 flex items-center gap-1 text-center text-[10px] text-dark-300">
-            <ShieldCheck size={11} className="text-green-500" />
-            Preț montaj valabil pentru instalare standard în raza Arad și județ Timiș.
-          </p>
         </div>
       </div>
     </>

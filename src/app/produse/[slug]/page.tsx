@@ -309,23 +309,31 @@ export default function ProductPage() {
               )}
 
               {product.category === 'aer-conditionat' && product.btu && !serviceProduct && (
-                <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4">
-                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                    <Wrench size={17} className="text-primary" />
+                <div className="mb-5 overflow-hidden rounded-2xl border border-blue-100">
+                  {/* Zone restriction strip */}
+                  <div className="flex items-center gap-2 bg-orange-500 px-4 py-2">
+                    <span className="text-sm leading-none">⚠️</span>
+                    <p className="text-xs font-bold text-white">Montaj disponibil DOAR în Arad și Timiș</p>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-heading text-sm font-bold text-dark">
-                      Montaj standard disponibil — {getMontajForBtu(product.btu).price.toLocaleString('ro-RO')} RON
-                    </p>
-                    <p className="mt-0.5 text-xs text-dark-300">
-                      Echipă F-Gas autorizată, garanție 12 luni. Disponibil în Arad și Timiș.{' '}
-                      <Link href="/servicii/montaj" className="font-semibold text-primary hover:underline">
-                        Vezi ce include →
-                      </Link>
-                    </p>
-                    <p className="mt-1.5 text-xs font-medium text-blue-700">
-                      Se adaugă automat în coș la apăsarea butonului de mai jos.
-                    </p>
+                  {/* Content */}
+                  <div className="flex items-start gap-3 bg-blue-50 p-4">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                      <Wrench size={17} className="text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-heading text-sm font-bold text-dark">
+                        Montaj standard — {getMontajForBtu(product.btu).price.toLocaleString('ro-RO')} RON (cu TVA)
+                      </p>
+                      <p className="mt-0.5 text-xs text-dark-300">
+                        Echipă F-Gas autorizată, garanție 12 luni.{' '}
+                        <Link href="/servicii/montaj" className="font-semibold text-primary hover:underline">
+                          Vezi ce include →
+                        </Link>
+                      </p>
+                      <p className="mt-1.5 text-xs font-medium text-blue-700">
+                        Se propune automat la adăugarea în coș.
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
