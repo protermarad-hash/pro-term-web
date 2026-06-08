@@ -1,4 +1,4 @@
-import { ArrowRight, Shield, Zap, Award } from 'lucide-react';
+import { ArrowRight, MapPin, Truck, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 const stats = [
@@ -8,10 +8,25 @@ const stats = [
   { value: '2 ani', label: 'Garanție extinsă' },
 ];
 
-const badges = [
-  { icon: Shield, text: 'Autorizat ANRE & ISCIR' },
-  { icon: Zap,    text: 'Industrial & Civil' },
-  { icon: Award,  text: 'Garanție 2 ani' },
+const coverage = [
+  {
+    icon: MapPin,
+    title: 'Montaj & Service',
+    detail: 'Arad și Timiș',
+    color: 'bg-brand/20 text-brand',
+  },
+  {
+    icon: Truck,
+    title: 'Livrare produse',
+    detail: 'Toată România',
+    color: 'bg-primary/20 text-primary-200',
+  },
+  {
+    icon: Building2,
+    title: 'Proiecte VRV comerciale',
+    detail: 'La nivel național',
+    color: 'bg-accent/20 text-accent',
+  },
 ];
 
 export default function Hero() {
@@ -38,41 +53,49 @@ export default function Hero() {
           <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-6">
             <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
             <span className="text-white/90 text-sm font-medium">
-              Soluții HVAC complete din 1999 · 25+ ani experiență
+              Dealer autorizat Gree · Midea · Yamato — din 1999
             </span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white font-heading leading-tight mb-6">
-            Soluții HVAC{' '}
-            <span className="text-brand">Profesionale</span>
+            Montaj & Service HVAC{' '}
+            <span className="text-brand">în Arad și Timiș</span>
             <br />
-            pentru Industrie și Locuințe
+            <span className="text-3xl md:text-4xl text-white/80 font-medium">
+              Produse cu livrare în toată România
+            </span>
           </h1>
 
-          <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-10 max-w-2xl">
-            Cu peste <strong className="text-white">25 de ani de experiență</strong> în instalații
-            industriale și civile, PRO TERM este partenerul tău de încredere în sisteme de
-            climatizare, ventilație și încălzire.
+          <p className="text-lg md:text-xl text-white/80 leading-relaxed mb-8 max-w-2xl">
+            <strong className="text-white">PRO TERM SRL</strong> — instalăm și întreținem sisteme de
+            climatizare în județele Arad și Timiș. Vindem echipamente Gree, Midea și Yamato cu livrare
+            națională. Proiecte VRV comerciale și industriale în colaborare cu antreprenori din toată România.
           </p>
 
-          <div className="flex flex-wrap gap-4 mb-14">
+          <div className="flex flex-wrap gap-4 mb-10">
             <Link href="/produse" className="btn-primary text-base px-8 py-4">
               Vezi produse
               <ArrowRight size={20} />
             </Link>
             <Link href="/#contact" className="btn-outline text-base px-8 py-4">
-              Solicită consultanță gratuită
+              Solicită ofertă gratuită
             </Link>
           </div>
 
-          <div className="flex flex-wrap gap-4 mb-14">
-            {badges.map(({ icon: Icon, text }) => (
+          {/* Coverage badges */}
+          <div className="flex flex-wrap gap-3 mb-12">
+            {coverage.map(({ icon: Icon, title, detail, color }) => (
               <div
-                key={text}
-                className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2"
+                key={title}
+                className="flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/15 rounded-xl px-4 py-3"
               >
-                <Icon size={16} className="text-brand" />
-                <span className="text-white/90 text-sm font-medium">{text}</span>
+                <div className={`w-8 h-8 rounded-lg ${color} flex items-center justify-center flex-shrink-0`}>
+                  <Icon size={16} />
+                </div>
+                <div>
+                  <div className="text-white text-xs font-semibold leading-none">{title}</div>
+                  <div className="text-white/60 text-xs mt-0.5">{detail}</div>
+                </div>
               </div>
             ))}
           </div>

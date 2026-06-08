@@ -14,9 +14,16 @@ import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Despre PRO TERM SRL | 25+ ani HVAC',
+  title: 'Despre PRO TERM SRL | Montaj HVAC Arad & Timiș, Proiecte VRV Naționale',
   description:
-    'Aflați povestea PRO TERM SRL, fondată în 1999 în Arad. 25+ ani de experiență în instalații HVAC industriale și civile pe întreg teritoriul României.',
+    'PRO TERM SRL din Arad — 25+ ani experiență HVAC. Montaj și service aer condiționat în Arad și Timiș. Sisteme VRV comerciale și industriale la nivel național. Dealer Gree, Midea, Yamato. ISO 9001, F-Gas/AGFR.',
+  alternates: { canonical: 'https://pro-term.ro/despre' },
+  openGraph: {
+    title: 'Despre PRO TERM SRL | Montaj HVAC Arad & Timiș, Proiecte VRV Naționale',
+    description:
+      'Companie HVAC din Arad, fondată 1999. Montaj și service în Arad și Timiș. Proiecte VRV comerciale și industriale la nivel național. Dealer Gree, Midea, Yamato.',
+    url: 'https://pro-term.ro/despre',
+  },
 };
 
 const timeline = [
@@ -146,21 +153,27 @@ export default function DesprePage() {
                   extinzând domeniul de activitate spre instalații industriale complexe.
                 </p>
                 <p className="text-dark-300 leading-relaxed mb-4">
-                  Astăzi, PRO TERM înseamnă 30 de specialiști, o flotă proprie de
-                  intervenție, un depozit logistic complet echipat și relații solide cu
-                  cei mai importanți producători de echipamente HVAC din lume.
+                  Activitatea noastră are două direcții complementare:{' '}
+                  <strong className="text-dark">montaj și service HVAC direct în județele Arad și Timiș</strong>,
+                  unde avem echipă proprie de intervenție, și{' '}
+                  <strong className="text-dark">livrare echipamente Gree, Midea și Yamato în toată România</strong>.
+                </p>
+                <p className="text-dark-300 leading-relaxed mb-4">
+                  O specializare distinctivă a firmei sunt{' '}
+                  <strong className="text-dark">sistemele VRV pentru spații comerciale și industriale</strong>.
+                  Proiectăm și executăm instalații VRV pentru retail, birouri corporate, hoteluri și
+                  unități de producție, în colaborare cu antreprenori generali din toată România —
+                  de la proiecte de 500 mp până la hale industriale de zeci de mii de metri pătrați.
                 </p>
                 <p className="text-dark-300 leading-relaxed mb-8">
-                  Deservim clienți din industria alimentară, farmaceutică, retail, HoReCa,
-                  instituții publice și proprietari privați din toată România. Fiecare
-                  proiect, indiferent de dimensiune, beneficiază de aceeași atenție la
-                  detaliu și standarde ridicate de execuție.
+                  Fiecare proiect, indiferent de dimensiune, beneficiază de aceeași atenție la
+                  detaliu, documentație completă și standarde ridicate de execuție.
                 </p>
                 <div className="grid grid-cols-3 gap-4">
                   {[
                     { val: '1999', lbl: 'Fondată în Arad' },
                     { val: '500+', lbl: 'Proiecte finalizate' },
-                    { val: '30',   lbl: 'Specialiști în echipă' },
+                    { val: '6',    lbl: 'Specialiști în echipă' },
                   ].map(({ val, lbl }) => (
                     <div key={lbl} className="text-center">
                       <div className="text-3xl font-bold font-heading text-primary">{val}</div>

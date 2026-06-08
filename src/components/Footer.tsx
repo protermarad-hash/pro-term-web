@@ -1,17 +1,28 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin, Truck } from 'lucide-react';
 
 const footerLinks = {
   Servicii: [
-    'Climatizare & HVAC',
-    'Refrigerare comercială',
-    'Refrigerare industrială',
-    'Camere frigorifice',
-    'Service & mentenanță',
+    { label: 'Montaj aer condiționat', href: '#' },
+    { label: 'Service HVAC Arad', href: '#' },
+    { label: 'Service HVAC Timiș', href: '#' },
+    { label: 'Sisteme VRV comerciale', href: '#' },
+    { label: 'Mentenanță preventivă', href: '#' },
   ],
-  Companie: ['Despre noi', 'Echipa noastră', 'Certificări', 'Parteneri', 'Blog'],
-  Legal: ['Termeni și condiții', 'Politica de confidențialitate', 'GDPR', 'Cookies'],
+  Companie: [
+    { label: 'Despre noi', href: '/despre' },
+    { label: 'Proiecte realizate', href: '/#proiecte' },
+    { label: 'Certificări', href: '/despre#certificari' },
+    { label: 'Produse', href: '/produse' },
+    { label: 'Contact', href: '/#contact' },
+  ],
+  Legal: [
+    { label: 'Termeni și condiții', href: '#' },
+    { label: 'Politica de confidențialitate', href: '#' },
+    { label: 'GDPR', href: '#' },
+    { label: 'Cookies', href: '#' },
+  ],
 };
 
 export default function Footer() {
@@ -23,39 +34,50 @@ export default function Footer() {
             <Link href="/" className="inline-block mb-4">
               <Image
                 src="/logo-proterm.jpg"
-                alt="PRO TERM"
+                alt="PRO TERM SRL"
                 width={160}
                 height={48}
                 className="h-10 w-auto object-contain brightness-200"
               />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
-              PRO TERM SRL — fondată în 1999, cu peste 25 de ani de experiență în sisteme
-              HVAC industriale și civile.
+              PRO TERM SRL — fondată în 1999 în Arad. Dealer autorizat Gree, Midea și Yamato.
+              Instalare și service HVAC autorizat.
             </p>
-            <p className="text-white/40 text-xs mb-6">
-              Soluții HVAC Complete · Arad, România
-            </p>
+
+            {/* Coverage zone */}
+            <div className="mt-4 mb-5 space-y-1.5">
+              <div className="flex items-center gap-2 text-xs text-white/50">
+                <MapPin size={13} className="text-brand flex-shrink-0" />
+                <span>
+                  <span className="text-white/80 font-semibold">Montaj & service:</span>{' '}
+                  Arad și Timiș
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-white/50">
+                <Truck size={13} className="text-primary-300 flex-shrink-0" />
+                <span>
+                  <span className="text-white/80 font-semibold">Livrări produse:</span>{' '}
+                  Toată România
+                </span>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <a
-                href="tel:+40700000000"
+                href="tel:+40749025610"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Phone size={15} className="text-accent" />
-                0700 000 000
+                0749 025 610
               </a>
               <a
-                href="mailto:office@pro-term.ro"
+                href="mailto:proterm.arad@gmail.com"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
-                office@pro-term.ro
+                proterm.arad@gmail.com
               </a>
-              <span className="flex items-center gap-2 text-white/70 text-sm">
-                <MapPin size={15} className="text-primary-300" />
-                Arad, România
-              </span>
             </div>
           </div>
 
@@ -65,13 +87,13 @@ export default function Footer() {
                 {category}
               </h4>
               <ul className="space-y-2">
-                {links.map((link) => (
-                  <li key={link}>
+                {links.map(({ label, href }) => (
+                  <li key={label}>
                     <Link
-                      href={link === 'Despre noi' ? '/despre' : '#'}
+                      href={href}
                       className="text-white/60 hover:text-white text-sm transition-colors"
                     >
-                      {link}
+                      {label}
                     </Link>
                   </li>
                 ))}
@@ -86,8 +108,8 @@ export default function Footer() {
           <p className="text-white/40 text-sm">
             © {new Date().getFullYear()} PRO TERM SRL. Toate drepturile rezervate.
           </p>
-          <p className="text-white/30 text-xs">
-            Fondată în 1999 · Arad, România
+          <p className="text-white/30 text-xs text-center">
+            Montaj & service: Arad și Timiș · Livrări: toată România · Fondată 1999
           </p>
         </div>
       </div>

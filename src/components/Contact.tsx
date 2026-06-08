@@ -1,26 +1,32 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Send, Clock } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, Clock, Truck } from 'lucide-react';
 
 const contactInfo = [
   {
     icon: Phone,
     label: 'Telefon',
-    value: '0700 000 000',
-    href: 'tel:+40700000000',
+    value: '0749 025 610',
+    href: 'tel:+40749025610',
   },
   {
     icon: Mail,
     label: 'Email',
-    value: 'office@pro-term.ro',
-    href: 'mailto:office@pro-term.ro',
+    value: 'proterm.arad@gmail.com',
+    href: 'mailto:proterm.arad@gmail.com',
   },
   {
     icon: MapPin,
-    label: 'Adresă',
-    value: 'Arad, România',
-    href: '#',
+    label: 'Montaj & service',
+    value: 'Județele Arad și Timiș',
+    href: null,
+  },
+  {
+    icon: Truck,
+    label: 'Livrări produse',
+    value: 'Toată România',
+    href: null,
   },
   {
     icon: Clock,
@@ -60,8 +66,8 @@ export default function Contact() {
           </span>
           <h2 className="section-title mt-2">Solicită o Ofertă Gratuită</h2>
           <p className="section-subtitle mx-auto text-center">
-            Completează formularul și te contactăm în maxim 2 ore în zilele
-            lucrătoare.
+            Montaj și service în Arad și Timiș. Livrare echipamente în toată România.
+            Te contactăm în maxim 2 ore în zilele lucrătoare.
           </p>
         </div>
 
@@ -77,7 +83,7 @@ export default function Contact() {
                   <div className="text-xs text-dark-300 font-medium uppercase tracking-wide">
                     {label}
                   </div>
-                  {href && href !== '#' ? (
+                  {href ? (
                     <a
                       href={href}
                       className="text-dark font-semibold text-sm hover:text-primary transition-colors"
@@ -98,13 +104,14 @@ export default function Contact() {
               </div>
               <p className="text-white/80 text-sm mb-3">
                 Sunăm înapoi în maxim 30 de minute, non-stop.
+                Acoperim județele Arad și Timiș.
               </p>
               <a
-                href="tel:+40700000000"
+                href="tel:+40749025610"
                 className="flex items-center gap-2 font-bold text-white"
               >
                 <Phone size={18} />
-                0700 000 000
+                0749 025 610
               </a>
             </div>
           </div>
@@ -181,11 +188,12 @@ export default function Contact() {
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
                   >
                     <option value="">Selectează serviciul...</option>
-                    <option>Refrigerare comercială</option>
-                    <option>Refrigerare industrială</option>
-                    <option>Climatizare / HVAC</option>
-                    <option>Cameră frigorifică</option>
-                    <option>Service & mentenanță</option>
+                    <option>Montaj aer condiționat (Arad/Timiș)</option>
+                    <option>Service & mentenanță (Arad/Timiș)</option>
+                    <option>Sistem VRV comercial/industrial</option>
+                    <option>Climatizare spațiu comercial</option>
+                    <option>Comandă produse (livrare națională)</option>
+                    <option>Colaborare antreprenor — proiect național</option>
                     <option>Alt serviciu</option>
                   </select>
                 </div>
@@ -199,7 +207,7 @@ export default function Contact() {
                     rows={4}
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Descrie pe scurt ce ai nevoie..."
+                    placeholder="Descrie pe scurt ce ai nevoie: suprafața, tipul spațiului, județul..."
                     className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
                   />
                 </div>

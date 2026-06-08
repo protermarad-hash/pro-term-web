@@ -4,10 +4,12 @@ import Link from 'next/link';
 
 const highlights = [
   'Fondată în 1999 în Arad — 25+ ani de experiență continuă',
-  'Instalații HVAC industriale și civile pe întreg teritoriul României',
-  'Echipă autorizată ANRE și ISCIR',
-  'Parteneriate cu Daikin, Midea, Gree, LG, Carrier, Trane',
-  'Proiecte de la 50 m² până la hale industriale de zeci de mii m²',
+  'Montaj, service și mentenanță în județele Arad și Timiș',
+  'Vânzare echipamente HVAC cu livrare în toată România',
+  'Dealer autorizat Gree, Midea și Yamato',
+  'Specializare în sisteme VRV pentru spații comerciale și industriale',
+  'Proiecte mari în colaborare cu antreprenori naționali',
+  'Echipă autorizată ANRE, ISCIR și certificată F-Gas',
   'Service post-vânzare cu garanție extinsă 2 ani',
 ];
 
@@ -28,7 +30,7 @@ export default function About() {
               <div className="absolute inset-0 flex flex-col items-center justify-center p-10">
                 <Image
                   src="/logo-proterm.jpg"
-                  alt="PRO TERM"
+                  alt="PRO TERM SRL — HVAC Arad și Timiș"
                   width={200}
                   height={60}
                   className="h-14 w-auto object-contain opacity-90 mb-5"
@@ -36,6 +38,10 @@ export default function About() {
                 <p className="text-white/80 text-center text-sm">
                   Soluții HVAC Complete din 1999
                 </p>
+                <div className="mt-4 flex gap-3 text-xs text-white/60 text-center">
+                  <span className="bg-white/10 rounded-full px-3 py-1">Arad & Timiș</span>
+                  <span className="bg-white/10 rounded-full px-3 py-1">Livrare Națională</span>
+                </div>
               </div>
             </div>
 
@@ -56,13 +62,15 @@ export default function About() {
             </h2>
             <p className="text-dark-300 leading-relaxed mb-4">
               PRO TERM SRL a fost fondată în 1999 în Arad cu o misiune clară: să ofere
-              soluții HVAC complete, fiabile și eficiente energetic atât pentru sectorul
-              industrial, cât și pentru cel civil și rezidențial.
+              soluții HVAC complete, fiabile și eficiente energetic. Montajul, service-ul
+              și mentenanța le acoperim direct în <strong className="text-dark">județele Arad și Timiș</strong>,
+              iar echipamentele Gree, Midea și Yamato le livrăm în toată România.
             </p>
             <p className="text-dark-300 leading-relaxed mb-8">
-              Cu peste 25 de ani de activitate neîntreruptă, am devenit un nume de referință
-              în domeniu. Deservim clienți din industria alimentară, farmaceutică, retail,
-              HoReCa și instituții publice din toată România.
+              O specializare importantă a firmei sunt{' '}
+              <strong className="text-dark">sistemele VRV pentru spații comerciale și industriale</strong> —
+              executăm proiecte la nivel național în colaborare cu antreprenori generali,
+              pentru retail, logistică, birouri corporate și unități de producție.
             </p>
 
             <ul className="space-y-3 mb-8">
