@@ -2,8 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { ShoppingCart, Star } from 'lucide-react';
+import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
+import { useFavorites } from '@/lib/favorites-context';
 import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, STOCK_LABEL } from '@/lib/products';
 
 function getDiscountPercent(product: Product) {
@@ -13,11 +14,13 @@ function getDiscountPercent(product: Product) {
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
   const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
   const discountPercent = getDiscountPercent(product);
   const hasImage = Boolean(product.imageUrl);
+  const favActive = isFavorite(product.slug);
 
   return (
     <div className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
@@ -65,6 +68,19 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
+
+          {/* Favorite button */}
+          <button
+            type="button"
+            onClick={(e) => { e.preventDefault(); toggleFavorite(product); }}
+            className="absolute right-3 bottom-3 z-30 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 shadow-sm transition-transform hover:scale-110"
+            aria-label={favActive ? 'Elimină din favorite' : 'Adaugă la favorite'}
+          >
+            <Heart
+              size={15}
+              className={favActive ? 'fill-red-500 text-red-500' : 'text-dark-300'}
+            />
+          </button>
 
           <span className="absolute right-3 top-3 z-30 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-white shadow-sm">
             {product.energyClass}

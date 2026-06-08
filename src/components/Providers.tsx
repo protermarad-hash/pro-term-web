@@ -1,17 +1,21 @@
 'use client';
 
 import { CartProvider } from '@/lib/cart-context';
+import { AuthProvider } from '@/lib/auth-context';
+import { FavoritesProvider } from '@/lib/favorites-context';
 import CartDrawer from './CartDrawer';
-import CookieConsent from './CookieConsent';
 import WhatsAppFloat from './WhatsAppFloat';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <CartProvider>
-      {children}
-      <CartDrawer />
-      <WhatsAppFloat />
-      <CookieConsent />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <FavoritesProvider>
+          {children}
+          <CartDrawer />
+          <WhatsAppFloat />
+        </FavoritesProvider>
+      </CartProvider>
+    </AuthProvider>
   );
 }

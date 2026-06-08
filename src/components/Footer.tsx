@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Phone, Mail, MapPin } from 'lucide-react';
+import FooterAccountLink from './FooterAccountLink';
 
 const footerLinks = {
   Servicii: [
@@ -80,7 +81,7 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2">
                 {links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.href + link.label}>
                     <Link
                       href={link.href}
                       className="text-white/60 hover:text-white text-sm transition-colors"
@@ -89,6 +90,7 @@ export default function Footer() {
                     </Link>
                   </li>
                 ))}
+                {category === 'Companie' && <FooterAccountLink />}
               </ul>
             </div>
           ))}

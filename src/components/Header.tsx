@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Phone, Menu, X, ShoppingCart } from 'lucide-react';
+import { Phone, Menu, X, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
+import { useAuth } from '@/lib/auth-context';
 
 const navLinks = [
   { label: 'Servicii',    href: '/#servicii' },
@@ -21,6 +22,7 @@ export default function Header() {
   const [scrolled,  setScrolled]  = useState(false);
   const [menuOpen,  setMenuOpen]  = useState(false);
   const { totalItems, openCart }  = useCart();
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -32,6 +34,9 @@ export default function Header() {
   const bgClass = scrolled
     ? 'bg-white/95 backdrop-blur-xl shadow-card py-3 border-b border-slate-100'
     : 'bg-primary/85 backdrop-blur-xl py-4 border-b border-white/10';
+
+  const accountHref  = user ? '/cont/profil' : '/cont/autentificare';
+  const accountLabel = user ? 'Contul meu' : 'Intră în cont';
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgClass}`}>
@@ -87,6 +92,20 @@ export default function Header() {
             )}
           </button>
 
+          {!authLoading && (
+            <Link
+              href={accountHref}
+              className={`flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
+                scrolled
+                  ? 'border border-slate-200 text-dark hover:border-primary hover:text-primary'
+                  : 'border border-white/30 text-white hover:bg-white/10'
+              }`}
+            >
+              <User size={15} />
+              {accountLabel}
+            </Link>
+          )}
+
           <Link href="/#contact" className="btn-primary py-2.5 px-5 text-sm">
             Ofertă gratuită
           </Link>
@@ -105,6 +124,15 @@ export default function Header() {
               </span>
             )}
           </button>
+          {!authLoading && (
+            <Link
+              href={accountHref}
+              className={`p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
+              aria-label={accountLabel}
+            >
+              <User size={22} />
+            </Link>
+          )}
           <button
             className={`p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -128,6 +156,14 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href={accountHref}
+              className="flex items-center gap-2 text-dark-300 font-semibold py-2 hover:text-accent transition-colors"
+              onClick={() => setMenuOpen(false)}
+            >
+              <User size={16} />
+              {accountLabel}
+            </Link>
             <a
               href={contactPhoneHref}
               className="flex items-center gap-2 text-primary font-bold py-2"

@@ -15,12 +15,14 @@ import {
   ShieldCheck,
   Truck,
   Wrench,
+  Heart,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { buildWhatsAppUrl } from '@/components/WhatsAppFloat';
 import { useCart } from '@/lib/cart-context';
+import { useFavorites } from '@/lib/favorites-context';
 import {
   BRAND_GRADIENT,
   CATEGORY_LABEL,
@@ -87,6 +89,7 @@ function isServiceProduct(product: Product) {
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const [product, setProduct] = useState<Product | null>(null);
   const [related, setRelated] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -321,6 +324,18 @@ export default function ProductPage() {
                       Cere ofertă
                     </Link>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => toggleFavorite(product)}
+                    className={`flex items-center justify-center gap-2 rounded-lg border-2 px-5 py-4 font-semibold transition-all ${
+                      isFavorite(product.slug)
+                        ? 'border-red-400 bg-red-50 text-red-500 hover:bg-red-100'
+                        : 'border-slate-200 text-dark-300 hover:border-red-300 hover:text-red-400'
+                    }`}
+                  >
+                    <Heart size={18} className={isFavorite(product.slug) ? 'fill-red-500' : ''} />
+                    {isFavorite(product.slug) ? 'Șterge din favorite' : 'Adaugă la favorite'}
+                  </button>
                   <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-4 font-semibold text-white transition-all hover:bg-green-600">
                     <MessageCircle size={18} />
                     Întreabă pe WhatsApp

@@ -40,4 +40,8 @@
   .product-surface {
     @apply bg-gradient-to-br from-slate-50 to-white border border-slate-100;
   }
+
+  .input-field {
+    @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-dark outline-none placeholder:text-dark-300/50 focus:border-accent focus:ring-2 focus:ring-accent/30 transition-colors;
+  }
 }
