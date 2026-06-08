@@ -13,6 +13,7 @@ const routes = [
   '/politica-retur',
   '/politica-cookies',
   '/formular-retragere',
+  '/servicii/montaj',
   '/servicii/montaj-aer-conditionat-arad',
   '/servicii/montaj-aer-conditionat-timisoara',
   '/servicii/service-aer-conditionat-arad',
@@ -23,6 +24,8 @@ const routes = [
   '/servicii/curatare-ac-timisoara',
   '/servicii/proiecte-hvac-romania',
   '/servicii/climatizare-comerciala-industriala-romania',
+  '/calculator-btu',
+  '/blog',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1,8 +1,13 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState } from 'react';
 import { Award, ShieldCheck, Zap } from 'lucide-react';
 
 export default function MideaBanner() {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-800 to-blue-950 py-16 text-white">
       {/* Decorative background circles */}
@@ -16,14 +21,18 @@ export default function MideaBanner() {
           {/* Logo + badge */}
           <div className="flex flex-col items-center gap-4 lg:items-start">
             <div className="flex h-20 w-48 items-center justify-center rounded-2xl bg-white px-6">
-              <Image
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Midea_logo.svg/1200px-Midea_logo.svg.png"
-                alt="Midea Logo"
-                width={160}
-                height={60}
-                className="h-12 w-auto object-contain"
-                unoptimized
-              />
+              {!imgError ? (
+                <Image
+                  src="/images/brands/midea-logo.svg"
+                  alt="Midea Logo"
+                  width={160}
+                  height={60}
+                  className="h-12 w-auto object-contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="font-bold text-3xl text-blue-700 tracking-wider">midea</span>
+              )}
             </div>
             <div className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur-sm">
               <ShieldCheck size={15} className="text-green-300" />

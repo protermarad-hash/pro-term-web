@@ -5,7 +5,7 @@ import { ShieldCheck } from 'lucide-react';
 const AUTHORIZED_BRANDS = [
   {
     name: 'Midea',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Midea_logo.svg/1200px-Midea_logo.svg.png',
+    logoUrl: '/images/brands/midea-logo.svg',
     color: 'from-blue-600 to-blue-800',
     text: 'Cel mai mare producător de aparate de aer condiționat din lume. Tehnologie AI EcoMaster, eficiență energetică A+++.',
     href: '/produse?brand=Midea',
@@ -13,7 +13,7 @@ const AUTHORIZED_BRANDS = [
   },
   {
     name: 'Gree',
-    logoUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Gree_logo.svg/1200px-Gree_logo.svg.png',
+    logoUrl: '/images/brands/gree-logo.svg',
     color: 'from-green-600 to-green-800',
     text: 'Lider mondial în climatizare. Sisteme split, VRF și pompe de căldură cu tehnologie Cold Plasma și Wi-Fi integrat.',
     href: '/produse?brand=Gree',
@@ -21,7 +21,7 @@ const AUTHORIZED_BRANDS = [
   },
   {
     name: 'Yamato',
-    logoUrl: 'https://www.yamato.ro/image/catalog/logo.png',
+    logoUrl: '/images/brands/yamato-logo.svg',
     color: 'from-red-600 to-red-800',
     text: 'Brand japonez cu tradiție. Aparate de aer condiționat cu tratament Golden Fin, R32 și filtre antibacteriene.',
     href: '/produse?brand=Yamato',
@@ -65,7 +65,7 @@ export default function PartnerBanners() {
                 <Image
                   src={brand.logoUrl}
                   alt={`Logo ${brand.name}`}
-                  width={140}
+                  width={160}
                   height={56}
                   className="h-10 w-auto object-contain"
                   unoptimized
