@@ -9,11 +9,12 @@ import { useAuth } from '@/lib/auth-context';
 import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 
 const navLinks = [
-  { label: 'Servicii',    href: '/#servicii' },
-  { label: 'Produse',     href: '/produse' },
-  { label: 'Despre noi',  href: '/despre' },
-  { label: 'Avantaje',    href: '/#avantaje' },
-  { label: 'Contact',     href: '/#contact' },
+  { label: 'Servicii',       href: '/#servicii' },
+  { label: 'Produse',        href: '/produse' },
+  { label: 'Calculator BTU', href: '/calculator-btu' },
+  { label: 'Despre noi',     href: '/despre' },
+  { label: 'Avantaje',       href: '/#avantaje' },
+  { label: 'Contact',        href: '/#contact' },
 ];
 
 const contactPhone = '0749 025 610';
