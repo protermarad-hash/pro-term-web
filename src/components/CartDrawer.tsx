@@ -1,9 +1,10 @@
 'use client';
 
-import { X, Minus, Plus, Trash2, ShoppingCart, ArrowRight } from 'lucide-react';
+import { X, Minus, Plus, Trash2, ShoppingCart, ArrowRight, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart-context';
 import { BRAND_GRADIENT, CATEGORY_LABEL } from '@/lib/products';
+import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD, SHIPPING_COST } from '@/lib/shipping';
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeFromCart, setQuantity, totalItems, totalPrice } =
@@ -119,10 +120,36 @@ export default function CartDrawer() {
 
         {items.length > 0 && (
           <div className="border-t border-gray-100 px-5 py-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-dark-300">Total (TVA inclus)</span>
+            {/* Shipping info banner */}
+            {totalPrice < SHIPPING_FREE_THRESHOLD ? (
+              <div className="flex items-center gap-2 rounded-xl bg-amber-50 px-3 py-2.5 text-xs font-medium text-amber-700">
+                <Truck size={14} className="flex-shrink-0" />
+                {getShippingMessage(totalPrice)}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 rounded-xl bg-green-50 px-3 py-2.5 text-xs font-medium text-green-700">
+                <Truck size={14} className="flex-shrink-0" />
+                Transport gratuit inclus în comandă!
+              </div>
+            )}
+
+            <div className="flex justify-between text-sm text-dark-300">
+              <span>Subtotal produse</span>
+              <span>{totalPrice.toLocaleString('ro-RO')} RON</span>
+            </div>
+            <div className="flex justify-between text-sm text-dark-300">
+              <span>Transport</span>
+              <span>
+                {calculateShipping(totalPrice) === 0
+                  ? <span className="font-semibold text-green-600">GRATUIT</span>
+                  : <span>{SHIPPING_COST} RON</span>
+                }
+              </span>
+            </div>
+            <div className="flex items-center justify-between border-t border-gray-100 pt-2">
+              <span className="font-semibold text-dark">Total (TVA inclus)</span>
               <span className="text-xl font-bold font-heading text-dark">
-                {totalPrice.toLocaleString('ro-RO')} RON
+                {(totalPrice + calculateShipping(totalPrice)).toLocaleString('ro-RO')} RON
               </span>
             </div>
             <p className="text-xs text-dark-300">

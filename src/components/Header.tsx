@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Phone, Menu, X, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useAuth } from '@/lib/auth-context';
+import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 
 const navLinks = [
   { label: 'Servicii',    href: '/#servicii' },
@@ -40,6 +41,11 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgClass}`}>
+      {!scrolled && (
+        <div className="bg-primary/95 border-b border-white/10 py-1.5 text-center text-xs font-medium text-white/80">
+          Transport gratuit la comenzi peste {SHIPPING_FREE_THRESHOLD.toLocaleString('ro-RO')} RON
+        </div>
+      )}
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3">
           <span className="inline-flex items-center justify-center rounded-2xl bg-white p-1.5 shadow-sm ring-1 ring-slate-100">

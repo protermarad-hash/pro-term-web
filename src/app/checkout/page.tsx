@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useCart } from '@/lib/cart-context';
 import { BRAND_GRADIENT } from '@/lib/products';
+import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 
 const JUDETE = [
   'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
@@ -35,7 +36,8 @@ export default function CheckoutPage() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const shipping = totalPrice >= 3000 ? 0 : 299;
+  const shipping = calculateShipping(totalPrice);
+  const shippingMessage = getShippingMessage(totalPrice);
   const grandTotal = totalPrice + shipping;
 
   if (placed) {
@@ -210,10 +212,33 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="border-t border-gray-100 pt-4 space-y-2">
-                  <div className="flex justify-between text-sm text-dark-300"><span>Subtotal produse</span><span>{totalPrice.toLocaleString('ro-RO')} RON</span></div>
-                  <div className="flex justify-between text-sm text-dark-300"><span>Transport estimat</span><span>{shipping === 0 ? <span className="text-green-600 font-semibold">Gratuit</span> : `${shipping} RON`}</span></div>
-                  {shipping > 0 && <p className="text-xs text-dark-300">Transport gratuit la comenzi peste 3.000 RON. Costul final se confirmă înainte de expediere.</p>}
-                  <div className="flex justify-between font-bold text-dark text-lg border-t border-gray-100 pt-3 mt-1"><span>Total (TVA 21% inclus)</span><span>{grandTotal.toLocaleString('ro-RO')} RON</span></div>
+                  <div className="flex justify-between text-sm text-dark-300">
+                    <span>Subtotal produse</span>
+                    <span>{totalPrice.toLocaleString('ro-RO')} RON</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-dark-300">
+                    <span>Transport</span>
+                    <span>
+                      {shipping === 0
+                        ? <span className="font-semibold text-green-600">GRATUIT</span>
+                        : <span>{shipping.toLocaleString('ro-RO')} RON</span>
+                      }
+                    </span>
+                  </div>
+                  {shippingMessage && (
+                    <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+                      {shippingMessage}
+                    </p>
+                  )}
+                  {shipping === 0 && (
+                    <p className="text-xs font-medium text-green-600">
+                      Ai beneficiat de transport gratuit!
+                    </p>
+                  )}
+                  <div className="flex justify-between font-bold text-dark text-lg border-t border-gray-100 pt-3 mt-1">
+                    <span>Total (TVA 21% inclus)</span>
+                    <span>{grandTotal.toLocaleString('ro-RO')} RON</span>
+                  </div>
                 </div>
               </div>
 
