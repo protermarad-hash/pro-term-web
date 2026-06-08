@@ -213,7 +213,7 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-sm text-dark-300"><span>Subtotal produse</span><span>{totalPrice.toLocaleString('ro-RO')} RON</span></div>
                   <div className="flex justify-between text-sm text-dark-300"><span>Transport estimat</span><span>{shipping === 0 ? <span className="text-green-600 font-semibold">Gratuit</span> : `${shipping} RON`}</span></div>
                   {shipping > 0 && <p className="text-xs text-dark-300">Transport gratuit la comenzi peste 3.000 RON. Costul final se confirmă înainte de expediere.</p>}
-                  <div className="flex justify-between font-bold text-dark text-lg border-t border-gray-100 pt-3 mt-1"><span>Total estimat</span><span>{grandTotal.toLocaleString('ro-RO')} RON</span></div>
+                  <div className="flex justify-between font-bold text-dark text-lg border-t border-gray-100 pt-3 mt-1"><span>Total (TVA 21% inclus)</span><span>{grandTotal.toLocaleString('ro-RO')} RON</span></div>
                 </div>
               </div>
 

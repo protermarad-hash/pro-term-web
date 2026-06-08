@@ -135,7 +135,7 @@ export default function ProductCard({ product }: { product: Product }) {
               Economisești {(product.originalPrice! - product.price).toLocaleString('ro-RO')} RON
             </div>
           )}
-          <div className="mb-3 flex items-baseline gap-2">
+          <div className="mb-1 flex items-baseline gap-2">
             <span className="font-heading text-2xl font-bold text-dark">
               {hasPrice ? `${product.price.toLocaleString('ro-RO')} RON` : product.priceLabel ?? 'Cere ofertă'}
             </span>
@@ -145,6 +145,10 @@ export default function ProductCard({ product }: { product: Product }) {
               </span>
             )}
           </div>
+          {hasPrice && (
+            <p className="mb-3 text-xs text-dark-300">TVA inclus</p>
+          )}
+          {!hasPrice && <div className="mb-3" />}
 
           {hasPrice ? (
             <button

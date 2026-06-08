@@ -29,6 +29,7 @@ import {
   STOCK_LABEL,
   type Product,
 } from '@/lib/products';
+import { VAT_RATE, vatAmount } from '@/lib/constants';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -301,7 +302,7 @@ export default function ProductPage() {
                     Ofertă specială: -{discountPercent}% · Economisești {(product.originalPrice - product.price).toLocaleString('ro-RO')} RON
                   </div>
                 )}
-                <div className="mb-4 flex items-baseline gap-3">
+                <div className="mb-1 flex items-baseline gap-3">
                   <span className="font-heading text-4xl font-bold text-dark">
                     {hasPrice ? `${product.price.toLocaleString('ro-RO')} RON` : product.priceLabel ?? 'Cere ofertă'}
                   </span>
@@ -311,6 +312,13 @@ export default function ProductPage() {
                     </span>
                   )}
                 </div>
+                {hasPrice && (
+                  <div className="mb-4 space-y-0.5 text-xs text-dark-300">
+                    <p>Preț cu TVA {Math.round(VAT_RATE * 100)}% inclus</p>
+                    <p>din care TVA: <span className="font-semibold">{vatAmount(product.price).toLocaleString('ro-RO')} RON</span></p>
+                  </div>
+                )}
+                {!hasPrice && <div className="mb-4" />}
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   {hasPrice ? (

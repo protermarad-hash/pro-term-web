@@ -120,13 +120,13 @@ export default function CartDrawer() {
         {items.length > 0 && (
           <div className="border-t border-gray-100 px-5 py-4 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-dark-300">Total</span>
+              <span className="text-dark-300">Total (TVA inclus)</span>
               <span className="text-xl font-bold font-heading text-dark">
                 {totalPrice.toLocaleString('ro-RO')} RON
               </span>
             </div>
             <p className="text-xs text-dark-300">
-              * Prețul include TVA. Stocul va fi validat prin SmartBill după conectare.
+              Prețurile includ TVA 21%. Stocul se validează înainte de expediere.
             </p>
             <Link
               href="/checkout"

@@ -120,8 +120,8 @@ export default function Footer() {
           <p className="text-white/40 text-sm">
             © {new Date().getFullYear()} SC PRO TERM SRL. Toate drepturile rezervate.
           </p>
-          <p className="text-white/30 text-xs">
-            Arad, România
+          <p className="text-white/30 text-xs text-center md:text-right">
+            Toate prețurile afișate includ TVA de 21% · Arad, România
           </p>
         </div>
       </div>

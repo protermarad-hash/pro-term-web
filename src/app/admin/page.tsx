@@ -298,12 +298,18 @@ export default function AdminPage() {
               </label>
 
               <label>
-                <span className="mb-1 block text-sm font-bold text-dark">Preț vânzare RON</span>
+                <span className="mb-1 block text-sm font-bold text-dark">
+                  Preț vânzare RON{' '}
+                  <span className="font-normal text-dark-300">(final cu TVA 21% inclus, ex: 2499)</span>
+                </span>
                 <input value={form.price} onChange={(e) => updateField('price', e.target.value)} type="number" min="0" step="0.01" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="2499" />
               </label>
 
               <label>
-                <span className="mb-1 block text-sm font-bold text-dark">Preț vechi RON</span>
+                <span className="mb-1 block text-sm font-bold text-dark">
+                  Preț vechi RON{' '}
+                  <span className="font-normal text-dark-300">(înainte de reducere, cu TVA inclus)</span>
+                </span>
                 <input value={form.originalPrice} onChange={(e) => updateField('originalPrice', e.target.value)} type="number" min="0" step="0.01" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="opțional" />
               </label>
 
