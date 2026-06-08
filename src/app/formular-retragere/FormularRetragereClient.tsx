@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getSupabaseAnonClient } from '@/lib/supabase';
 
 type FormState = {
   name: string;
@@ -51,7 +52,7 @@ export default function FormularRetragereClient() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [ref, setRef] = useState<string | null>(null);
+  const [refId, setRefId] = useState<string | null>(null);
   const [serverError, setServerError] = useState('');
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -74,7 +75,7 @@ export default function FormularRetragereClient() {
     if (!form.orderDate) e.orderDate = 'Câmp obligatoriu';
     if (!form.deliveryDate) e.deliveryDate = 'Câmp obligatoriu';
     if (!form.reason) e.reason = 'Selectați un motiv';
-    if (form.refundMethod === 'Transfer bancar' && !form.iban.trim()) e.iban = 'IBAN obligatoriu pentru transfer';
+    if (form.refundMethod === 'Transfer bancar' && !form.iban.trim()) e.iban = 'IBAN obligatoriu';
     if (!form.confirmed) e.confirmed = 'Trebuie să confirmați';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -84,64 +85,111 @@ export default function FormularRetragereClient() {
     e.preventDefault();
     setServerError('');
     if (!validate()) return;
+
+    const supabase = getSupabaseAnonClient();
+    if (!supabase) {
+      setServerError('Serviciul nu este configurat momentan. Contactați-ne la 0749 025 610.');
+      return;
+    }
+
     setSubmitting(true);
     try {
-      const res = await fetch('/api/retragere', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? 'Eroare necunoscută');
-      setRef(json.ref);
+      const { data, error } = await supabase
+        .from('retrageri')
+        .insert({
+          nume: form.name,
+          adresa: form.address,
+          telefon: form.phone,
+          email: form.email,
+          numar_comanda: form.orderNumber,
+          produs: form.products,
+          cantitate: form.quantity,
+          pret: parseFloat(form.pricePaid.replace(',', '.')),
+          data_comanda: form.orderDate,
+          data_primire: form.deliveryDate,
+          motiv: form.reason,
+          detalii: form.details || null,
+          metoda_rambursare: form.refundMethod,
+          iban: form.iban || null,
+          status: 'nou',
+        })
+        .select('id')
+        .single();
+
+      if (error) throw new Error(error.message);
+      const shortId = (data.id as string).slice(0, 8).toUpperCase();
+      setRefId(shortId);
     } catch (err: unknown) {
-      setServerError(err instanceof Error ? err.message : 'Eroare la trimitere');
+      setServerError(
+        err instanceof Error ? err.message : 'Eroare la înregistrare. Încercați din nou.',
+      );
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (ref) {
+  if (refId) {
     return (
       <div className="mx-auto max-w-xl rounded-3xl bg-white p-8 shadow-card text-center">
         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
-          <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="h-8 w-8 text-green-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h2 className="font-heading text-2xl font-bold text-dark mb-2">Cerere înregistrată</h2>
-        <p className="text-dark-300 mb-6">Numărul dvs. de referință:</p>
-        <div className="rounded-2xl border-2 border-dashed border-accent px-6 py-4 mb-6">
-          <span className="font-heading text-3xl font-bold text-accent tracking-wider">{ref}</span>
+        <h2 className="font-heading text-2xl font-bold text-dark mb-3">Cerere înregistrată</h2>
+        <div className="rounded-2xl border-2 border-dashed border-accent px-6 py-4 mb-5">
+          <span className="font-heading text-2xl font-bold text-accent tracking-wider">
+            RET-{refId}
+          </span>
         </div>
-        <p className="text-sm text-dark-300 mb-2">
-          Am trimis o confirmare la adresa dvs. de email. Vom analiza cererea în cel mult <strong>14 zile lucrătoare</strong>.
+        <p className="text-sm text-dark-300 mb-4">
+          Cererea ta de retragere <strong>RET-{refId}</strong> a fost înregistrată. Te vom contacta
+          în maxim <strong>14 zile lucrătoare</strong>.
         </p>
         <p className="text-sm text-dark-300">
           Întrebări?{' '}
-          <a href="tel:+40749025610" className="text-accent hover:underline">0749 025 610</a>{' '}
+          <a href="tel:+40749025610" className="text-accent hover:underline">
+            0749 025 610
+          </a>{' '}
           sau{' '}
-          <a href="mailto:proterm.arad@gmail.com" className="text-accent hover:underline">proterm.arad@gmail.com</a>
+          <a href="mailto:proterm.arad@gmail.com" className="text-accent hover:underline">
+            proterm.arad@gmail.com
+          </a>
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-card md:p-10">
-      <p className="mb-3 text-sm font-bold uppercase tracking-widest text-accent">Formular electronic</p>
-      <h1 className="font-heading text-3xl font-bold text-dark md:text-4xl">Retragere din contract</h1>
+    <form
+      onSubmit={handleSubmit}
+      noValidate
+      className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-card md:p-10"
+    >
+      <p className="mb-3 text-sm font-bold uppercase tracking-widest text-accent">
+        Formular electronic
+      </p>
+      <h1 className="font-heading text-3xl font-bold text-dark md:text-4xl">
+        Retragere din contract
+      </h1>
       <p className="mt-3 text-sm text-dark-300">
-        Conform OUG 34/2014, aveți dreptul de retragere în 14 zile calendaristice de la primirea produsului.
-        Completați formularul de mai jos; veți primi confirmare pe email.
+        Conform OUG 34/2014, aveți dreptul de retragere în 14 zile calendaristice de la primirea
+        produsului. Completați formularul de mai jos.
       </p>
 
-      {/* Separator */}
       <div className="my-8 border-t border-slate-100" />
 
       {/* Date consumator */}
       <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">1. Date consumator</h2>
+        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
+          1. Date consumator
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Nume și prenume *" error={errors.name}>
             <input
@@ -188,7 +236,9 @@ export default function FormularRetragereClient() {
 
       {/* Date comandă */}
       <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">2. Date comandă</h2>
+        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
+          2. Date comandă
+        </h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Număr comandă / factură *" error={errors.orderNumber}>
             <input
@@ -254,7 +304,9 @@ export default function FormularRetragereClient() {
             >
               <option value="">— Selectați —</option>
               {REASONS.map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           </Field>
@@ -266,7 +318,7 @@ export default function FormularRetragereClient() {
               onChange={(e) => set('details', e.target.value)}
               className={`${inputCls('')} resize-none`}
               rows={3}
-              placeholder="Orice informație relevantă pentru procesarea cererii..."
+              placeholder="Orice informație relevantă..."
             />
           </Field>
         </div>
@@ -274,7 +326,9 @@ export default function FormularRetragereClient() {
 
       {/* Rambursare */}
       <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">3. Metodă rambursare</h2>
+        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
+          3. Metodă rambursare
+        </h2>
         <div className="flex flex-col gap-3">
           {['Transfer bancar', 'Ramburs la ridicare'].map((method) => (
             <label key={method} className="flex cursor-pointer items-center gap-3">
@@ -290,7 +344,6 @@ export default function FormularRetragereClient() {
             </label>
           ))}
         </div>
-
         {form.refundMethod === 'Transfer bancar' && (
           <div className="mt-4">
             <Field label="IBAN *" error={errors.iban}>
@@ -317,18 +370,25 @@ export default function FormularRetragereClient() {
             className="mt-0.5 h-4 w-4 accent-accent"
           />
           <span className="text-sm text-dark-300">
-            Confirm că informațiile furnizate sunt corecte și că doresc să exercit dreptul de retragere din contractul de vânzare-cumpărare.
-            Am citit{' '}
-            <Link href="/politica-retur" className="text-accent hover:underline">Politica de retur</Link>{' '}
+            Confirm că informațiile sunt corecte și că doresc să exercit dreptul de retragere. Am
+            citit{' '}
+            <Link href="/politica-retur" className="text-accent hover:underline">
+              Politica de retur
+            </Link>{' '}
             și{' '}
-            <Link href="/termeni-si-conditii" className="text-accent hover:underline">Termenii și condițiile</Link>.
+            <Link href="/termeni-si-conditii" className="text-accent hover:underline">
+              Termenii și condițiile
+            </Link>
+            .
           </span>
         </label>
-        {errors.confirmed && <p className="mt-2 text-xs text-red-500">{errors.confirmed}</p>}
+        {errors.confirmed && (
+          <p className="mt-2 text-xs text-red-500">{errors.confirmed}</p>
+        )}
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
         </div>
       )}
@@ -336,9 +396,9 @@ export default function FormularRetragereClient() {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full rounded-xl bg-accent py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-accent/90 disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0"
+        className="w-full rounded-xl bg-accent py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-accent/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
       >
-        {submitting ? 'Se trimite...' : 'Trimite cererea de retragere'}
+        {submitting ? 'Se înregistrează...' : 'Trimite cererea de retragere'}
       </button>
     </form>
   );
@@ -368,7 +428,7 @@ function inputCls(error: string | undefined): string {
   return [
     'w-full rounded-xl border px-3.5 py-2.5 text-sm text-dark outline-none transition-colors',
     'placeholder:text-dark-300/50',
-    'focus:ring-2 focus:ring-accent/30 focus:border-accent',
+    'focus:border-accent focus:ring-2 focus:ring-accent/30',
     error ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white hover:border-slate-300',
   ].join(' ');
 }
