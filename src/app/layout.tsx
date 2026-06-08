@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
+import { GoogleAnalytics } from '@next/third-parties/google';
 import Providers from '@/components/Providers';
 import StructuredData from '@/components/StructuredData';
 import './globals.css';
@@ -72,6 +73,7 @@ export default function RootLayout({
         <StructuredData />
         <Providers>{children}</Providers>
       </body>
+      <GoogleAnalytics gaId="G-58E9WQ01JX" />
     </html>
   );
 }
