@@ -4,6 +4,7 @@ import { CartProvider } from '@/lib/cart-context';
 import { AuthProvider } from '@/lib/auth-context';
 import { FavoritesProvider } from '@/lib/favorites-context';
 import CartDrawer from './CartDrawer';
+import MontajUpsellModal from './MontajUpsellModal';
 import WhatsAppFloat from './WhatsAppFloat';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -13,6 +14,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         <FavoritesProvider>
           {children}
           <CartDrawer />
+          <MontajUpsellModal />
           <WhatsAppFloat />
         </FavoritesProvider>
       </CartProvider>

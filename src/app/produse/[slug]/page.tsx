@@ -30,6 +30,7 @@ import {
   type Product,
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
+import { getMontajForBtu } from '@/lib/montaj';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -305,6 +306,28 @@ export default function ProductPage() {
                     </li>
                   ))}
                 </ul>
+              )}
+
+              {product.category === 'aer-conditionat' && product.btu && !serviceProduct && (
+                <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blue-100 bg-blue-50 p-4">
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                    <Wrench size={17} className="text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-heading text-sm font-bold text-dark">
+                      Montaj standard disponibil — {getMontajForBtu(product.btu).price.toLocaleString('ro-RO')} RON
+                    </p>
+                    <p className="mt-0.5 text-xs text-dark-300">
+                      Echipă F-Gas autorizată, garanție 12 luni. Disponibil în Arad și Timiș.{' '}
+                      <Link href="/servicii/montaj" className="font-semibold text-primary hover:underline">
+                        Vezi ce include →
+                      </Link>
+                    </p>
+                    <p className="mt-1.5 text-xs font-medium text-blue-700">
+                      Se adaugă automat în coș la apăsarea butonului de mai jos.
+                    </p>
+                  </div>
+                </div>
               )}
 
               <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-card">

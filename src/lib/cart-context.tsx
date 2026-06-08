@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import type { Product } from './products';
+import { isMontajSlug } from './montaj';
 
 export interface CartItem {
   product: Product;
@@ -11,6 +12,7 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   isOpen: boolean;
+  upsellForProduct: Product | null;
 }
 
 type CartAction =
@@ -20,7 +22,8 @@ type CartAction =
   | { type: 'CLEAR' }
   | { type: 'OPEN' }
   | { type: 'CLOSE' }
-  | { type: 'HYDRATE'; items: CartItem[] };
+  | { type: 'HYDRATE'; items: CartItem[] }
+  | { type: 'DISMISS_UPSELL' };
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
@@ -33,7 +36,19 @@ function cartReducer(state: CartState, action: CartAction): CartState {
               : i
           )
         : [...state.items, { product: action.product, quantity: 1 }];
-      return { items, isOpen: true };
+
+      const isNewItem = !existing;
+      const hasMontaj = items.some((i) => isMontajSlug(i.product.slug));
+      const shouldShowUpsell =
+        isNewItem &&
+        action.product.category === 'aer-conditionat' &&
+        !hasMontaj;
+
+      return {
+        items,
+        isOpen: !shouldShowUpsell,
+        upsellForProduct: shouldShowUpsell ? action.product : state.upsellForProduct,
+      };
     }
     case 'REMOVE':
       return { ...state, items: state.items.filter((i) => i.product.id !== action.id) };
@@ -52,9 +67,11 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case 'CLOSE':
       return { ...state, isOpen: false };
     case 'CLEAR':
-      return { ...state, items: [], isOpen: false };
+      return { ...state, items: [], isOpen: false, upsellForProduct: null };
     case 'HYDRATE':
       return { ...state, items: action.items };
+    case 'DISMISS_UPSELL':
+      return { ...state, upsellForProduct: null, isOpen: true };
     default:
       return state;
   }
@@ -63,12 +80,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
 interface CartContextValue {
   items: CartItem[];
   isOpen: boolean;
+  upsellForProduct: Product | null;
   addToCart: (product: Product) => void;
   removeFromCart: (id: string) => void;
   setQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
+  dismissUpsell: () => void;
   totalItems: number;
   totalPrice: number;
 }
@@ -76,7 +95,7 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
+  const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false, upsellForProduct: null });
 
   useEffect(() => {
     try {
@@ -99,12 +118,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       value={{
         items: state.items,
         isOpen: state.isOpen,
+        upsellForProduct: state.upsellForProduct,
         addToCart:      (product)           => dispatch({ type: 'ADD', product }),
         removeFromCart: (id)                => dispatch({ type: 'REMOVE', id }),
         setQuantity:    (id, quantity)      => dispatch({ type: 'SET_QTY', id, quantity }),
         clearCart:      ()                  => dispatch({ type: 'CLEAR' }),
         openCart:       ()                  => dispatch({ type: 'OPEN' }),
         closeCart:      ()                  => dispatch({ type: 'CLOSE' }),
+        dismissUpsell:  ()                  => dispatch({ type: 'DISMISS_UPSELL' }),
         totalItems,
         totalPrice,
       }}
