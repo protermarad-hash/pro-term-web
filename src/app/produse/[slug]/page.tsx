@@ -250,6 +250,12 @@ export default function ProductPage() {
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{product.brand}</span>
+                {['Midea', 'Gree', 'Yamato'].includes(product.brand) && (
+                  <span title={`PRO TERM SRL este dealer autorizat ${product.brand} pentru România`} className="flex cursor-help items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-bold text-green-700">
+                    <ShieldCheck size={11} />
+                    Dealer Autorizat
+                  </span>
+                )}
                 <span className="text-sm text-dark-300">{CATEGORY_LABEL[product.category]}</span>
                 <span className="text-sm text-dark-300">· {stockLabel}</span>
               </div>

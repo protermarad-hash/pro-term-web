@@ -1,9 +1,12 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
+import { useMemo, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { ChevronDown, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { CATEGORY_LABEL, type Brand, type Category, type Product } from '@/lib/products';
+
+const AUTHORIZED_BRANDS: Brand[] = ['Midea', 'Gree', 'Yamato'];
 
 const BRANDS: Brand[] = [
   'Midea',
@@ -42,13 +45,25 @@ const SORT_LABELS: Record<SortKey, string> = {
   recenzii: 'Cele mai populare',
 };
 
+const BRAND_ORDER: Record<string, number> = { Midea: 0, Gree: 1, Yamato: 2 };
+
 export default function ProductCatalog({ products }: { products: Product[] }) {
+  const searchParams = useSearchParams();
   const [selectedBrands, setSelectedBrands] = useState<Set<Brand>>(new Set());
   const [selectedCategories, setSelectedCategories] = useState<Set<Category>>(new Set());
   const [selectedBTU, setSelectedBTU] = useState<Set<number>>(new Set());
   const [showQuoteOnly, setShowQuoteOnly] = useState(false);
   const [sort, setSort] = useState<SortKey>('rating');
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [quickBrand, setQuickBrand] = useState<Brand | null>(null);
+
+  // Apply ?brand=X URL param on first render
+  useEffect(() => {
+    const urlBrand = searchParams.get('brand') as Brand | null;
+    if (urlBrand && BRANDS.includes(urlBrand)) {
+      setQuickBrand(urlBrand);
+    }
+  }, [searchParams]);
 
   function toggle<T>(set: Set<T>, val: T): Set<T> {
     const next = new Set(set);
@@ -58,6 +73,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => {
+      if (quickBrand && p.brand !== quickBrand) return false;
       if (selectedBrands.size > 0 && !selectedBrands.has(p.brand)) return false;
       if (selectedCategories.size > 0 && !selectedCategories.has(p.category)) return false;
       if (selectedBTU.size > 0 && (!p.btu || !selectedBTU.has(p.btu))) return false;
@@ -73,7 +89,11 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
         list = [...list].sort((a, b) => b.price - a.price);
         break;
       case 'rating':
-        list = [...list].sort((a, b) => b.rating - a.rating);
+        list = [...list].sort((a, b) => {
+          const brandDiff = (BRAND_ORDER[a.brand] ?? 99) - (BRAND_ORDER[b.brand] ?? 99);
+          if (brandDiff !== 0) return brandDiff;
+          return b.rating - a.rating;
+        });
         break;
       case 'recenzii':
         list = [...list].sort((a, b) => b.reviews - a.reviews);
@@ -88,9 +108,10 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
     setSelectedCategories(new Set());
     setSelectedBTU(new Set());
     setShowQuoteOnly(false);
+    setQuickBrand(null);
   }
 
-  const hasFilters = selectedBrands.size > 0 || selectedCategories.size > 0 || selectedBTU.size > 0 || showQuoteOnly;
+  const hasFilters = selectedBrands.size > 0 || selectedCategories.size > 0 || selectedBTU.size > 0 || showQuoteOnly || quickBrand !== null;
 
   const FilterPanel = () => (
     <div className="space-y-6">
@@ -165,11 +186,31 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
 
   return (
     <>
-      <div className="mb-8">
+      <div className="mb-6">
         <h1 className="font-heading text-3xl font-bold text-dark">Magazin HVAC PRO TERM</h1>
         <p className="mt-1 text-dark-300">
           {filtered.length} produse și categorii · Aer condiționat, centrale, pompe de căldură și accesorii
         </p>
+      </div>
+
+      {/* Quick brand tabs */}
+      <div className="mb-6 flex flex-wrap gap-2">
+        <button
+          onClick={() => setQuickBrand(null)}
+          className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${quickBrand === null ? 'bg-primary text-white shadow-sm' : 'border border-gray-200 bg-white text-dark-300 hover:border-gray-300'}`}
+        >
+          Toate
+        </button>
+        {AUTHORIZED_BRANDS.map((b) => (
+          <button
+            key={b}
+            onClick={() => setQuickBrand(quickBrand === b ? null : b)}
+            className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all ${quickBrand === b ? 'bg-primary text-white shadow-sm' : 'border border-gray-200 bg-white text-dark-300 hover:border-gray-300'}`}
+          >
+            {quickBrand === b && <ShieldCheck size={13} />}
+            {b}
+          </button>
+        ))}
       </div>
 
       <div className="flex gap-8">
