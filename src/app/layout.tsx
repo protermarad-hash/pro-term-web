@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
-import { GoogleAnalytics } from '@next/third-parties/google';
 import Providers from '@/components/Providers';
 import StructuredData from '@/components/StructuredData';
+import CookieConsent from '@/components/CookieConsent';
 import './globals.css';
 
 const inter = Inter({
@@ -72,8 +72,8 @@ export default function RootLayout({
       <body>
         <StructuredData />
         <Providers>{children}</Providers>
+        <CookieConsent />
       </body>
-      <GoogleAnalytics gaId="G-58E9WQ01JX" />
     </html>
   );
 }

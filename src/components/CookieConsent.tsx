@@ -1,53 +1,95 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Script from 'next/script';
 
+const GA_ID = 'G-58E9WQ01JX';
 const STORAGE_KEY = 'proterm-cookie-consent';
-
-type Consent = 'accepted' | 'rejected';
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
+  const [gaEnabled, setGaEnabled] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-    if (!saved) setVisible(true);
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      setVisible(true);
+    } else if (stored === 'accepted') {
+      setGaEnabled(true);
+    }
   }, []);
 
-  function saveConsent(consent: Consent) {
-    window.localStorage.setItem(STORAGE_KEY, consent);
-    window.dispatchEvent(new CustomEvent('proterm-cookie-consent', { detail: consent }));
+  function accept() {
+    localStorage.setItem(STORAGE_KEY, 'accepted');
+    setGaEnabled(true);
     setVisible(false);
   }
 
-  if (!visible) return null;
+  function decline() {
+    localStorage.setItem(STORAGE_KEY, 'declined');
+    setVisible(false);
+  }
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 md:px-6 md:pb-6">
-      <div className="mx-auto max-w-5xl rounded-3xl border border-slate-200 bg-white p-5 shadow-card-hover md:flex md:items-center md:justify-between md:gap-6">
-        <div>
-          <p className="font-heading text-lg font-bold text-dark">Setări cookies</p>
-          <p className="mt-2 text-sm leading-relaxed text-dark-300">
-            Folosim cookies esențiale pentru funcționarea site-ului. Cu acordul tău, putem folosi și cookies pentru analiză și îmbunătățirea experienței. Poți accepta sau refuza cookies opționale.
-          </p>
+    <>
+      {gaEnabled && (
+        <>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+            strategy="afterInteractive"
+          />
+          <Script id="ga-init" strategy="afterInteractive">{`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}</Script>
+        </>
+      )}
+
+      {visible && (
+        <div
+          role="dialog"
+          aria-label="Consimțământ cookie-uri"
+          className="fixed inset-x-0 bottom-0 z-[100] border-t border-white/10 bg-dark/95 backdrop-blur-md"
+        >
+          <div className="container mx-auto flex flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-white">
+                Folosim cookie-uri pentru a îmbunătăți experiența ta pe site.
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-white/60">
+                Cookie-urile analitice (Google Analytics) ne ajută să înțelegem cum este utilizat
+                site-ul. Cookie-urile necesare asigură funcționarea de bază.{' '}
+                <Link
+                  href="/politica-cookies"
+                  className="text-accent underline underline-offset-2 transition-colors hover:text-accent/80"
+                >
+                  Politica cookies
+                </Link>
+              </p>
+            </div>
+
+            <div className="flex flex-shrink-0 items-center gap-3">
+              <button
+                type="button"
+                onClick={decline}
+                className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-medium text-white/70 transition-colors hover:border-white/40 hover:text-white"
+              >
+                Doar necesare
+              </button>
+              <button
+                type="button"
+                onClick={accept}
+                className="rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:-translate-y-px hover:bg-accent/90"
+              >
+                Accept toate
+              </button>
+            </div>
+          </div>
         </div>
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row md:mt-0 md:flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => saveConsent('rejected')}
-            className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-dark-300 transition-colors hover:border-primary hover:text-primary"
-          >
-            Refuz cookies opționale
-          </button>
-          <button
-            type="button"
-            onClick={() => saveConsent('accepted')}
-            className="rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600"
-          >
-            Accept cookies
-          </button>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
