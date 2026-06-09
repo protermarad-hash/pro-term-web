@@ -31,6 +31,7 @@ import {
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
 import { getMontajForBtu } from '@/lib/montaj';
+import BannerSlider from '@/components/BannerSlider';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -403,6 +404,13 @@ export default function ProductPage() {
               </div>
             </div>
           </div>
+
+          {slug.includes('breezeless') && (
+            <div className="mb-14">
+              <h2 className="mb-4 font-heading text-xl font-bold text-dark">De ce să alegi Midea Breezeless E?</h2>
+              <BannerSlider />
+            </div>
+          )}
 
           <div className="mb-14 grid gap-8 lg:grid-cols-3">
             <div className="card lg:col-span-2">
