@@ -20,7 +20,7 @@ export default function MideaBanner() {
         <div className="flex flex-col items-center gap-10 lg:flex-row">
           {/* Logo + badge */}
           <div className="flex flex-col items-center gap-4 lg:items-start">
-            <div className="flex h-20 w-48 items-center justify-center rounded-2xl bg-white px-6">
+            <div className="flex h-20 w-48 items-center justify-center rounded-2xl bg-blue-900/50 px-6 ring-1 ring-white/20">
               {!imgError ? (
                 <Image
                   src="/images/brands/midea-logo.svg"
@@ -31,7 +31,7 @@ export default function MideaBanner() {
                   onError={() => setImgError(true)}
                 />
               ) : (
-                <span className="font-bold text-3xl text-blue-700 tracking-wider">midea</span>
+                <span className="font-bold text-3xl text-white tracking-wider">midea</span>
               )}
             </div>
             <div className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur-sm">

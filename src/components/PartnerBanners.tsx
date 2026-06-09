@@ -7,6 +7,7 @@ const AUTHORIZED_BRANDS = [
     name: 'Midea',
     logoUrl: '/images/brands/midea-logo.svg',
     color: 'from-blue-600 to-blue-800',
+    logoBg: 'bg-gradient-to-r from-blue-700 to-blue-900',
     text: 'Cel mai mare producător de aparate de aer condiționat din lume. Tehnologie AI EcoMaster, eficiență energetică A+++.',
     href: '/produse?brand=Midea',
     featured: true,
@@ -15,6 +16,7 @@ const AUTHORIZED_BRANDS = [
     name: 'Gree',
     logoUrl: '/images/brands/gree-logo.svg',
     color: 'from-green-600 to-green-800',
+    logoBg: 'bg-gray-50',
     text: 'Lider mondial în climatizare. Sisteme split, VRF și pompe de căldură cu tehnologie Cold Plasma și Wi-Fi integrat.',
     href: '/produse?brand=Gree',
     featured: false,
@@ -23,6 +25,7 @@ const AUTHORIZED_BRANDS = [
     name: 'Yamato',
     logoUrl: '/images/brands/yamato-logo.svg',
     color: 'from-red-600 to-red-800',
+    logoBg: 'bg-gradient-to-r from-slate-700 to-slate-900',
     text: 'Brand japonez cu tradiție. Aparate de aer condiționat cu tratament Golden Fin, R32 și filtre antibacteriene.',
     href: '/produse?brand=Yamato',
     featured: false,
@@ -61,7 +64,7 @@ export default function PartnerBanners() {
                 </span>
               )}
 
-              <div className="mb-4 flex h-16 items-center justify-center rounded-2xl bg-gray-50 px-4">
+              <div className={`mb-4 flex h-16 items-center justify-center rounded-2xl px-4 ${brand.logoBg}`}>
                 <Image
                   src={brand.logoUrl}
                   alt={`Logo ${brand.name}`}

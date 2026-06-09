@@ -21,10 +21,11 @@ const BANNERS = [
 ];
 
 const HREF = '/produse?brand=Midea&model=breezeless-e';
-const INTERVAL = 5000;
+const INTERVAL = 6000;
 
 export default function BannerSlider() {
   const [current, setCurrent] = useState(0);
+  const [errors, setErrors] = useState<Set<number>>(new Set());
 
   const next = useCallback(() => {
     setCurrent((c) => (c + 1) % BANNERS.length);
@@ -44,50 +45,51 @@ export default function BannerSlider() {
       className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-md"
       style={{ height: 'clamp(220px, 28vw, 400px)' }}
     >
-      <div
-        className="flex h-full transition-transform duration-500 ease-in-out"
-        style={{ transform: `translateX(-${current * 100}%)`, width: `${BANNERS.length * 100}%` }}
-      >
-        {BANNERS.map((banner) => (
-          <Link
-            key={banner.src}
-            href={HREF}
-            className="relative block flex-shrink-0 h-full"
-            style={{ width: `${100 / BANNERS.length}%` }}
-          >
-            <Image
-              src={banner.src}
-              alt={banner.alt}
-              fill
-              sizes="(max-width: 768px) 100vw, 1200px"
-              className="object-cover"
-              priority
-            />
-          </Link>
-        ))}
-      </div>
+      {BANNERS.map((banner, i) => (
+        <Link
+          key={banner.src}
+          href={HREF}
+          className="absolute inset-0"
+          style={{
+            opacity: i === current ? 1 : 0,
+            transition: 'opacity 800ms ease-in-out',
+            pointerEvents: i === current ? 'auto' : 'none',
+            visibility: errors.has(i) ? 'hidden' : 'visible',
+          }}
+        >
+          <Image
+            src={banner.src}
+            alt={banner.alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 1200px"
+            className="object-cover"
+            priority={i === 0}
+            onError={() => setErrors((prev) => new Set(prev).add(i))}
+          />
+        </Link>
+      ))}
 
       <button
         onClick={prev}
-        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/60"
+        className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/60"
         aria-label="Banner anterior"
       >
         <ChevronLeft size={20} />
       </button>
       <button
         onClick={next}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/60"
+        className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/40 p-2 text-white backdrop-blur-sm transition-all hover:bg-black/60"
         aria-label="Banner următor"
       >
         <ChevronRight size={20} />
       </button>
 
-      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-2">
         {BANNERS.map((_, i) => (
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            className={`h-2 rounded-full transition-all ${i === current ? 'w-6 bg-white' : 'w-2 bg-white/60'}`}
+            className={`h-2 rounded-full transition-all duration-300 ${i === current ? 'w-6 bg-white' : 'w-2 bg-white/60'}`}
             aria-label={`Slide ${i + 1}`}
           />
         ))}
