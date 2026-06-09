@@ -11,10 +11,10 @@ import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 const navLinks = [
   { label: 'Servicii',       href: '/servicii' },
   { label: 'Produse',        href: '/produse' },
+  { label: 'Multisplit',     href: '/multisplit' },
   { label: 'Calculator BTU', href: '/calculator-btu' },
   { label: 'Blog',           href: '/blog' },
   { label: 'Despre noi',     href: '/despre' },
-  { label: 'Avantaje',       href: '/#avantaje' },
   { label: 'Contact',        href: '/#contact' },
 ];
 

@@ -20,7 +20,9 @@ export type Category =
   | 'teava-fitinguri'
   | 'condens-drenaj'
   | 'termostate-automatizari'
-  | 'service-montaj';
+  | 'service-montaj'
+  | 'multisplit'
+  | 'multisplit-pachet';
 
 export type StockStatus = 'in-stock' | 'low-stock' | 'out-of-stock' | 'on-request';
 
@@ -80,6 +82,8 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   'condens-drenaj': 'Condens și drenaj',
   'termostate-automatizari': 'Termostate & automatizări',
   'service-montaj': 'Service & montaj',
+  'multisplit': 'Sistem multisplit',
+  'multisplit-pachet': 'Pachet multisplit',
 };
 
 export const STOCK_LABEL: Record<StockStatus, string> = {

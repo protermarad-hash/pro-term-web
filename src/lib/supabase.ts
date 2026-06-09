@@ -99,7 +99,7 @@ function parseSpecs(raw: DbProduct['specs']): { label: string; value: string }[]
       .filter(([, v]) => v !== null && v !== undefined && v !== '')
       .map(([k, v]) => ({
         label: SPEC_KEY_LABELS[k] ?? k,
-        value: String(v),
+        value: typeof v === 'object' ? JSON.stringify(v) : String(v),
       }));
   }
   return [];
