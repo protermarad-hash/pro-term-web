@@ -98,6 +98,16 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [imgTransitioning, setImgTransitioning] = useState(false);
+
+  function changeImage(url: string) {
+    if (url === selectedImage) return;
+    setImgTransitioning(true);
+    setTimeout(() => {
+      setSelectedImage(url);
+      setImgTransitioning(false);
+    }, 200);
+  }
 
   useEffect(() => {
     let active = true;
@@ -198,6 +208,7 @@ export default function ProductPage() {
                     fill
                     sizes="(max-width: 1024px) 100vw, 50vw"
                     className="bg-white object-contain p-8"
+                    style={{ opacity: imgTransitioning ? 0 : 1, transition: 'opacity 200ms ease-in-out' }}
                     unoptimized
                   />
                 ) : (
@@ -230,14 +241,14 @@ export default function ProductPage() {
               </div>
 
               {galleryImages.length > 1 && (
-                <div className="mt-4 grid grid-cols-4 gap-3">
+                <div className="mt-4 flex gap-3 overflow-x-auto pb-1 md:grid md:grid-cols-5 md:overflow-visible">
                   {galleryImages.map((image) => (
                     <button
                       key={image}
-                      onClick={() => setSelectedImage(image)}
-                      className={`relative aspect-square overflow-hidden rounded-xl border bg-white ${selectedImage === image ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200'}`}
+                      onClick={() => changeImage(image)}
+                      className={`relative aspect-square flex-shrink-0 w-16 md:w-auto overflow-hidden rounded-xl border bg-white transition-all ${selectedImage === image ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200 hover:border-primary/50'}`}
                     >
-                      <Image src={image} alt={product.name} fill sizes="120px" className="object-contain p-2" unoptimized />
+                      <Image src={image} alt={product.name} fill sizes="120px" className="object-contain p-1.5" unoptimized />
                     </button>
                   ))}
                 </div>
