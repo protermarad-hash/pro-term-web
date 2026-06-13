@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     description:
       'Dealer autorizat Midea, Gree și Yamato. Montaj și service HVAC în Arad și Timiș. Livrare echipamente în toată România. Sisteme VRV comerciale național.',
     url: 'https://pro-term.ro',
+    images: [{ url: '/logo-proterm.jpg', width: 930, height: 640, alt: 'PRO TERM' }],
   },
 };
 

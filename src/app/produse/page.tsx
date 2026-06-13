@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCatalog from '@/components/ProductCatalog';
@@ -11,8 +12,7 @@ export const metadata: Metadata = {
     'Catalog produse HVAC cu livrare în România: aparate de aer condiționat, pompe de căldură, centrale termice, accesorii și servicii de montaj PRO TERM.',
 };
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 async function getProducts() {
   const supabase = getSupabaseServiceClient();
@@ -57,7 +57,9 @@ export default async function ProdusePage() {
           </div>
         </section>
         <div className="container mx-auto px-4 pt-10">
-          <ProductCatalog products={products} />
+          <Suspense fallback={<p className="py-20 text-center text-dark-300">Se încarcă produsele...</p>}>
+            <ProductCatalog products={products} />
+          </Suspense>
         </div>
       </main>
       <Footer />

@@ -5,6 +5,17 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: [
+        '/admin',
+        '/admin/',
+        '/api/',
+        '/cont/profil',
+        '/cont/profil/',
+        '/checkout',
+        '/checkout/',
+        '/comanda-confirmata/',
+        '/formular-retragere',
+      ],
     },
     sitemap: 'https://pro-term.ro/sitemap.xml',
   };
