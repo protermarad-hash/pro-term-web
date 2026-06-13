@@ -46,9 +46,12 @@ export const metadata: Metadata = {
     canonical: 'https://pro-term.ro',
   },
   icons: {
-    icon: '/logo-proterm.jpg',
-    apple: '/logo-proterm.jpg',
-    shortcut: '/logo-proterm.jpg',
+    icon: [
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
+    shortcut: '/favicon.ico',
   },
   openGraph: {
     title: 'PRO TERM | Produse HVAC România și servicii în Arad / Timișoara',
