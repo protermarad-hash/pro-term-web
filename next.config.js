@@ -19,6 +19,13 @@ const nextConfig = {
         ],
       },
       {
+        // HTML pages: browser always revalidates; CDN cache is purged on each Vercel deploy
+        source: '/((?!_next).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=0, must-revalidate' },
+        ],
+      },
+      {
         source: '/_next/static/(.*)',
         headers: [
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
