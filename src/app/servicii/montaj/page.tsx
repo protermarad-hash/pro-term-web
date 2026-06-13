@@ -13,13 +13,13 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Montaj Aer Condiționat Arad | Tarife 2025 | PRO TERM SRL',
+  title: 'Montaj Aer Condiționat Arad și Timișoara | PRO TERM SRL',
   description:
-    'Montaj standard aer condiționat în Arad de la 750 RON cu TVA. Echipă F-Gas autorizată, garanție 12 luni. Tarife complete pentru 9000, 18000 și 24000 BTU.',
+    'Montaj standard aer condiționat în Arad și Timișoara de la 750 RON cu TVA. Echipă F-Gas autorizată, garanție 12 luni. Tarife pentru 9000, 18000 și 24000 BTU.',
   alternates: { canonical: 'https://pro-term.ro/servicii/montaj' },
   openGraph: {
-    title: 'Montaj Aer Condiționat Arad — Tarife 2025 | PRO TERM SRL',
-    description: 'Montaj profesional aer condiționat în Arad. De la 750 RON, garanție 12 luni, tehnicieni F-Gas autorizați.',
+    title: 'Montaj Aer Condiționat Arad și Timișoara | PRO TERM SRL',
+    description: 'Montaj profesional aer condiționat în Arad și Timișoara. De la 750 RON, garanție 12 luni, tehnicieni F-Gas autorizați.',
     url: 'https://pro-term.ro/servicii/montaj',
   },
   robots: { index: true, follow: true },

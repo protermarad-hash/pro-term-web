@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Politica de retur și retragere | PRO TERM SRL',
+  description: 'Condițiile de returnare a produselor HVAC achiziționate de la PRO TERM SRL și dreptul de retragere conform legislației privind protecția consumatorilor.',
+  alternates: { canonical: 'https://pro-term.ro/politica-retur' },
+};
 
 const updatedAt = '07.06.2026';
 

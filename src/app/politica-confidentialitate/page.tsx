@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Politica de confidențialitate GDPR | PRO TERM SRL',
+  description: 'Politica de confidențialitate PRO TERM SRL: cum sunt prelucrate datele personale ale clienților conform GDPR și legislației române în vigoare.',
+  alternates: { canonical: 'https://pro-term.ro/politica-confidentialitate' },
+};
 
 const updatedAt = '06.06.2026';
 

@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Informații legale comerciant | PRO TERM SRL',
+  description: 'Date de identificare PRO TERM SRL: CUI, număr înregistrare, adresă sediu, contact și informații legale conform legislației române.',
+  alternates: { canonical: 'https://pro-term.ro/informatii-legale' },
+};
 
 const updatedAt = '07.06.2026';
 

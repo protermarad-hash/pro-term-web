@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Politica cookies | PRO TERM SRL',
+  description: 'Informații despre utilizarea cookie-urilor pe site-ul pro-term.ro și cum poți gestiona preferințele tale de confidențialitate.',
+  alternates: { canonical: 'https://pro-term.ro/politica-cookies' },
+};
 
 const updatedAt = '06.06.2026';
 

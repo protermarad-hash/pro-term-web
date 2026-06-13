@@ -9,7 +9,14 @@ import { dbProductToProduct, getSupabaseServiceClient } from '@/lib/supabase';
 export const metadata: Metadata = {
   title: 'Produse HVAC România | Aer condiționat, pompe de căldură, centrale | PRO TERM',
   description:
-    'Catalog produse HVAC cu livrare în România: aparate de aer condiționat, pompe de căldură, centrale termice, accesorii și servicii de montaj PRO TERM.',
+    'Catalog produse HVAC cu livrare în România: aparate de aer condiționat Midea, Gree, Yamato, pompe de căldură, centrale termice, accesorii și servicii de montaj PRO TERM.',
+  alternates: { canonical: 'https://pro-term.ro/produse' },
+  openGraph: {
+    title: 'Produse HVAC cu livrare în România | PRO TERM',
+    description:
+      'Aer condiționat Midea, Gree, Yamato, pompe de căldură, centrale termice și accesorii HVAC. Livrare în toată România.',
+    url: 'https://pro-term.ro/produse',
+  },
 };
 
 export const revalidate = 60;

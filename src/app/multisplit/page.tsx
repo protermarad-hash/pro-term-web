@@ -10,14 +10,14 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: 'Sisteme Multisplit Gree | Configurator Online | PRO TERM Arad',
+  title: 'Sisteme Multisplit Gree | Configurator Online | PRO TERM',
   description:
-    'Configurează online sistemul tău multisplit Gree. 2, 3 sau 4 camere climatizate cu o singură unitate exterioară. Pachete preconfigurate sau configurare personalizată. PRO TERM Arad.',
+    'Sisteme multisplit Gree cu livrare în România. Configurează online 2, 3 sau 4 camere cu o singură unitate exterioară. Pachete preconfigurate sau configurare personalizată.',
   alternates: { canonical: 'https://pro-term.ro/multisplit' },
   openGraph: {
-    title: 'Sisteme Multisplit Gree | Configurator Online | PRO TERM Arad',
+    title: 'Sisteme Multisplit Gree | Configurator Online | PRO TERM',
     description:
-      'Climatizează mai multe camere cu o singură unitate exterioară. Pachete preconfigurate Gree 2-4 camere sau configurator personalizat.',
+      'Climatizează mai multe camere cu o singură unitate exterioară Gree. Pachete preconfigurate 2-4 camere, livrare în toată România.',
     url: 'https://pro-term.ro/multisplit',
   },
 };

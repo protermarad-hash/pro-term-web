@@ -42,9 +42,7 @@ export const metadata: Metadata = {
     'pro term',
     'pro-term.ro',
   ],
-  alternates: {
-    canonical: 'https://pro-term.ro',
-  },
+  alternates: {},
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },

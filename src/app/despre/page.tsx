@@ -14,9 +14,16 @@ import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Despre PRO TERM SRL | 25+ ani HVAC',
+  title: 'Despre PRO TERM SRL | 25+ ani experiență HVAC',
   description:
-    'Aflați povestea PRO TERM SRL, firmă din Arad cu experiență în climatizare, HVAC, montaj, service și mentenanță pentru echipamente Gree, Midea, Yamato, Fujitsu și alți producători.',
+    'PRO TERM SRL — firmă din Arad fondată în 1999, dealer autorizat Midea, Gree și Yamato. Montaj, service și mentenanță HVAC în Arad și Timiș, proiecte comerciale la nivel național.',
+  alternates: { canonical: 'https://pro-term.ro/despre' },
+  openGraph: {
+    title: 'Despre PRO TERM SRL | 25+ ani experiență HVAC',
+    description:
+      'Dealer autorizat Midea, Gree, Yamato, fondați în 1999. Echipă certificată F-Gas, proiecte HVAC rezidențiale și comerciale în România.',
+    url: 'https://pro-term.ro/despre',
+  },
 };
 
 const timeline = [

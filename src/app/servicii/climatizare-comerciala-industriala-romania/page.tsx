@@ -5,8 +5,16 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Climatizare comercială și industrială România | PRO TERM',
-  description: 'Soluții de climatizare comercială și industrială în România: spații comerciale, birouri, hale, sisteme HVAC, VRV/VRF, montaj, service și mentenanță.',
+  title: 'Climatizare Comercială și Industrială România | Sisteme HVAC | PRO TERM',
+  description:
+    'Soluții complete de climatizare comercială și industrială în România: spații comerciale, birouri, hale de producție, sisteme VRV/VRF, montaj, service și mentenanță preventivă.',
+  alternates: { canonical: 'https://pro-term.ro/servicii/climatizare-comerciala-industriala-romania' },
+  openGraph: {
+    title: 'Climatizare Comercială și Industrială România | PRO TERM',
+    description:
+      'Proiecte HVAC pentru spații comerciale, industriale și birouri în România. Sisteme VRV/VRF, consultanță tehnică și mentenanță.',
+    url: 'https://pro-term.ro/servicii/climatizare-comerciala-industriala-romania',
+  },
 };
 
 const phone = '40749025610';

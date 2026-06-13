@@ -1,6 +1,13 @@
+import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Termeni și condiții | PRO TERM SRL',
+  description: 'Termenii și condițiile comerciale ale PRO TERM SRL pentru achiziția de produse HVAC și servicii de montaj, service și mentenanță.',
+  alternates: { canonical: 'https://pro-term.ro/termeni-si-conditii' },
+};
 
 const updatedAt = '07.06.2026';
 

@@ -21,6 +21,7 @@ const staticRoutes: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/servicii/climatizare-comerciala-industriala-romania', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/calculator-btu', priority: 0.65, changeFrequency: 'monthly' },
   { path: '/despre', priority: 0.65, changeFrequency: 'monthly' },
+  { path: '/contact', priority: 0.65, changeFrequency: 'monthly' },
   { path: '/blog', priority: 0.65, changeFrequency: 'weekly' },
   { path: '/informatii-legale', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/termeni-si-conditii', priority: 0.4, changeFrequency: 'monthly' },
@@ -28,7 +29,6 @@ const staticRoutes: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/politica-confidentialitate', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/politica-retur', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/politica-cookies', priority: 0.4, changeFrequency: 'monthly' },
-  { path: '/formular-retragere', priority: 0.3, changeFrequency: 'monthly' },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -50,11 +50,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
 
-  const { data: products } = await supabase
-    .from('products')
-    .select('slug, updated_at')
-    .eq('active', true)
-    .order('updated_at', { ascending: false });
+  const [{ data: products }, { data: blogPosts }] = await Promise.all([
+    supabase
+      .from('products')
+      .select('slug, updated_at')
+      .eq('active', true)
+      .order('updated_at', { ascending: false }),
+    supabase
+      .from('blog_posts')
+      .select('slug, updated_at')
+      .eq('published', true)
+      .order('updated_at', { ascending: false }),
+  ]);
 
   const productEntries: MetadataRoute.Sitemap = (products ?? []).map((p) => ({
     url: `${baseUrl}/produse/${p.slug}`,
@@ -63,5 +70,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticEntries, ...productEntries];
+  const blogEntries: MetadataRoute.Sitemap = (blogPosts ?? []).map((p) => ({
+    url: `${baseUrl}/blog/${p.slug}`,
+    lastModified: p.updated_at ? new Date(p.updated_at) : now,
+    changeFrequency: 'monthly',
+    priority: 0.55,
+  }));
+
+  return [...staticEntries, ...productEntries, ...blogEntries];
 }
