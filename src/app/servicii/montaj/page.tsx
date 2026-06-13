@@ -33,14 +33,14 @@ const TARIFE = [
     suprafata: '12 – 23 m²',
     pret: '750',
     slug: 'montaj-standard-9000-12000-btu',
-    popular: false,
+    popular: true,
   },
   {
     btu: '18.000 BTU',
     suprafata: '23 – 35 m²',
     pret: '850',
     slug: 'montaj-standard-18000-btu',
-    popular: true,
+    popular: false,
   },
   {
     btu: '24.000 BTU',
