@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseServiceClient, slugify } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const BUCKET = 'product-images';
 
@@ -13,6 +14,9 @@ function getMissingSupabaseEnv() {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const supabase = getSupabaseServiceClient();
   const missing = getMissingSupabaseEnv();
 

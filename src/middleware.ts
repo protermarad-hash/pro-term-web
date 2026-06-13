@@ -1,8 +1,25 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const response = NextResponse.next();
   const pathname = request.nextUrl.pathname;
+
+  // Fast pre-filter for API admin routes — full is_admin check happens inside each route handler
+  if (pathname.startsWith('/api/admin/')) {
+    const auth = request.headers.get('Authorization');
+    if (!auth || !/^Bearer\s+\S/i.test(auth)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+
+  // Redirect unauthenticated users away from admin UI
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    const hasSession = request.cookies.get('sb-session');
+    if (!hasSession) {
+      return NextResponse.redirect(new URL('/cont/autentificare', request.url));
+    }
+  }
+
+  const response = NextResponse.next();
 
   const shouldDisableCache =
     pathname === '/admin' ||
@@ -22,5 +39,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*', '/produse/:path*', '/api/products/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/api/admin/:path*', '/produse/:path*', '/api/products/:path*'],
 };

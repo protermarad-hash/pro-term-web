@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { getSupabaseAnonClient } from '@/lib/supabase';
 import {
   AlertCircle,
   CheckCircle2,
@@ -19,6 +20,15 @@ import {
   X,
 } from 'lucide-react';
 import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/lib/products';
+
+async function authFetch(url: string, init: RequestInit = {}): Promise<Response> {
+  const supabase = getSupabaseAnonClient();
+  const { data } = supabase ? await supabase.auth.getSession() : { data: { session: null } };
+  const token = data.session?.access_token;
+  const headers = new Headers(init.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  return fetch(url, { ...init, headers });
+}
 
 const BRANDS: Brand[] = ['Gree', 'Midea', 'Yamato', 'Fujitsu', 'Yukon', 'Habitat', 'Bosch', 'Vaillant', 'Immergas', 'Viessmann', 'Generic', 'PRO TERM'];
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
@@ -156,7 +166,7 @@ function OrdersSection() {
   async function loadOrders() {
     setLoading(true);
     try {
-      const res = await fetch('/api/admin/orders', { cache: 'no-store' });
+      const res = await authFetch('/api/admin/orders', { cache: 'no-store' });
       const data = await res.json();
       if (data.warning) setWarning(data.warning);
       setOrders(data.orders ?? []);
@@ -172,7 +182,7 @@ function OrdersSection() {
   async function changeStatus(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
     try {
-      const res = await fetch('/api/admin/orders', {
+      const res = await authFetch('/api/admin/orders', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: orderId, status: newStatus }),
@@ -367,7 +377,7 @@ function BlogSection() {
 
   async function loadPosts() {
     try {
-      const res = await fetch('/api/admin/blog', { cache: 'no-store' });
+      const res = await authFetch('/api/admin/blog', { cache: 'no-store' });
       const data = await res.json();
       setPosts(data.posts ?? []);
     } catch { /* silent */ }
@@ -399,7 +409,7 @@ function BlogSection() {
         tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
         read_time: parseInt(form.readTime) || 5,
       };
-      const res = await fetch('/api/admin/blog', {
+      const res = await authFetch('/api/admin/blog', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -419,7 +429,7 @@ function BlogSection() {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Ștergi articolul "${title}"?`)) return;
-    await fetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
+    await authFetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
     await loadPosts();
   }
 
@@ -565,7 +575,7 @@ export default function AdminClient() {
 
   async function loadProducts() {
     try {
-      const response = await fetch('/api/admin/products', { cache: 'no-store' });
+      const response = await authFetch('/api/admin/products', { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Nu am putut încărca produsele.');
       setProducts(data.products || []);
@@ -596,7 +606,7 @@ export default function AdminClient() {
     setError('');
 
     try {
-      const response = await fetch('/api/admin/products', {
+      const response = await authFetch('/api/admin/products', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
@@ -627,7 +637,7 @@ export default function AdminClient() {
       Array.from(files).forEach((file) => formData.append('files', file));
       formData.append('productName', form.name || 'produs');
 
-      const response = await fetch('/api/admin/product-images', {
+      const response = await authFetch('/api/admin/product-images', {
         method: 'POST',
         body: formData,
       });
@@ -681,7 +691,7 @@ export default function AdminClient() {
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/products?id=${product.id}`, { method: 'DELETE' });
+      const response = await authFetch(`/api/admin/products?id=${product.id}`, { method: 'DELETE' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Produsul nu a fost șters.');
       setMessage('Produs șters cu succes.');

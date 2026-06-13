@@ -65,7 +65,6 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    console.error('[orders] insert error:', error);
     return NextResponse.json(
       { error: error.code === '42P01' ? 'Tabela orders nu există. Rulează scripts/create-orders-table.sql în Supabase SQL Editor.' : error.message },
       { status: 500 },
@@ -95,12 +94,8 @@ export async function POST(request: Request) {
 
   // Emails trimise asincron — nu blochează răspunsul
   Promise.all([
-    sendOrderConfirmationToClient(emailData).catch((e) =>
-      console.error('[email] client error:', e?.message),
-    ),
-    sendOrderNotificationToAdmin(emailData).catch((e) =>
-      console.error('[email] admin error:', e?.message),
-    ),
+    sendOrderConfirmationToClient(emailData).catch(() => {}),
+    sendOrderNotificationToAdmin(emailData).catch(() => {}),
   ]);
 
   return NextResponse.json({ orderId: order.id, orderRef });

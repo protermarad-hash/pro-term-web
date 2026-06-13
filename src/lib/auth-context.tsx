@@ -39,6 +39,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
       setLoading(false);
+      // Sync presence cookie so middleware can redirect unauthenticated users
+      if (newSession) {
+        document.cookie = `sb-session=1; path=/; SameSite=Lax; max-age=${7 * 24 * 3600}`;
+      } else {
+        document.cookie = 'sb-session=; path=/; SameSite=Lax; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      }
     });
 
     return () => subscription.unsubscribe();

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseServiceClient, slugify } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/admin-auth';
 
 function getMissingSupabaseEnv() {
   return [
@@ -84,7 +85,10 @@ function getSupabaseOrError() {
   return { supabase, response: null };
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const { supabase, response } = getSupabaseOrError();
   if (!supabase) return response;
 
@@ -101,6 +105,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const { supabase, response } = getSupabaseOrError();
   if (!supabase) return response;
 
@@ -125,6 +132,9 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const { supabase, response } = getSupabaseOrError();
   if (!supabase) return response;
 
@@ -155,6 +165,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const { supabase, response } = getSupabaseOrError();
   if (!supabase) return response;
 

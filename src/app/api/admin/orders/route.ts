@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
 import { getSupabaseServiceClient } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/admin-auth';
 
 const VALID_STATUSES = ['nou', 'confirmat', 'in-livrare', 'livrat', 'anulat'] as const;
 
-export async function GET() {
+export async function GET(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const supabase = getSupabaseServiceClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Server config error.' }, { status: 500 });
@@ -26,6 +30,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const auth = await requireAdmin(request);
+  if (!auth.ok) return auth.response;
+
   const supabase = getSupabaseServiceClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Server config error.' }, { status: 500 });
