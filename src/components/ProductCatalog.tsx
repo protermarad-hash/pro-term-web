@@ -122,7 +122,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
             <input
               type="checkbox"
               checked={selectedBrands.has(b)}
-              onChange={() => setSelectedBrands(toggle(selectedBrands, b))}
+              onChange={() => { setSelectedBrands(toggle(selectedBrands, b)); setQuickBrand(null); }}
               className="h-4 w-4 accent-primary"
             />
             <span className="text-sm text-dark-300">{b}</span>
@@ -196,7 +196,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
       {/* Quick brand tabs */}
       <div className="mb-6 flex flex-wrap gap-2">
         <button
-          onClick={() => setQuickBrand(null)}
+          onClick={() => { setQuickBrand(null); setSelectedBrands(new Set()); }}
           className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${quickBrand === null ? 'bg-primary text-white shadow-sm' : 'border border-gray-200 bg-white text-dark-300 hover:border-gray-300'}`}
         >
           Toate
@@ -204,7 +204,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
         {AUTHORIZED_BRANDS.map((b) => (
           <button
             key={b}
-            onClick={() => setQuickBrand(quickBrand === b ? null : b)}
+            onClick={() => { setQuickBrand(quickBrand === b ? null : b); setSelectedBrands(new Set()); }}
             className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all ${quickBrand === b ? 'bg-primary text-white shadow-sm' : 'border border-gray-200 bg-white text-dark-300 hover:border-gray-300'}`}
           >
             {quickBrand === b && <ShieldCheck size={13} />}
@@ -215,7 +215,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
 
       <div className="flex gap-8">
         <aside className="hidden w-64 flex-shrink-0 lg:block">
-          <div className="card sticky top-24">
+          <div className="card sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto">
             <h2 className="mb-4 font-heading font-bold text-dark">Filtre</h2>
             <FilterPanel />
           </div>
