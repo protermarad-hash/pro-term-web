@@ -2,12 +2,10 @@ import Link from 'next/link';
 import {
   CheckCircle2,
   ChevronRight,
-  Clock3,
   MapPin,
   MessageCircle,
   Phone,
   ShieldCheck,
-  Wrench,
 } from 'lucide-react';
 
 type ServiceType = 'montaj' | 'service' | 'igienizare' | 'revizie';
@@ -391,6 +389,7 @@ const serviceContent: Record<ServiceType, ServiceContent> = {
 export default function ServiceCityPage({ city, service }: ServiceCityPageProps) {
   const content = serviceContent[service];
   const locationLabel = city === 'Arad' ? 'Arad si imprejurimi' : `${city} si zone apropiate`;
+
   const whatsappUrl = buildWhatsAppUrl(
     `Buna ziua, doresc detalii pentru ${content.label.toLowerCase()} in ${city}.`,
   );
@@ -403,58 +402,53 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
           ? `Buna ziua, vreau o estimare pentru ${content.label.toLowerCase()} in ${city}. Trimit cateva detalii despre aparat.`
           : `Buna ziua, vreau o estimare pentru ${content.label.toLowerCase()} in ${city}. Trimit detalii despre aparat si locatie.`,
   );
-  const pricingSecondaryCta =
-    service === 'montaj'
-      ? 'Vezi lista completa de tarife'
-      : service === 'service'
-        ? 'Programeaza verificarea'
-        : 'Contacteaza PRO TERM';
-  const pricingSecondaryHref = service === 'montaj' ? '/servicii/montaj' : '/contact';
+
+  const trustPoints = [
+    'PRO TERM activeaza in domeniul HVAC din 1999.',
+    'Personal tehnic profesionist cu consultanta practica inclusa.',
+    `Servicii disponibile in ${locationLabel}, in functie de programare.`,
+  ];
 
   return (
     <main className="bg-light-200 pt-24">
-      <section className="bg-hero-gradient py-20 text-white">
+
+      {/* 1. HERO — compact */}
+      <section className="bg-hero-gradient py-12 text-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl">
-            <span className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-white/90 ring-1 ring-white/20">
-              <MapPin size={16} />
+          <div className="max-w-3xl">
+            <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/90 ring-1 ring-white/20">
+              <MapPin size={14} />
               {content.label} in {city}
             </span>
-            <h1 className="font-heading text-4xl font-bold leading-tight md:text-6xl">
+            <h1 className="font-heading text-3xl font-bold leading-tight md:text-5xl">
               {content.label} {city}
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/80">
-              {content.heroSubtitle} Servicii disponibile in {locationLabel}, in functie de programare.
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-white/80">
+              {content.heroSubtitle}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <a
                 href={phoneHref}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 font-bold text-primary transition hover:bg-slate-100"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 font-bold text-primary transition hover:bg-slate-100"
               >
-                <Phone size={20} />
-                Suna acum
+                <Phone size={18} />
+                {phoneDisplay}
               </a>
               <a
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-3.5 font-bold text-white transition hover:bg-green-600"
               >
-                <MessageCircle size={20} />
+                <MessageCircle size={18} />
                 Cere oferta pe WhatsApp
               </a>
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-4 font-bold text-white transition hover:bg-white hover:text-primary"
-              >
-                Contacteaza PRO TERM
-              </Link>
             </div>
-            <div className="mt-6 flex flex-wrap gap-2 text-sm">
-              {['PRO TERM din 1999', 'Consultanta tehnica', 'Locuinte si birouri', locationLabel].map((item) => (
+            <div className="mt-5 flex flex-wrap gap-2 text-sm">
+              {['PRO TERM din 1999', 'F-Gas Autorizat', locationLabel].map((item) => (
                 <span
                   key={item}
-                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 font-semibold text-white/90"
+                  className="rounded-full border border-white/20 bg-white/10 px-3 py-1 font-semibold text-white/90"
                 >
                   {item}
                 </span>
@@ -464,287 +458,217 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
         </div>
       </section>
 
-      <section className="py-16">
+      {/* 2. PRICING — vizibil imediat dupa hero */}
+      <section className="py-8">
         <div className="container mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="card lg:col-span-2">
-              <div className="mb-6 rounded-3xl border border-primary/15 bg-primary/5 p-5">
-                <h2 className="font-heading text-2xl font-bold text-dark">{content.pricingTitle}</h2>
-                {content.pricingFrom && (
-                  <div className="mt-3 inline-flex rounded-full bg-white px-4 py-1.5 text-sm font-bold text-primary shadow-sm ring-1 ring-primary/10">
-                    {content.pricingFrom}
-                  </div>
-                )}
-                <p className="mt-3 text-sm leading-relaxed text-dark-300">{content.pricingText}</p>
-                {(content.pricingIncludes || content.pricingExcludes) && (
-                  <div className="mt-5 grid gap-4 lg:grid-cols-2">
-                    {content.pricingIncludes && (
-                      <div className="rounded-2xl bg-white p-4 shadow-sm">
-                        <h3 className="font-heading text-base font-bold text-dark">Include</h3>
-                        <ul className="mt-3 space-y-2">
-                          {content.pricingIncludes.map((item) => (
-                            <li key={item} className="flex items-start gap-2 text-sm text-dark-300">
-                              <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0 text-green-500" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {content.pricingExcludes && (
-                      <div className="rounded-2xl bg-white p-4 shadow-sm">
-                        <h3 className="font-heading text-base font-bold text-dark">Nu include</h3>
-                        <ul className="mt-3 space-y-2">
-                          {content.pricingExcludes.map((item) => (
-                            <li key={item} className="flex items-start gap-2 text-sm text-dark-300">
-                              <ChevronRight size={15} className="mt-0.5 flex-shrink-0 text-amber-500" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <a
-                    href={pricingWhatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
-                  >
-                    <MessageCircle size={18} />
-                    {service === 'montaj' ? 'Cere oferta pe WhatsApp' : 'Cere estimare pe WhatsApp'}
-                  </a>
-                  <a
-                    href={phoneHref}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary shadow-sm transition hover:bg-slate-50"
-                  >
-                    <Phone size={18} />
-                    Suna pentru detalii
-                  </a>
-                  <Link
-                    href={pricingSecondaryHref}
-                    className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
-                  >
-                    {service === 'service' || service === 'igienizare' || service === 'revizie'
-                      ? 'Programeaza verificarea'
-                      : pricingSecondaryCta}
-                  </Link>
-                </div>
+          <div className="rounded-3xl border border-primary/15 bg-white p-6 shadow-card md:p-8">
+            <h2 className="font-heading text-xl font-bold text-dark md:text-2xl">
+              {content.pricingTitle}
+            </h2>
+            {content.pricingFrom && (
+              <div className="mt-3 inline-flex rounded-full bg-primary/10 px-4 py-1.5 text-sm font-bold text-primary">
+                {content.pricingFrom}
               </div>
+            )}
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-dark-300">
+              {content.pricingText}
+            </p>
 
-              <h2 className="mb-5 font-heading text-2xl font-bold text-dark">
+            {(content.pricingIncludes || content.pricingExcludes) && (
+              <div className="mt-5 grid gap-4 md:grid-cols-2">
+                {content.pricingIncludes && (
+                  <div className="rounded-2xl bg-light-200 p-4">
+                    <h3 className="mb-3 text-sm font-bold text-dark">Include</h3>
+                    <ul className="space-y-2">
+                      {content.pricingIncludes.slice(0, 5).map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-dark-300">
+                          <CheckCircle2 size={14} className="mt-0.5 flex-shrink-0 text-green-500" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {content.pricingExcludes && (
+                  <div className="rounded-2xl bg-light-200 p-4">
+                    <h3 className="mb-3 text-sm font-bold text-dark">Nu include</h3>
+                    <ul className="space-y-2">
+                      {content.pricingExcludes.slice(0, 4).map((item) => (
+                        <li key={item} className="flex items-start gap-2 text-sm text-dark-300">
+                          <ChevronRight size={14} className="mt-0.5 flex-shrink-0 text-amber-500" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a
+                href={pricingWhatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
+              >
+                <MessageCircle size={16} />
+                {service === 'montaj' ? 'Cere oferta pe WhatsApp' : 'Cere estimare pe WhatsApp'}
+              </a>
+              <a
+                href={phoneHref}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-primary/25 px-5 py-3 font-bold text-primary transition hover:border-primary hover:bg-primary/5"
+              >
+                <Phone size={16} />
+                Suna pentru detalii
+              </a>
+              {service === 'montaj' && (
+                <Link
+                  href="/servicii/montaj"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
+                >
+                  Vezi lista completa de tarife
+                  <ChevronRight size={16} />
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. TREI CARDURI — Ce include / Cand ai nevoie / Cum programezi */}
+      <section className="pb-10">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-5 md:grid-cols-3">
+
+            {/* Card 1: Ce include */}
+            <div className="card">
+              <h2 className="mb-4 font-heading text-base font-bold text-dark">
                 {content.includeTitle}
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
-                {content.includeItems.map((item) => (
-                  <div key={item} className="flex gap-3 rounded-2xl bg-light-200 p-4">
-                    <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-primary" />
-                    <p className="text-sm leading-relaxed text-dark-300">{item}</p>
-                  </div>
+              <ul className="space-y-2.5">
+                {content.includeItems.slice(0, 4).map((item) => (
+                  <li key={item} className="flex gap-2.5 text-sm text-dark-300">
+                    <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0 text-primary" />
+                    {item}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
-            <div className="space-y-4">
-              <div className="card">
-                <ShieldCheck className="mb-3 text-primary" size={28} />
-                <h3 className="font-heading text-lg font-bold text-dark">Lucrari si recomandari clare</h3>
-                <p className="mt-2 text-sm leading-relaxed text-dark-300">
-                  Explicam pe scurt ce observam, ce este util sa faci mai departe si cum te poti programa mai usor.
-                </p>
-              </div>
-              <div className="card">
-                <Wrench className="mb-3 text-primary" size={28} />
-                <h3 className="font-heading text-lg font-bold text-dark">Echipa tehnica PRO TERM</h3>
-                <p className="mt-2 text-sm leading-relaxed text-dark-300">
-                  Oferim servicii HVAC pentru clienti din Arad si imprejurimi, cu orientare practica si comunicare directa.
-                </p>
-              </div>
-              <div className="card">
-                <Phone className="mb-3 text-primary" size={28} />
-                <h3 className="font-heading text-lg font-bold text-dark">Programare rapida</h3>
-                <a href={phoneHref} className="mt-2 block text-lg font-bold text-primary hover:underline">
-                  {phoneDisplay}
-                </a>
-                <p className="mt-1 text-sm leading-relaxed text-dark-300">
-                  Pentru {content.label.toLowerCase()} in {city}, ne poti suna direct sau scrie pe WhatsApp.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-2">
+            {/* Card 2: Cand ai nevoie */}
             <div className="card">
-              <h2 className="mb-5 font-heading text-2xl font-bold text-dark">
+              <h2 className="mb-4 font-heading text-base font-bold text-dark">
                 {content.whenNeedTitle}
               </h2>
-              <div className="space-y-3">
-                {content.whenNeedItems.map((item) => (
-                  <div key={item} className="flex gap-3 rounded-2xl bg-light-200 p-4">
-                    <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-primary" />
-                    <p className="text-sm leading-relaxed text-dark-300">{item}</p>
-                  </div>
+              <ul className="space-y-2.5">
+                {content.whenNeedItems.slice(0, 4).map((item) => (
+                  <li key={item} className="flex gap-2.5 text-sm text-dark-300">
+                    <CheckCircle2 size={15} className="mt-0.5 flex-shrink-0 text-primary" />
+                    {item}
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
-            <div className="card">
-              <h2 className="mb-5 font-heading text-2xl font-bold text-dark">
+            {/* Card 3: Cum programezi — cu CTA */}
+            <div className="card flex flex-col">
+              <h2 className="mb-4 font-heading text-base font-bold text-dark">
                 {content.processTitle}
               </h2>
-              <div className="space-y-3">
-                {content.processSteps.map((step, index) => (
-                  <div key={step} className="flex gap-3 rounded-2xl bg-light-200 p-4">
-                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                      {index + 1}
-                    </div>
-                    <p className="text-sm leading-relaxed text-dark-300">{step}</p>
-                  </div>
+              <ol className="space-y-2.5">
+                {content.processSteps.slice(0, 4).map((step, i) => (
+                  <li key={step} className="flex gap-2.5 text-sm text-dark-300">
+                    <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                      {i + 1}
+                    </span>
+                    {step}
+                  </li>
                 ))}
+              </ol>
+              <div className="mt-5 flex flex-col gap-2 pt-4 border-t border-slate-100">
+                <a
+                  href={phoneHref}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-bold text-white transition hover:bg-primary/90"
+                >
+                  <Phone size={15} />
+                  Suna acum — {phoneDisplay}
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-600"
+                >
+                  <MessageCircle size={15} />
+                  {content.ctaLabel}
+                </a>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      <section className="py-16">
+      {/* 4. TRUST — compact, 3 puncte fixe */}
+      <section className="bg-white py-10">
         <div className="container mx-auto px-4">
-          <div className="rounded-3xl bg-primary p-8 text-white shadow-card">
-            <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
-              <div>
-                <span className="text-sm font-bold uppercase tracking-widest text-white/70">
-                  Incredere locala
-                </span>
-                <h2 className="mt-2 font-heading text-3xl font-bold">{content.trustTitle}</h2>
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {content.trustItems.map((item) => (
-                    <div key={item} className="rounded-2xl bg-white/10 p-4 ring-1 ring-white/10">
-                      <p className="text-sm leading-relaxed text-white/85">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-3xl bg-white/10 p-6 ring-1 ring-white/10">
-                <Clock3 className="mb-3 text-white" size={28} />
-                <h3 className="font-heading text-2xl font-bold">Vrei raspuns rapid?</h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/80">
-                  Pentru {content.label.toLowerCase()} in {city}, ne poti trimite direct cateva detalii si revenim pentru programare.
-                </p>
-                <div className="mt-5 flex flex-col gap-3">
-                  <a
-                    href={phoneHref}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary transition hover:bg-slate-100"
-                  >
-                    <Phone size={18} />
-                    Suna acum
-                  </a>
-                  <a
-                    href={whatsappUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
-                  >
-                    <MessageCircle size={18} />
-                    {content.ctaLabel}
-                  </a>
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center justify-center rounded-lg border-2 border-white/70 px-5 py-3 font-bold text-white transition hover:bg-white hover:text-primary"
-                  >
-                    Cere oferta scrisa
-                  </Link>
-                </div>
-              </div>
-            </div>
+          <div className="mb-5 flex items-center gap-2.5">
+            <ShieldCheck size={22} className="text-primary" />
+            <h2 className="font-heading text-lg font-bold text-dark">{content.trustTitle}</h2>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-8 max-w-3xl">
-            <span className="text-sm font-bold uppercase tracking-widest text-accent">FAQ</span>
-            <h2 className="mt-2 font-heading text-3xl font-bold text-dark">
-              Intrebari frecvente despre {content.label.toLowerCase()} in {city}
-            </h2>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            {content.faq.map((item) => (
-              <div key={item.question} className="rounded-3xl border border-slate-100 bg-light-200 p-6 shadow-sm">
-                <h3 className="font-heading text-lg font-bold text-dark">{item.question}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-dark-300">{item.answer}</p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {trustPoints.map((item) => (
+              <div key={item} className="rounded-2xl bg-light-200 p-4">
+                <p className="text-sm leading-relaxed text-dark-300">{item}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16">
+      {/* 5. FAQ — primele 3 intrebari */}
+      <section className="py-10">
         <div className="container mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-[1.2fr,0.8fr]">
-            <div className="card">
-              <h2 className="font-heading text-2xl font-bold text-dark">Servicii conexe utile</h2>
-              <p className="mt-2 text-sm leading-relaxed text-dark-300">
-                Daca vrei sa compari servicii sau sa rezolvi o nevoie complementara, vezi si paginile de mai jos.
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {content.relatedLinks.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center justify-between rounded-2xl bg-light-200 px-4 py-3 text-sm font-bold text-primary transition hover:-translate-y-0.5 hover:text-accent"
-                  >
-                    <span>{item.label}</span>
-                    <ChevronRight size={16} />
-                  </Link>
-                ))}
-              </div>
-              <Link
-                href="/contact"
-                className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline"
+          <span className="text-xs font-bold uppercase tracking-widest text-accent">FAQ</span>
+          <h2 className="mt-1 mb-6 font-heading text-xl font-bold text-dark">
+            Intrebari frecvente
+          </h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            {content.faq.slice(0, 3).map((item) => (
+              <div
+                key={item.question}
+                className="rounded-2xl border border-slate-100 bg-white p-5 shadow-sm"
               >
-                Contacteaza PRO TERM pentru detalii
-                <ChevronRight size={16} />
-              </Link>
-            </div>
-
-            <div className="rounded-3xl bg-light-200 p-8 shadow-card">
-              <h2 className="font-heading text-2xl font-bold text-dark">
-                Ai nevoie de {content.label.toLowerCase()} in {city}?
-              </h2>
-              <p className="mt-3 text-sm leading-relaxed text-dark-300">
-                Spune-ne ce aparat ai, ce simptome observi sau ce tip de lucrare vrei sa programezi. Te ajutam sa alegi pasul potrivit.
-              </p>
-              <div className="mt-6 flex flex-col gap-3">
-                <a href={phoneHref} className="btn-primary justify-center">
-                  <Phone size={18} />
-                  Suna acum
-                </a>
-                <a
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
-                >
-                  <MessageCircle size={18} />
-                  Cere oferta pe WhatsApp
-                </a>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
-                >
-                  Contacteaza PRO TERM
-                </Link>
+                <h3 className="font-heading text-sm font-bold text-dark">{item.question}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-dark-300">{item.answer}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+
+      {/* 6. LINKURI INTERNE — discrete, la final */}
+      <section className="bg-white py-8">
+        <div className="container mx-auto px-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-dark-300">
+            Ai nevoie si de:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {content.relatedLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-light-200 px-4 py-1.5 text-sm font-semibold text-dark-300 transition hover:border-primary/40 hover:text-primary"
+              >
+                {item.label}
+                <ChevronRight size={13} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
     </main>
   );
 }
