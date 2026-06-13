@@ -15,9 +15,19 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://pro-term.ro' },
+    { '@type': 'ListItem', position: 2, name: 'Contact', item: 'https://pro-term.ro/contact' },
+  ],
+};
+
 export default function ContactPage() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <Header />
       <main className="bg-light-200 pt-24 pb-20">
         <div className="container mx-auto px-4">

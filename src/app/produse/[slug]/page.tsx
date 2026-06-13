@@ -118,12 +118,23 @@ export default async function ProductPage({ params }: { params: { slug: string }
     },
   };
 
+  const breadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://pro-term.ro' },
+      { '@type': 'ListItem', position: 2, name: 'Produse', item: 'https://pro-term.ro/produse' },
+      { '@type': 'ListItem', position: 3, name: product.name, item: canonical },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <ProductPageClient product={product} related={related} />
     </>
   );

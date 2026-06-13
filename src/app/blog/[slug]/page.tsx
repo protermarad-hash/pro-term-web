@@ -120,12 +120,23 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     image: post.image_url ?? 'https://pro-term.ro/og-image.jpg',
   };
 
+  const schemaBreadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://pro-term.ro' },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: 'https://pro-term.ro/blog' },
+      { '@type': 'ListItem', position: 3, name: post.title, item: `https://pro-term.ro/blog/${post.slug}` },
+    ],
+  };
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaArticle) }}
       />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }} />
       <Header />
       <main className="bg-light-200 pb-20 pt-24">
         <div className="container mx-auto max-w-4xl px-4">

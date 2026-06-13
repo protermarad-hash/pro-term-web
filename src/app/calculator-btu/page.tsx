@@ -14,6 +14,20 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://pro-term.ro' },
+    { '@type': 'ListItem', position: 2, name: 'Calculator BTU', item: 'https://pro-term.ro/calculator-btu' },
+  ],
+};
+
 export default function CalculatorBtuPage() {
-  return <CalculatorBtuClient />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <CalculatorBtuClient />
+    </>
+  );
 }

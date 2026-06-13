@@ -53,6 +53,15 @@ async function getMultisplitData(): Promise<{ packages: Product[]; units: Produc
 export default async function MultisplitPage() {
   const { packages, units } = await getMultisplitData();
 
+  const schemaBreadcrumb = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Acasă', item: 'https://pro-term.ro' },
+      { '@type': 'ListItem', position: 2, name: 'Sisteme Multisplit Gree', item: 'https://pro-term.ro/multisplit' },
+    ],
+  };
+
   const schemaItemList = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -67,6 +76,7 @@ export default async function MultisplitPage() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaBreadcrumb) }} />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaItemList) }}
