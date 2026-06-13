@@ -5,6 +5,7 @@ import {
   Award,
   CheckCircle2,
   Phone,
+  MessageCircle,
   Mail,
   ShieldCheck,
   Wrench,
@@ -19,7 +20,8 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://pro-term.ro/servicii/montaj' },
   openGraph: {
     title: 'Montaj Aer Condiționat Arad și Timișoara | PRO TERM SRL',
-    description: 'Montaj profesional aer condiționat în Arad și Timișoara. De la 750 RON, garanție 12 luni, tehnicieni F-Gas autorizați.',
+    description:
+      'Montaj profesional aer condiționat în Arad și Timișoara. De la 750 RON, garanție 12 luni, tehnicieni F-Gas autorizați.',
     url: 'https://pro-term.ro/servicii/montaj',
   },
   robots: { index: true, follow: true },
@@ -108,6 +110,10 @@ const schemaJson = {
 };
 
 export default function MontajPage() {
+  const whatsappUrl = `https://wa.me/40749025610?text=${encodeURIComponent(
+    'Bună ziua, vreau să verific dacă montajul meu este standard.',
+  )}`;
+
   return (
     <>
       <script
@@ -116,7 +122,6 @@ export default function MontajPage() {
       />
       <Header />
       <main className="bg-light-200 pb-20 pt-24">
-        {/* Hero */}
         <section className="border-b border-slate-100 bg-white py-12">
           <div className="container mx-auto px-4">
             <div className="flex flex-wrap items-center gap-6">
@@ -125,7 +130,8 @@ export default function MontajPage() {
                   Servicii PRO TERM Arad
                 </span>
                 <h1 className="mt-2 font-heading text-4xl font-bold text-dark md:text-5xl">
-                  Montaj Standard<br className="hidden md:block" /> Aer Condiționat
+                  Montaj Standard
+                  <br className="hidden md:block" /> Aer Condiționat
                 </h1>
                 <p className="mt-4 max-w-xl text-dark-300 leading-relaxed">
                   Echipă certificată F-Gas/AGFR cu 25 ani experiență. Instalare profesională cu garanție 12 luni. Disponibil în Arad și județul Arad.
@@ -153,13 +159,47 @@ export default function MontajPage() {
         </section>
 
         <div className="container mx-auto px-4 pt-12">
-          {/* Pricing cards */}
           <h2 className="mb-6 font-heading text-2xl font-bold text-dark">Tarife montaj standard</h2>
+          <div className="mb-6 rounded-3xl border border-primary/15 bg-primary/5 p-5">
+            <p className="text-sm leading-relaxed text-dark-300">
+              Prețurile sunt valabile pentru montaj standard. Lucrările suplimentare, traseele mai lungi,
+              străpungerile suplimentare sau deplasările în afara localității se confirmă separat înainte de execuție.
+            </p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
+              >
+                <MessageCircle size={18} />
+                Cere ofertă pe WhatsApp
+              </a>
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
+              >
+                Verifică dacă montajul tău este standard
+              </a>
+              <a
+                href="tel:+40749025610"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary shadow-sm transition hover:bg-slate-50"
+              >
+                <Phone size={18} />
+                Sună pentru detalii
+              </a>
+            </div>
+          </div>
+
           <div className="mb-12 grid gap-5 sm:grid-cols-3">
             {TARIFE.map((t) => (
               <div
                 key={t.slug}
-                className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-card ${t.popular ? 'border-primary ring-2 ring-primary/20' : 'border-slate-100'}`}
+                className={`relative flex flex-col rounded-3xl border bg-white p-6 shadow-card ${
+                  t.popular ? 'border-primary ring-2 ring-primary/20' : 'border-slate-100'
+                }`}
               >
                 {t.popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-4 py-1 text-xs font-bold text-white shadow">
@@ -170,18 +210,38 @@ export default function MontajPage() {
                 <p className="mb-4 text-sm text-dark-300">Suprafață recomandată: {t.suprafata}</p>
                 <p className="mb-1 font-heading text-4xl font-bold text-primary">{t.pret} RON</p>
                 <p className="mb-6 text-xs text-dark-300">cu TVA 21% inclus</p>
-                <Link
-                  href={`/produse/${t.slug}`}
-                  className="btn-primary mt-auto justify-center py-3"
-                >
+                <Link href={`/produse/${t.slug}`} className="btn-primary mt-auto justify-center py-3">
                   Adaugă în coș
                 </Link>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-600"
+                >
+                  <MessageCircle size={16} />
+                  Cere ofertă pe WhatsApp
+                </a>
+                <a
+                  href="tel:+40749025610"
+                  className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg border border-primary/25 px-4 py-2.5 text-sm font-bold text-primary transition hover:border-primary hover:bg-primary/5"
+                >
+                  <Phone size={16} />
+                  Sună pentru detalii
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 text-center text-sm font-semibold text-dark-300 transition hover:text-primary hover:underline"
+                >
+                  Verifică dacă montajul tău este standard
+                </a>
               </div>
             ))}
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
-            {/* Ce include */}
             <div className="card">
               <h2 className="mb-5 flex items-center gap-2 font-heading text-xl font-bold text-dark">
                 <CheckCircle2 size={20} className="text-green-600" />
@@ -197,7 +257,6 @@ export default function MontajPage() {
               </ul>
             </div>
 
-            {/* Ce nu include */}
             <div className="card">
               <h2 className="mb-5 flex items-center gap-2 font-heading text-xl font-bold text-dark">
                 <AlertTriangle size={20} className="text-amber-500" />
@@ -214,7 +273,6 @@ export default function MontajPage() {
             </div>
           </div>
 
-          {/* Tarife suplimentare */}
           <div className="mt-8 card overflow-hidden p-0">
             <div className="px-6 py-5 border-b border-gray-100">
               <h2 className="font-heading text-xl font-bold text-dark">Tarife suplimentare</h2>
@@ -240,7 +298,6 @@ export default function MontajPage() {
             </div>
           </div>
 
-          {/* CTA banner */}
           <div className="mt-10 rounded-3xl bg-gradient-to-r from-primary to-blue-700 p-8 text-white">
             <div className="flex flex-col gap-6 md:flex-row md:items-center">
               <div className="flex-1">
