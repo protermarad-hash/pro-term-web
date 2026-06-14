@@ -705,7 +705,7 @@ export default function AdminClient() {
               Gestionează comenzi, produse, imagini și conținut din această pagină.
             </p>
           </div>
-          <Link href="/produse" className="btn-outline w-fit">
+          <Link href="/produse" className="btn-primary w-fit">
             Vezi catalogul
             <ExternalLink size={18} />
           </Link>

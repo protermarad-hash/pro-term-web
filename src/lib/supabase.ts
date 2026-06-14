@@ -92,13 +92,21 @@ const SPEC_KEY_LABELS: Record<string, string> = {
   filtru: 'Filtru',
 };
 
+function formatRawKey(k: string): string {
+  return k.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function parseSpecs(raw: DbProduct['specs']): { label: string; value: string }[] {
-  if (Array.isArray(raw)) return raw as { label: string; value: string }[];
+  if (Array.isArray(raw)) {
+    return (raw as { label: string; value: string }[]).filter(
+      (s) => s.label?.trim() && s.value?.trim() && s.value.trim() !== '-',
+    );
+  }
   if (raw && typeof raw === 'object') {
     return Object.entries(raw as Record<string, unknown>)
       .filter(([, v]) => v !== null && v !== undefined && v !== '')
       .map(([k, v]) => ({
-        label: SPEC_KEY_LABELS[k] ?? k,
+        label: SPEC_KEY_LABELS[k] ?? formatRawKey(k),
         value: typeof v === 'object' ? JSON.stringify(v) : String(v),
       }));
   }
