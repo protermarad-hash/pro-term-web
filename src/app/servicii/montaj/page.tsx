@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { TrackedPhoneLink, TrackedWhatsAppLink } from '@/components/analytics/TrackedLinks';
 
 export const metadata: Metadata = {
   title: 'Montaj Aer Condiționat Arad și Timișoara | PRO TERM SRL',
@@ -166,30 +167,36 @@ export default function MontajPage() {
               străpungerile suplimentare sau deplasările în afara localității se confirmă separat înainte de execuție.
             </p>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a
+              <TrackedWhatsAppLink
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                ctaLocation="pricing-banner"
+                serviceType="montaj"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
               >
                 <MessageCircle size={18} />
                 Cere ofertă pe WhatsApp
-              </a>
-              <a
+              </TrackedWhatsAppLink>
+              <TrackedWhatsAppLink
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                ctaLocation="pricing-banner"
+                serviceType="montaj"
                 className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
               >
                 Verifică dacă montajul tău este standard
-              </a>
-              <a
+              </TrackedWhatsAppLink>
+              <TrackedPhoneLink
                 href="tel:+40749025610"
+                ctaLocation="pricing-banner"
+                serviceType="montaj"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary shadow-sm transition hover:bg-slate-50"
               >
                 <Phone size={18} />
                 Sună pentru detalii
-              </a>
+              </TrackedPhoneLink>
             </div>
           </div>
 
@@ -213,30 +220,36 @@ export default function MontajPage() {
                 <Link href={`/produse/${t.slug}`} className="btn-primary mt-auto justify-center py-3">
                   Adaugă în coș
                 </Link>
-                <a
+                <TrackedWhatsAppLink
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  ctaLocation="pricing-card"
+                  serviceType="montaj"
                   className="mt-3 inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-green-600"
                 >
                   <MessageCircle size={16} />
                   Cere ofertă pe WhatsApp
-                </a>
-                <a
+                </TrackedWhatsAppLink>
+                <TrackedPhoneLink
                   href="tel:+40749025610"
+                  ctaLocation="pricing-card"
+                  serviceType="montaj"
                   className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg border border-primary/25 px-4 py-2.5 text-sm font-bold text-primary transition hover:border-primary hover:bg-primary/5"
                 >
                   <Phone size={16} />
                   Sună pentru detalii
-                </a>
-                <a
+                </TrackedPhoneLink>
+                <TrackedWhatsAppLink
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  ctaLocation="pricing-card"
+                  serviceType="montaj"
                   className="mt-2 text-center text-sm font-semibold text-dark-300 transition hover:text-primary hover:underline"
                 >
                   Verifică dacă montajul tău este standard
-                </a>
+                </TrackedWhatsAppLink>
               </div>
             ))}
           </div>
@@ -307,13 +320,15 @@ export default function MontajPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <a
+                <TrackedPhoneLink
                   href="tel:+40749025610"
+                  ctaLocation="final-cta-banner"
+                  serviceType="montaj"
                   className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-primary hover:bg-blue-50"
                 >
                   <Phone size={16} />
                   0749 025 610
-                </a>
+                </TrackedPhoneLink>
                 <a
                   href="mailto:proterm.arad@gmail.com"
                   className="flex items-center gap-2 rounded-xl bg-white/15 px-5 py-3 font-bold text-white hover:bg-white/25"

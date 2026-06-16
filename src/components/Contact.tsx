@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Send, Clock, UserRound } from 'lucide-react';
+import { trackPhoneClick, trackLeadSubmit } from '@/lib/analytics';
 
 const contactInfo = [
   {
@@ -54,6 +55,7 @@ export default function Contact() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    trackLeadSubmit({ cta_location: 'contact-form', service_type: form.service || undefined });
     setSent(true);
   };
 
@@ -85,6 +87,7 @@ export default function Contact() {
                   {href && href !== '#' ? (
                     <a
                       href={href}
+                      onClick={href.startsWith('tel:') ? () => trackPhoneClick({ cta_location: 'contact-info' }) : undefined}
                       className="text-dark font-semibold text-sm hover:text-primary transition-colors"
                     >
                       {value}
@@ -105,6 +108,7 @@ export default function Contact() {
               </p>
               <a
                 href="tel:+40749025610"
+                onClick={() => trackPhoneClick({ cta_location: 'contact-callback' })}
                 className="flex items-center gap-2 font-bold text-white"
               >
                 <Phone size={18} />

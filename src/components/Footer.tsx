@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import FooterAccountLink from './FooterAccountLink';
+import { TrackedPhoneLink } from './analytics/TrackedLinks';
 
 const footerLinks = {
   Servicii: [
@@ -53,13 +54,14 @@ export default function Footer() {
             </p>
 
             <div className="space-y-2">
-              <a
+              <TrackedPhoneLink
                 href="tel:+40749025610"
+                ctaLocation="footer"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
               >
                 <Phone size={15} className="text-accent" />
                 0749 025 610
-              </a>
+              </TrackedPhoneLink>
               <a
                 href="mailto:office@pro-term.ro"
                 className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"

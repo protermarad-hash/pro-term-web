@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MultisplitClientSection from '@/components/MultisplitClientSection';
+import { TrackedPhoneLink } from '@/components/analytics/TrackedLinks';
 import { getSupabaseServiceClient, dbProductToProduct } from '@/lib/supabase';
 import type { Product } from '@/lib/products';
 import { AlertTriangle } from 'lucide-react';
@@ -114,12 +115,14 @@ export default async function MultisplitPage() {
                   Contactați-ne pentru o ofertă de montaj personalizată.
                   Montaj disponibil în județul Arad și Timiș.
                 </p>
-                <a
+                <TrackedPhoneLink
                   href="tel:+40749025610"
+                  ctaLocation="multisplit-banner"
+                  serviceType="multisplit"
                   className="mt-2 inline-flex items-center gap-2 rounded-lg bg-orange-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-orange-600"
                 >
                   Sună pentru ofertă montaj: 0749 025 610
-                </a>
+                </TrackedPhoneLink>
               </div>
             </div>
           </div>

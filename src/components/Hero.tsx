@@ -1,5 +1,6 @@
 import { ArrowRight, BadgeCheck, Phone, ShieldCheck, ShoppingCart, Snowflake, Wrench } from 'lucide-react';
 import Link from 'next/link';
+import { TrackedPhoneLink } from '@/components/analytics/TrackedLinks';
 
 const stats = [
   { value: '25+', label: 'ani experiență' },
@@ -41,10 +42,14 @@ export default function Hero() {
                 Vezi produsele
                 <ArrowRight size={20} />
               </Link>
-              <a href="tel:+40749025610" className="btn-outline justify-center px-8 py-4 text-base">
+              <TrackedPhoneLink
+                href="tel:+40749025610"
+                ctaLocation="hero"
+                className="btn-outline justify-center px-8 py-4 text-base"
+              >
                 <Phone size={20} />
                 Sună pentru ofertă
-              </a>
+              </TrackedPhoneLink>
             </div>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3">

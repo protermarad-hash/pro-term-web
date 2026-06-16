@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { Building2, CheckCircle2, ClipboardCheck, MapPinned, MessageCircle, Zap } from 'lucide-react';
+import { TrackedContactLink, TrackedWhatsAppLink } from '@/components/analytics/TrackedLinks';
 
 const phone = '40749025610';
 
@@ -67,12 +67,24 @@ export default function NationalProjectPage() {
               PRO TERM preia proiecte mari de climatizare, montaj, service și mentenanță HVAC pentru clienți comerciali și industriali. Pentru lucrări complexe, echipa se poate deplasa în România, în funcție de dimensiunea proiectului, cerințele tehnice și programare.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600">
+              <TrackedWhatsAppLink
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                ctaLocation="hero"
+                serviceType="proiecte-hvac"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600"
+              >
                 <MessageCircle size={20} /> Discută proiectul pe WhatsApp
-              </a>
-              <Link href="/#contact" className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-4 font-bold text-white transition hover:bg-white hover:text-primary">
+              </TrackedWhatsAppLink>
+              <TrackedContactLink
+                href="/#contact"
+                ctaLocation="national-project-hero"
+                serviceType="proiecte-hvac"
+                className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-4 font-bold text-white transition hover:bg-white hover:text-primary"
+              >
                 Trimite cerere ofertă
-              </Link>
+              </TrackedContactLink>
             </div>
           </div>
         </div>
@@ -157,9 +169,16 @@ export default function NationalProjectPage() {
                 Trimite informații despre locație, suprafață, destinația spațiului, cerințe de temperatură, număr de echipamente și termenul dorit. Revenim cu pașii necesari pentru evaluare.
               </p>
             </div>
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 rounded-lg bg-green-500 px-6 py-3 font-bold text-white transition hover:bg-green-600 md:mt-0">
+            <TrackedWhatsAppLink
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              ctaLocation="national-project-cta"
+              serviceType="proiecte-hvac"
+              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-green-500 px-6 py-3 font-bold text-white transition hover:bg-green-600 md:mt-0"
+            >
               <Zap size={18} /> Contact rapid
-            </a>
+            </TrackedWhatsAppLink>
           </div>
         </div>
       </section>

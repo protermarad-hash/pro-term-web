@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Wrench,
 } from 'lucide-react';
+import { TrackedPhoneLink, TrackedWhatsAppLink } from '@/components/analytics/TrackedLinks';
 
 type ServiceType = 'montaj' | 'service' | 'igienizare' | 'revizie';
 
@@ -427,22 +428,28 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
               {content.heroSubtitle} Servicii disponibile in {locationLabel}, in functie de programare.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <a
+              <TrackedPhoneLink
                 href={phoneHref}
+                ctaLocation="hero"
+                serviceType={service}
+                city={city}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-4 font-bold text-primary transition hover:bg-slate-100"
               >
                 <Phone size={20} />
                 Suna acum
-              </a>
-              <a
+              </TrackedPhoneLink>
+              <TrackedWhatsAppLink
                 href={whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                ctaLocation="hero"
+                serviceType={service}
+                city={city}
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600"
               >
                 <MessageCircle size={20} />
                 Cere oferta pe WhatsApp
-              </a>
+              </TrackedWhatsAppLink>
               <Link
                 href="/contact"
                 className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-4 font-bold text-white transition hover:bg-white hover:text-primary"
@@ -507,22 +514,28 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
                   </div>
                 )}
                 <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                  <a
+                  <TrackedWhatsAppLink
                     href={pricingWhatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    ctaLocation="pricing-card"
+                    serviceType={service}
+                    city={city}
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
                   >
                     <MessageCircle size={18} />
                     {service === 'montaj' ? 'Cere oferta pe WhatsApp' : 'Cere estimare pe WhatsApp'}
-                  </a>
-                  <a
+                  </TrackedWhatsAppLink>
+                  <TrackedPhoneLink
                     href={phoneHref}
+                    ctaLocation="pricing-card"
+                    serviceType={service}
+                    city={city}
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary shadow-sm transition hover:bg-slate-50"
                   >
                     <Phone size={18} />
                     Suna pentru detalii
-                  </a>
+                  </TrackedPhoneLink>
                   <Link
                     href={pricingSecondaryHref}
                     className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"
@@ -564,9 +577,15 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
               <div className="card">
                 <Phone className="mb-3 text-primary" size={28} />
                 <h3 className="font-heading text-lg font-bold text-dark">Programare rapida</h3>
-                <a href={phoneHref} className="mt-2 block text-lg font-bold text-primary hover:underline">
+                <TrackedPhoneLink
+                  href={phoneHref}
+                  ctaLocation="trust-section"
+                  serviceType={service}
+                  city={city}
+                  className="mt-2 block text-lg font-bold text-primary hover:underline"
+                >
                   {phoneDisplay}
-                </a>
+                </TrackedPhoneLink>
                 <p className="mt-1 text-sm leading-relaxed text-dark-300">
                   Pentru {content.label.toLowerCase()} in {city}, ne poti suna direct sau scrie pe WhatsApp.
                 </p>
@@ -636,22 +655,28 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
                   Pentru {content.label.toLowerCase()} in {city}, ne poti trimite direct cateva detalii si revenim pentru programare.
                 </p>
                 <div className="mt-5 flex flex-col gap-3">
-                  <a
+                  <TrackedPhoneLink
                     href={phoneHref}
+                    ctaLocation="cta-banner"
+                    serviceType={service}
+                    city={city}
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-3 font-bold text-primary transition hover:bg-slate-100"
                   >
                     <Phone size={18} />
                     Suna acum
-                  </a>
-                  <a
+                  </TrackedPhoneLink>
+                  <TrackedWhatsAppLink
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    ctaLocation="cta-banner"
+                    serviceType={service}
+                    city={city}
                     className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
                   >
                     <MessageCircle size={18} />
                     {content.ctaLabel}
-                  </a>
+                  </TrackedWhatsAppLink>
                   <Link
                     href="/contact"
                     className="inline-flex items-center justify-center rounded-lg border-2 border-white/70 px-5 py-3 font-bold text-white transition hover:bg-white hover:text-primary"
@@ -721,19 +746,22 @@ export default function ServiceCityPage({ city, service }: ServiceCityPageProps)
                 Spune-ne ce aparat ai, ce simptome observi sau ce tip de lucrare vrei sa programezi. Te ajutam sa alegi pasul potrivit.
               </p>
               <div className="mt-6 flex flex-col gap-3">
-                <a href={phoneHref} className="btn-primary justify-center">
+                <TrackedPhoneLink href={phoneHref} ctaLocation="final-cta" serviceType={service} city={city} className="btn-primary justify-center">
                   <Phone size={18} />
                   Suna acum
-                </a>
-                <a
+                </TrackedPhoneLink>
+                <TrackedWhatsAppLink
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  ctaLocation="final-cta"
+                  serviceType={service}
+                  city={city}
                   className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-3 font-bold text-white transition hover:bg-green-600"
                 >
                   <MessageCircle size={18} />
                   Cere oferta pe WhatsApp
-                </a>
+                </TrackedWhatsAppLink>
                 <Link
                   href="/contact"
                   className="inline-flex items-center justify-center rounded-lg border-2 border-primary px-5 py-3 font-bold text-primary transition hover:bg-primary hover:text-white"

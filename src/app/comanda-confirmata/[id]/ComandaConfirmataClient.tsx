@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { trackPhoneClick, trackPurchase } from '@/lib/analytics';
 
 const IBAN = 'RO15BTRLRONCRT0CK3829101';
 
@@ -65,6 +66,15 @@ export default function ComandaConfirmataClient() {
       .catch(() => setError('Nu am putut încărca comanda.'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (!order) return;
+    trackPurchase({
+      value: order.total,
+      currency: 'RON',
+      transaction_id: order.id,
+    });
+  }, [order]);
 
   function copyIBAN() {
     navigator.clipboard.writeText(IBAN).then(() => {
@@ -247,7 +257,11 @@ export default function ComandaConfirmataClient() {
               <div className="flex-1 text-sm text-dark-300">
                 <span className="font-semibold text-dark">Ai întrebări? </span>
                 Suntem disponibili la{' '}
-                <a href="tel:0749025610" className="font-bold text-primary hover:underline">0749 025 610</a>{' '}
+                <a
+                  href="tel:0749025610"
+                  onClick={() => trackPhoneClick({ cta_location: 'order-confirmation' })}
+                  className="font-bold text-primary hover:underline"
+                >0749 025 610</a>{' '}
                 sau{' '}
                 <a href="mailto:office@pro-term.ro" className="font-semibold text-primary hover:underline">office@pro-term.ro</a>
               </div>

@@ -31,6 +31,7 @@ import {
 import { VAT_RATE, vatAmount } from '@/lib/constants';
 import { getMontajForBtu } from '@/lib/montaj';
 import BannerSlider from '@/components/BannerSlider';
+import { trackPhoneClick, trackWhatsAppClick, trackContactClick } from '@/lib/analytics';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -315,7 +316,11 @@ export default function ProductPageClient({ product, related }: Props) {
                       Adaugă în coș
                     </button>
                   ) : (
-                    <Link href="/#contact" className="btn-primary justify-center py-4">
+                    <Link
+                      href="/#contact"
+                      onClick={() => trackContactClick({ cta_location: 'product-price', service_type: product.category })}
+                      className="btn-primary justify-center py-4"
+                    >
                       <Zap size={20} />
                       Cere ofertă
                     </Link>
@@ -332,11 +337,21 @@ export default function ProductPageClient({ product, related }: Props) {
                     <Heart size={18} className={isFavorite(product.slug) ? 'fill-red-500' : ''} />
                     {isFavorite(product.slug) ? 'Șterge din favorite' : 'Adaugă la favorite'}
                   </button>
-                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-4 font-semibold text-white transition-all hover:bg-green-600">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackWhatsAppClick({ cta_location: 'product-detail', service_type: product.category })}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-5 py-4 font-semibold text-white transition-all hover:bg-green-600"
+                  >
                     <MessageCircle size={18} />
                     Întreabă pe WhatsApp
                   </a>
-                  <a href={phoneHref} className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white sm:col-span-2">
+                  <a
+                    href={phoneHref}
+                    onClick={() => trackPhoneClick({ cta_location: 'product-detail', service_type: product.category })}
+                    className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white sm:col-span-2"
+                  >
                     <Phone size={18} />
                     Sună pentru confirmare: 0749 025 610
                   </a>
@@ -389,7 +404,13 @@ export default function ProductPageClient({ product, related }: Props) {
                 ) : (
                   <p className="text-sm text-dark-300">Documentația produsului se oferă la cerere.</p>
                 )}
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-3 font-semibold text-white transition-all hover:bg-green-600">
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => trackWhatsAppClick({ cta_location: 'product-documentation', service_type: product.category })}
+                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-3 font-semibold text-white transition-all hover:bg-green-600"
+                >
                   <MessageCircle size={18} />
                   Cere detalii pe WhatsApp
                 </a>

@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { TrackedPhoneLink, TrackedWhatsAppLink } from '@/components/analytics/TrackedLinks';
 
 export const metadata: Metadata = {
   title: 'Servicii Aer Condiționat Arad și Timiș | PRO TERM SRL',
@@ -226,22 +227,24 @@ export default function ServiciiPage() {
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
-                <a
+                <TrackedPhoneLink
                   href="tel:+40749025610"
+                  ctaLocation="servicii-cta"
                   className="flex items-center gap-2 rounded-xl bg-white px-5 py-3 font-bold text-primary hover:bg-blue-50"
                 >
                   <Phone size={16} />
                   0749 025 610
-                </a>
-                <a
+                </TrackedPhoneLink>
+                <TrackedWhatsAppLink
                   href={`https://wa.me/40749025610?text=${encodeURIComponent('Bună ziua, am nevoie de informații despre serviciile HVAC.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  ctaLocation="servicii-cta"
                   className="flex items-center gap-2 rounded-xl bg-white/15 px-5 py-3 font-bold text-white hover:bg-white/25"
                 >
                   <MessageCircle size={16} />
                   WhatsApp
-                </a>
+                </TrackedWhatsAppLink>
               </div>
             </div>
           </div>

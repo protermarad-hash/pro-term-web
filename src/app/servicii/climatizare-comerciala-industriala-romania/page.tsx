@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Building2, CheckCircle2, Factory, MessageCircle, Store, Wrench } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { TrackedWhatsAppLink } from '@/components/analytics/TrackedLinks';
 
 export const metadata: Metadata = {
   title: 'Climatizare Comercială și Industrială România | Sisteme HVAC | PRO TERM',
@@ -75,9 +76,16 @@ export default function CommercialIndustrialPage() {
                 PRO TERM oferă soluții de climatizare pentru spații comerciale, birouri, hale, showroom-uri și proiecte tehnice care necesită echipamente fiabile, dimensionare corectă și suport după instalare.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600">
+                <TrackedWhatsAppLink
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  ctaLocation="hero"
+                  serviceType="climatizare-comerciala"
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-500 px-6 py-4 font-bold text-white transition hover:bg-green-600"
+                >
                   <MessageCircle size={20} /> Cere ofertă pe WhatsApp
-                </a>
+                </TrackedWhatsAppLink>
                 <Link href="/servicii/proiecte-hvac-romania" className="inline-flex items-center justify-center rounded-lg border-2 border-white px-6 py-4 font-bold text-white transition hover:bg-white hover:text-primary">
                   Vezi proiecte HVAC
                 </Link>

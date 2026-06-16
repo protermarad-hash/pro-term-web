@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Contact from '@/components/Contact';
+import ContactPageViewTracker from '@/components/analytics/ContactPageViewTracker';
 
 export const metadata: Metadata = {
   title: 'Contact PRO TERM | Arad | 0749 025 610',
@@ -28,6 +29,7 @@ export default function ContactPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <ContactPageViewTracker />
       <Header />
       <main className="bg-light-200 pt-24 pb-20">
         <div className="container mx-auto px-4">

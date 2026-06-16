@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { MessageCircle, ShoppingCart, ChevronRight, ChevronLeft, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import type { Product } from '@/lib/products';
+import { trackWhatsAppClick } from '@/lib/analytics';
 
 // ─── BTU helpers ────────────────────────────────────────────────────────────
 
@@ -350,6 +351,7 @@ export default function MultisplitConfigurator({ preloadedRooms, preloadedNumRoo
           href={`https://wa.me/40749025610?text=${buildWhatsAppText()}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackWhatsAppClick({ cta_location: 'multisplit-configurator', service_type: 'multisplit' })}
           className="flex items-center justify-center gap-2 rounded-xl bg-green-500 px-5 py-3.5 font-bold text-white transition-all hover:bg-green-600"
         >
           <MessageCircle size={18} />

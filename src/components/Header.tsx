@@ -7,6 +7,7 @@ import { Phone, Menu, X, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useAuth } from '@/lib/auth-context';
 import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
+import { trackContactClick, trackPhoneClick } from '@/lib/analytics';
 
 const navLinks = [
   { label: 'Servicii',       href: '/servicii' },
@@ -67,6 +68,7 @@ export default function Header() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={link.label === 'Contact' ? () => trackContactClick({ cta_location: 'header-nav' }) : undefined}
               className={`font-semibold text-sm transition-colors hover:text-accent ${textColor}`}
             >
               {link.label}
@@ -77,6 +79,7 @@ export default function Header() {
         <div className="hidden md:flex items-center gap-3">
           <a
             href={contactPhoneHref}
+            onClick={() => trackPhoneClick({ cta_location: 'header' })}
             className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
               scrolled ? 'text-primary hover:text-accent' : 'text-white hover:text-accent-200'
             }`}
@@ -114,7 +117,11 @@ export default function Header() {
             </Link>
           )}
 
-          <Link href="/#contact" className="btn-primary py-2.5 px-5 text-sm">
+          <Link
+            href="/#contact"
+            onClick={() => trackContactClick({ cta_location: 'header-cta' })}
+            className="btn-primary py-2.5 px-5 text-sm"
+          >
             Ofertă gratuită
           </Link>
         </div>
@@ -159,7 +166,10 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 className="text-dark-300 font-semibold py-2 hover:text-accent transition-colors"
-                onClick={() => setMenuOpen(false)}
+                onClick={() => {
+                  if (link.label === 'Contact') trackContactClick({ cta_location: 'header-nav-mobile' });
+                  setMenuOpen(false);
+                }}
               >
                 {link.label}
               </Link>
@@ -174,12 +184,20 @@ export default function Header() {
             </Link>
             <a
               href={contactPhoneHref}
+              onClick={() => trackPhoneClick({ cta_location: 'header-mobile' })}
               className="flex items-center gap-2 text-primary font-bold py-2"
             >
               <Phone size={16} />
               {contactPhone}
             </a>
-            <Link href="/#contact" className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
+            <Link
+              href="/#contact"
+              className="btn-primary text-center"
+              onClick={() => {
+                trackContactClick({ cta_location: 'header-cta-mobile' });
+                setMenuOpen(false);
+              }}
+            >
               Ofertă gratuită
             </Link>
           </nav>
