@@ -3,7 +3,7 @@
 import { X, Minus, Plus, Trash2, ShoppingCart, ArrowRight, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart-context';
-import { BRAND_GRADIENT, CATEGORY_LABEL } from '@/lib/products';
+import { BRAND_GRADIENT, CATEGORY_LABEL, isServiceProduct } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD, SHIPPING_COST } from '@/lib/shipping';
 
 export default function CartDrawer() {
@@ -64,6 +64,10 @@ export default function CartDrawer() {
           ) : (
             items.map(({ product, quantity }) => {
               const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
+              const maxQty = !isServiceProduct(product) && product.manageStock && product.stockQty !== undefined
+                ? product.stockQty
+                : 99;
+              const atMax = quantity >= maxQty;
               return (
                 <div key={product.id} className="flex gap-3 p-3 bg-light-200 rounded-xl">
                   <div
@@ -106,7 +110,9 @@ export default function CartDrawer() {
                       </span>
                       <button
                         onClick={() => setQuantity(product.id, quantity + 1)}
-                        className="w-6 h-6 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:border-primary transition-colors"
+                        disabled={atMax}
+                        className="w-6 h-6 rounded-md bg-white border border-gray-200 flex items-center justify-center hover:border-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        title={atMax ? `Stoc maxim: ${maxQty} buc.` : undefined}
                       >
                         <Plus size={12} />
                       </button>

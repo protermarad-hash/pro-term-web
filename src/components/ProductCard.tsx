@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
-import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, STOCK_LABEL } from '@/lib/products';
+import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, getStockBadge, isProductAvailable } from '@/lib/products';
 
 function getDiscountPercent(product: Product) {
   if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
@@ -17,7 +17,8 @@ export default function ProductCard({ product }: { product: Product }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
-  const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const stockBadge = getStockBadge(product);
+  const available = isProductAvailable(product);
   const discountPercent = getDiscountPercent(product);
   const hasImage = Boolean(product.imageUrl);
   const favActive = isFavorite(product.slug);
@@ -101,6 +102,9 @@ export default function ProductCard({ product }: { product: Product }) {
           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-dark-300">
             {CATEGORY_LABEL[product.category]}
           </span>
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${stockBadge.colorClass}`}>
+            {stockBadge.label}
+          </span>
         </div>
 
         <Link href={`/produse/${product.slug}`}>
@@ -108,10 +112,6 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </h3>
         </Link>
-
-        <div className="mb-3 text-xs font-medium text-dark-300">
-          Disponibilitate: {stockLabel}
-        </div>
 
         <div className="mb-4 flex items-center gap-1">
           <div className="flex">
@@ -152,13 +152,23 @@ export default function ProductCard({ product }: { product: Product }) {
           {!hasPrice && <div className="mb-3" />}
 
           {hasPrice ? (
-            <button
-              onClick={() => addToCart(product)}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600 active:scale-95"
-            >
-              <ShoppingCart size={16} />
-              Adaugă în coș
-            </button>
+            available ? (
+              <button
+                onClick={() => addToCart(product)}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600 active:scale-95"
+              >
+                <ShoppingCart size={16} />
+                Adaugă în coș
+              </button>
+            ) : (
+              <button
+                disabled
+                className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-gray-200 py-3 text-sm font-bold text-gray-400"
+              >
+                <ShoppingCart size={16} />
+                {product.stockStatus === 'on-request' ? 'La comandă' : 'Stoc epuizat'}
+              </button>
+            )
           ) : (
             <Link
               href="/#contact"

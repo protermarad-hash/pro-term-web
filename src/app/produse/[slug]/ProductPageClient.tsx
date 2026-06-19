@@ -15,6 +15,8 @@ import {
   Truck,
   Wrench,
   Heart,
+  Minus,
+  Plus,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -25,7 +27,9 @@ import { useFavorites } from '@/lib/favorites-context';
 import {
   BRAND_GRADIENT,
   CATEGORY_LABEL,
-  STOCK_LABEL,
+  getStockBadge,
+  isProductAvailable,
+  isServiceProduct,
   type Product,
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
@@ -83,10 +87,6 @@ function getDiscountPercent(product: Product) {
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 }
 
-function isServiceProduct(product: Product) {
-  const text = `${product.name} ${product.category}`.toLowerCase();
-  return text.includes('montaj') || text.includes('service') || text.includes('igienizare') || product.category === 'service-montaj';
-}
 
 interface Props {
   product: Product;
@@ -94,12 +94,13 @@ interface Props {
 }
 
 export default function ProductPageClient({ product, related }: Props) {
-  const { addToCart } = useCart();
+  const { addToCart, items } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [selectedImage, setSelectedImage] = useState<string | null>(
     product.imageUrl ?? product.galleryImages?.[0] ?? null
   );
   const [imgTransitioning, setImgTransitioning] = useState(false);
+  const [qty, setQty] = useState(1);
 
   function changeImage(url: string) {
     if (url === selectedImage) return;
@@ -112,13 +113,21 @@ export default function ProductPageClient({ product, related }: Props) {
 
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
-  const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const stockBadge = getStockBadge(product);
+  const available = isProductAvailable(product);
+  const serviceProduct = isServiceProduct(product);
+
+  const cartQty = items.find((i) => i.product.id === product.id)?.quantity ?? 0;
+  const stockMax = !serviceProduct && product.manageStock && product.stockQty !== undefined
+    ? product.stockQty
+    : 99;
+  const availableToAdd = Math.max(0, stockMax - cartQty);
+
   const customerDescription = cleanCustomerText(product.description);
   const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
   const officialUrl = getOfficialUrl(product);
   const discountPercent = getDiscountPercent(product);
   const galleryImages = Array.from(new Set([product.imageUrl, ...(product.galleryImages ?? [])].filter(Boolean))) as string[];
-  const serviceProduct = isServiceProduct(product);
   const whatsappMessage = `Bună ziua, sunt interesat de ${product.name}. Vă rog să îmi trimiteți detalii/ofertă.`;
   const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
 
@@ -206,7 +215,9 @@ export default function ProductPageClient({ product, related }: Props) {
                   </span>
                 )}
                 <span className="text-sm text-dark-300">{CATEGORY_LABEL[product.category]}</span>
-                <span className="text-sm text-dark-300">· {stockLabel}</span>
+                <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${stockBadge.colorClass}`}>
+                  {stockBadge.label}
+                </span>
               </div>
 
               <h1 className="mb-3 font-heading text-3xl font-bold text-dark">{product.name}</h1>
@@ -308,12 +319,60 @@ export default function ProductPageClient({ product, related }: Props) {
                 )}
                 {!hasPrice && <div className="mb-4" />}
 
+                {hasPrice && available && !serviceProduct && product.manageStock && stockMax < 99 && (
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="text-sm font-medium text-dark-300">Cantitate:</span>
+                    <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-light-200 p-1">
+                      <button
+                        type="button"
+                        onClick={() => setQty((q) => Math.max(1, q - 1))}
+                        disabled={qty <= 1}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-dark transition-colors hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Scade cantitate"
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="w-10 text-center text-sm font-bold text-dark">{qty}</span>
+                      <button
+                        type="button"
+                        onClick={() => setQty((q) => Math.min(availableToAdd, q + 1))}
+                        disabled={qty >= availableToAdd}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-dark transition-colors hover:bg-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                        aria-label="Crește cantitate"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                    {cartQty > 0 && (
+                      <span className="text-xs text-dark-300">
+                        ({cartQty} {cartQty === 1 ? 'bucată' : 'bucăți'} deja în coș · max {stockMax})
+                      </span>
+                    )}
+                    {cartQty === 0 && (
+                      <span className="text-xs text-dark-300">max {stockMax} buc.</span>
+                    )}
+                  </div>
+                )}
+
                 <div className="grid gap-3 sm:grid-cols-2">
                   {hasPrice ? (
-                    <button onClick={() => addToCart(product)} className="btn-primary justify-center py-4">
-                      <ShoppingCart size={20} />
-                      Adaugă în coș
-                    </button>
+                    available ? (
+                      <button
+                        onClick={() => { addToCart(product, qty); setQty(1); }}
+                        className="btn-primary justify-center py-4"
+                      >
+                        <ShoppingCart size={20} />
+                        {qty > 1 ? `Adaugă ${qty} buc. în coș` : 'Adaugă în coș'}
+                      </button>
+                    ) : (
+                      <button
+                        disabled
+                        className="flex cursor-not-allowed items-center justify-center gap-2 rounded-lg bg-gray-200 px-5 py-4 font-semibold text-gray-400"
+                      >
+                        <ShoppingCart size={20} />
+                        {product.stockStatus === 'on-request' ? 'La comandă — contactați-ne' : 'Stoc epuizat'}
+                      </button>
+                    )
                   ) : (
                     <Link href="/#contact" className="btn-primary justify-center py-4">
                       <Zap size={20} />

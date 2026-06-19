@@ -104,3 +104,50 @@ export function getRelatedProducts(product: Product, limit = 3) {
     .filter((candidate) => candidate.id !== product.id && candidate.category === product.category)
     .slice(0, limit);
 }
+
+export function isServiceProduct(product: Product): boolean {
+  if (product.category === 'service-montaj') return true;
+  if (product.slug.startsWith('montaj-standard-')) return true;
+  const name = product.name.toLowerCase();
+  return name.includes('montaj') || name.includes('igienizare');
+}
+
+export interface StockBadge {
+  label: string;
+  colorClass: string;
+}
+
+export function getStockBadge(product: Product): StockBadge {
+  if (isServiceProduct(product)) {
+    return { label: 'Disponibil', colorClass: 'bg-green-50 text-green-700' };
+  }
+
+  if (product.manageStock && product.stockQty !== undefined) {
+    if (product.stockQty <= 0) {
+      if (product.stockStatus === 'on-request') {
+        return { label: 'La comandă', colorClass: 'bg-orange-50 text-orange-700' };
+      }
+      return { label: 'Stoc epuizat', colorClass: 'bg-red-50 text-red-700' };
+    }
+    if (product.stockQty <= 5) {
+      return { label: 'Stoc limitat', colorClass: 'bg-orange-50 text-orange-700' };
+    }
+    return { label: 'În stoc', colorClass: 'bg-green-50 text-green-700' };
+  }
+
+  switch (product.stockStatus) {
+    case 'in-stock':    return { label: 'În stoc',       colorClass: 'bg-green-50 text-green-700' };
+    case 'low-stock':   return { label: 'Stoc limitat',  colorClass: 'bg-orange-50 text-orange-700' };
+    case 'out-of-stock':return { label: 'Stoc epuizat',  colorClass: 'bg-red-50 text-red-700' };
+    case 'on-request':  return { label: 'La comandă',    colorClass: 'bg-orange-50 text-orange-700' };
+    default:            return { label: 'La cerere',     colorClass: 'bg-gray-100 text-gray-500' };
+  }
+}
+
+export function isProductAvailable(product: Product): boolean {
+  if (isServiceProduct(product)) return true;
+  if (product.manageStock && product.stockQty !== undefined) {
+    return product.stockQty > 0;
+  }
+  return product.stockStatus !== 'out-of-stock';
+}
