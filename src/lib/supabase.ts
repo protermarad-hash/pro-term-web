@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import type { Product } from '@/lib/products';
+import { normalizeStockStatus, type Product } from '@/lib/products';
 
 // Browser singleton — ensures onAuthStateChange fires correctly across all callers
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,7 +143,7 @@ export function dbProductToProduct(p: DbProduct): Product {
     specs: parseSpecs(p.specs),
     smartbillCode: p.smartbill_code ?? undefined,
     manageStock: p.manage_stock,
-    stockStatus: p.stock_status as Product['stockStatus'],
+    stockStatus: normalizeStockStatus(p.stock_status),
     stockQty: p.stock_qty ?? undefined,
     imageUrl,
     galleryImages,

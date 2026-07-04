@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
-import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, STOCK_LABEL } from '@/lib/products';
+import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, getProductAvailability } from '@/lib/products';
 
 function getDiscountPercent(product: Product) {
   if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
@@ -17,7 +17,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const { isFavorite, toggleFavorite } = useFavorites();
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
-  const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const availability = getProductAvailability(product);
   const discountPercent = getDiscountPercent(product);
   const hasImage = Boolean(product.imageUrl);
   const favActive = isFavorite(product.slug);
@@ -109,8 +109,9 @@ export default function ProductCard({ product }: { product: Product }) {
           </h3>
         </Link>
 
-        <div className="mb-3 text-xs font-medium text-dark-300">
-          Disponibilitate: {stockLabel}
+        <div className="mb-3 space-y-1 text-xs">
+          <p className="font-medium text-dark-300">{availability.title}</p>
+          {availability.detail && <p className="text-dark-300/90">{availability.detail}</p>}
         </div>
 
         <div className="mb-4 flex items-center gap-1">

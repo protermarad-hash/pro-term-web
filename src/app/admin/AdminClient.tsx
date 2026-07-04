@@ -22,7 +22,7 @@ import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/l
 
 const BRANDS: Brand[] = ['Gree', 'Midea', 'Yamato', 'Fujitsu', 'Yukon', 'Habitat', 'Bosch', 'Vaillant', 'Immergas', 'Viessmann', 'Generic', 'PRO TERM'];
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
-const STOCK_STATUSES: StockStatus[] = ['in-stock', 'low-stock', 'out-of-stock', 'on-request'];
+const STOCK_STATUSES: StockStatus[] = ['in_stock', 'la_comanda', 'low_stock', 'out_of_stock'];
 
 const ORDER_STATUSES = [
   { value: 'nou', label: 'Nou', color: 'bg-blue-100 text-blue-700' },
@@ -90,7 +90,7 @@ const initialForm = {
   rating: '4.7',
   reviews: '0',
   smartbillCode: '',
-  stockStatus: 'on-request',
+  stockStatus: 'la_comanda',
   stockQty: '',
   imageUrl: '',
   galleryImages: '',
@@ -123,7 +123,7 @@ function productToForm(product: AdminProduct): ProductForm {
     rating: product.rating ? String(product.rating) : '4.7',
     reviews: product.reviews ? String(product.reviews) : '0',
     smartbillCode: product.smartbill_code ?? '',
-    stockStatus: product.stock_status ?? 'on-request',
+    stockStatus: product.stock_status ?? 'la_comanda',
     stockQty: product.stock_qty ? String(product.stock_qty) : '',
     imageUrl: product.image_url ?? '',
     galleryImages: Array.isArray(product.gallery_images) ? product.gallery_images.join('\n') : '',

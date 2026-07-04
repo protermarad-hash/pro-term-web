@@ -59,7 +59,7 @@ function buildPayload(body: Record<string, unknown>) {
     specs: parseSpecs(body.specs),
     smartbill_code: String(body.smartbillCode ?? body.smartbill_code ?? '').trim() || null,
     manage_stock: body.manageStock !== false && body.manage_stock !== false,
-    stock_status: String(body.stockStatus ?? body.stock_status ?? 'on-request'),
+    stock_status: String(body.stockStatus ?? body.stock_status ?? 'la_comanda'),
     stock_qty: body.stockQty ?? body.stock_qty ? Number(body.stockQty ?? body.stock_qty) : null,
     image_url: imageUrl,
     active: body.active !== false,

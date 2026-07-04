@@ -3,7 +3,7 @@
 import { X, Minus, Plus, Trash2, ShoppingCart, ArrowRight, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/lib/cart-context';
-import { BRAND_GRADIENT, CATEGORY_LABEL } from '@/lib/products';
+import { BRAND_GRADIENT, CATEGORY_LABEL, getProductAvailability } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD, SHIPPING_COST } from '@/lib/shipping';
 
 export default function CartDrawer() {
@@ -64,6 +64,7 @@ export default function CartDrawer() {
           ) : (
             items.map(({ product, quantity }) => {
               const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
+              const availability = getProductAvailability(product);
               return (
                 <div key={product.id} className="flex gap-3 p-3 bg-light-200 rounded-xl">
                   <div
@@ -81,6 +82,14 @@ export default function CartDrawer() {
                     <p className="text-xs text-dark-300 mt-0.5">
                       {capacity}
                     </p>
+                    <p className="mt-1 text-xs font-medium text-dark-300">
+                      {availability.title}
+                    </p>
+                    {availability.detail && (
+                      <p className="mt-0.5 text-[11px] text-dark-300">
+                        {availability.detail}
+                      </p>
+                    )}
                     <p className="text-primary font-bold text-sm mt-1">
                       {(product.price * quantity).toLocaleString('ro-RO')} RON
                     </p>

@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSupabaseServiceClient, dbProductToProduct } from '@/lib/supabase';
-import { CATEGORY_LABEL, type Product, type StockStatus } from '@/lib/products';
+import { CATEGORY_LABEL, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
 import ProductPageClient from './ProductPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -58,8 +58,8 @@ function buildSeoDescription(product: Product): string {
 }
 
 function schemaAvailability(stockStatus: StockStatus | undefined): string {
-  if (stockStatus === 'out-of-stock') return 'https://schema.org/OutOfStock';
-  if (stockStatus === 'low-stock') return 'https://schema.org/LimitedAvailability';
+  if (stockStatus === 'out_of_stock') return 'https://schema.org/OutOfStock';
+  if (stockStatus === 'low_stock') return 'https://schema.org/LimitedAvailability';
   return 'https://schema.org/InStock';
 }
 
@@ -100,6 +100,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const { product, related } = data;
   const description = buildSeoDescription(product);
   const canonical = `https://pro-term.ro/produse/${params.slug}`;
+  const availability = getProductAvailability(product);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -113,7 +114,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       ...(product.price > 0
         ? { price: product.price.toFixed(2), priceCurrency: 'RON' }
         : {}),
-      availability: schemaAvailability(product.stockStatus),
+      availability: schemaAvailability(availability.normalizedStatus),
       url: canonical,
     },
   };

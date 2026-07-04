@@ -25,7 +25,7 @@ import { useFavorites } from '@/lib/favorites-context';
 import {
   BRAND_GRADIENT,
   CATEGORY_LABEL,
-  STOCK_LABEL,
+  getProductAvailability,
   type Product,
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
@@ -83,11 +83,6 @@ function getDiscountPercent(product: Product) {
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 }
 
-function isServiceProduct(product: Product) {
-  const text = `${product.name} ${product.category}`.toLowerCase();
-  return text.includes('montaj') || text.includes('service') || text.includes('igienizare') || product.category === 'service-montaj';
-}
-
 interface Props {
   product: Product;
   related: Product[];
@@ -112,13 +107,13 @@ export default function ProductPageClient({ product, related }: Props) {
 
   const hasPrice = product.price > 0;
   const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
-  const stockLabel = product.stockStatus ? STOCK_LABEL[product.stockStatus] : 'La cerere';
+  const availability = getProductAvailability(product);
   const customerDescription = cleanCustomerText(product.description);
   const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
   const officialUrl = getOfficialUrl(product);
   const discountPercent = getDiscountPercent(product);
   const galleryImages = Array.from(new Set([product.imageUrl, ...(product.galleryImages ?? [])].filter(Boolean))) as string[];
-  const serviceProduct = isServiceProduct(product);
+  const serviceProduct = availability.isService;
   const whatsappMessage = `Bună ziua, sunt interesat de ${product.name}. Vă rog să îmi trimiteți detalii/ofertă.`;
   const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
 
@@ -206,7 +201,6 @@ export default function ProductPageClient({ product, related }: Props) {
                   </span>
                 )}
                 <span className="text-sm text-dark-300">{CATEGORY_LABEL[product.category]}</span>
-                <span className="text-sm text-dark-300">· {stockLabel}</span>
               </div>
 
               <h1 className="mb-3 font-heading text-3xl font-bold text-dark">{product.name}</h1>
@@ -226,6 +220,13 @@ export default function ProductPageClient({ product, related }: Props) {
               </div>
 
               <p className="mb-6 leading-relaxed text-dark-300">{customerDescription || 'Pentru detalii, disponibilitate și recomandarea potrivită spațiului tău, contactează echipa PRO TERM.'}</p>
+
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-sm font-bold text-dark">{availability.title}</p>
+                {availability.detail && (
+                  <p className="mt-1 text-sm text-dark-300">{availability.detail}</p>
+                )}
+              </div>
 
               <div className="mb-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-white p-4 shadow-card">
