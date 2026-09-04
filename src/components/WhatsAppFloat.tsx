@@ -40,7 +40,12 @@ export default function WhatsAppFloat() {
     return () => observer.disconnect();
   }, []);
 
-  const hidden = footerVisible;
+  // While the cookie dialog is up, don't try to guess its height and float above it —
+  // just don't render the button at all. No opacity/pointer-events transition means no
+  // window where it's visible-but-inert or invisible-but-clickable; it simply isn't in
+  // the DOM, so it can't be focused or hit-tested. It reappears immediately once the
+  // dialog closes or scrolls out, at its one normal position.
+  if (cookieBannerVisible || footerVisible) return null;
 
   return (
     <a
@@ -48,11 +53,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contact PRO TERM pe WhatsApp"
-      aria-hidden={hidden || undefined}
-      tabIndex={hidden ? -1 : undefined}
-      className={`fixed right-4 z-[90] flex h-[50px] w-[50px] items-center justify-center rounded-full bg-green-500 text-white shadow-card transition-all duration-200 hover:bg-green-600 sm:h-auto sm:w-auto sm:gap-2 sm:rounded-full sm:px-4 sm:py-3 sm:font-extrabold ${
-        cookieBannerVisible ? 'bottom-[188px] sm:bottom-28' : 'bottom-[calc(16px+env(safe-area-inset-bottom))] sm:bottom-7'
-      } ${hidden ? 'pointer-events-none opacity-0' : 'opacity-100'} sm:right-7`}
+      className="fixed bottom-[calc(16px+env(safe-area-inset-bottom))] right-4 z-[90] flex h-[50px] w-[50px] items-center justify-center rounded-full bg-green-500 text-white shadow-card hover:bg-green-600 sm:bottom-7 sm:right-7 sm:h-auto sm:w-auto sm:gap-2 sm:rounded-full sm:px-4 sm:py-3 sm:font-extrabold"
     >
       <MessageCircle size={22} />
       <span className="hidden sm:inline">WhatsApp</span>
