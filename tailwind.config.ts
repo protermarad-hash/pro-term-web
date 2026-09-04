@@ -91,11 +91,16 @@ const config: Config = {
         'brand-gradient': 'linear-gradient(135deg, #0B1D35 0%, #D62C35 100%)',
       },
       boxShadow: {
-        'accent':     '0 12px 30px rgba(214, 44, 53, 0.22)',
-        'primary':    '0 12px 30px rgba(11, 29, 53, 0.16)',
-        'brand':      '0 12px 30px rgba(214, 44, 53, 0.18)',
-        'card':       '0 8px 28px rgba(15, 23, 42, 0.08)',
-        'card-hover': '0 18px 42px rgba(15, 23, 42, 0.14)',
+        // Named "btn"/"btn-hover" rather than "accent"/"accent-hover": Tailwind auto-generates a
+        // `shadow-{colorName}` utility for every theme color (opaque, no alpha) — since a color
+        // named "accent" also exists, a boxShadow key of the same name collides with it and the
+        // auto-generated one wins the cascade, silently stripping the alpha from this shadow.
+        'btn':          '0 2px 6px rgba(214, 44, 53, 0.18)',
+        'btn-hover':     '0 6px 14px rgba(214, 44, 53, 0.24)',
+        'primary':      '0 12px 30px rgba(11, 29, 53, 0.16)',
+        'brand':        '0 4px 10px rgba(214, 44, 53, 0.16)',
+        'card':         '0 8px 28px rgba(15, 23, 42, 0.08)',
+        'card-hover':   '0 18px 42px rgba(15, 23, 42, 0.14)',
       },
     },
   },

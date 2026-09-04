@@ -41,13 +41,13 @@ export default function HomepageHero() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link href="/produse" className="btn-primary justify-center px-7 py-3.5 text-base">
+              <Link href="/produse" className="btn-primary justify-center px-7 py-3 text-base">
                 Găsește soluția potrivită
-                <ArrowRight size={20} />
+                <ArrowRight size={19} />
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/25 px-7 py-3.5 text-base font-semibold text-white transition-colors hover:border-white/50 hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/25 px-7 py-3 text-base font-semibold text-white transition-colors hover:border-white/50 hover:bg-white/10"
               >
                 Solicită o ofertă
               </Link>
@@ -79,7 +79,7 @@ export default function HomepageHero() {
                 <path d="M170 160h106M170 178h106M170 196h70" stroke="white" strokeOpacity="0.2" strokeWidth="1.5" />
               </svg>
             </div>
-            <div className="absolute -bottom-5 -right-4 rounded-xl bg-brand p-4 text-white shadow-accent">
+            <div className="absolute -bottom-5 -right-4 rounded-xl bg-brand p-4 text-white shadow-btn">
               <p className="text-xs font-semibold uppercase tracking-wider text-white/75">Sună acum</p>
               <p className="text-lg font-bold">0749 025 610</p>
             </div>

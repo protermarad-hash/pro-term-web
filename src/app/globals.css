@@ -18,7 +18,7 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-semibold rounded-xl shadow-accent hover:bg-accent-600 transition-all duration-200 hover:-translate-y-0.5;
+    @apply inline-flex items-center gap-2 px-6 py-3 bg-accent text-white font-semibold rounded-xl shadow-btn hover:shadow-btn-hover hover:bg-accent-600 transition-all duration-200 hover:-translate-y-0.5;
   }
 
   .btn-outline {
