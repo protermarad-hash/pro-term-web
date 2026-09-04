@@ -99,7 +99,7 @@ export default function Header() {
           {!authLoading && (
             <Link
               href={accountHref}
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-primary hover:text-primary"
+              className="flex items-center gap-1.5 rounded-xl border border-primary-300 px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-primary-400 hover:text-primary"
             >
               <User size={15} />
               {accountLabel}
