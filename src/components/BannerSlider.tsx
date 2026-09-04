@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import AIImage from './AIImage';
+
+/** Only this one slide is confirmed AI-generated (C2PA manifest) — see ai-media-registry.ts. */
+const AI_MEDIA_ID = 'midea-aer-proaspat-ai';
 
 const BANNERS = [
   {
@@ -45,29 +49,53 @@ export default function BannerSlider() {
       className="relative overflow-hidden rounded-2xl bg-gray-100 shadow-md"
       style={{ height: 'clamp(220px, 28vw, 400px)' }}
     >
-      {BANNERS.map((banner, i) => (
-        <Link
-          key={banner.src}
-          href={HREF}
-          className="absolute inset-0"
-          style={{
-            opacity: i === current ? 1 : 0,
-            transition: 'opacity 800ms ease-in-out',
-            pointerEvents: i === current ? 'auto' : 'none',
-            visibility: errors.has(i) ? 'hidden' : 'visible',
-          }}
-        >
-          <Image
-            src={banner.src}
-            alt={banner.alt}
-            fill
-            sizes="(max-width: 768px) 100vw, 1200px"
-            className="object-cover"
-            priority={i === 0}
-            onError={() => setErrors((prev) => new Set(prev).add(i))}
-          />
-        </Link>
-      ))}
+      {BANNERS.map((banner, i) => {
+        const slideStyle = {
+          opacity: i === current ? 1 : 0,
+          transition: 'opacity 800ms ease-in-out',
+          pointerEvents: i === current ? ('auto' as const) : ('none' as const),
+          visibility: (errors.has(i) ? 'hidden' : 'visible') as 'hidden' | 'visible',
+        };
+
+        // The confirmed-AI slide needs its own real <Link> for the "AI" badge
+        // (AIImage), and nesting an <a> inside another <a> is invalid HTML. Instead of
+        // wrapping the image in the slide-level Link, the image and the slide-level
+        // Link become siblings: the Link is a full-bleed layer behind the badge
+        // (z-0) so the whole slide still navigates to HREF on click, while the badge
+        // (z-10, inside AIImage) sits above it and remains its own independently
+        // focusable/clickable link. Slide behavior and keyboard access are unchanged;
+        // only this one slide's markup differs from the other two.
+        if (banner.src === '/images/banners/midea/aer-proaspat.jpg') {
+          return (
+            <div key={banner.src} className="absolute inset-0" style={slideStyle}>
+              <AIImage
+                mediaId={AI_MEDIA_ID}
+                alt={banner.alt}
+                fill
+                sizes="(max-width: 768px) 100vw, 1200px"
+                className="object-cover"
+                priority={i === 0}
+                onError={() => setErrors((prev) => new Set(prev).add(i))}
+              />
+              <Link href={HREF} aria-label={banner.alt} className="absolute inset-0 z-0" />
+            </div>
+          );
+        }
+
+        return (
+          <Link key={banner.src} href={HREF} className="absolute inset-0" style={slideStyle}>
+            <Image
+              src={banner.src}
+              alt={banner.alt}
+              fill
+              sizes="(max-width: 768px) 100vw, 1200px"
+              className="object-cover"
+              priority={i === 0}
+              onError={() => setErrors((prev) => new Set(prev).add(i))}
+            />
+          </Link>
+        );
+      })}
 
       <button
         onClick={prev}

@@ -28,6 +28,7 @@ const footerLinks = {
     { label: 'Politica de retur', href: '/politica-retur' },
     { label: 'Formular de retragere', href: '/formular-retragere' },
     { label: 'Politica cookies', href: '/politica-cookies' },
+    { label: 'Transparență imagini AI', href: '/transparenta-ai' },
   ],
 };
 
@@ -93,6 +94,11 @@ export default function Footer() {
                 ))}
                 {category === 'Companie' && <FooterAccountLink />}
               </ul>
+              {category === 'Legal' && (
+                <p className="mt-4 text-xs leading-relaxed text-white/55">
+                  Imaginile ilustrative generate cu AI sunt marcate cu simbolul „AI”.
+                </p>
+              )}
             </div>
           ))}
         </div>

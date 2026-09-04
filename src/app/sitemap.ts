@@ -29,6 +29,7 @@ const staticRoutes: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/politica-confidentialitate', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/politica-retur', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/politica-cookies', priority: 0.4, changeFrequency: 'monthly' },
+  { path: '/transparenta-ai', priority: 0.4, changeFrequency: 'monthly' },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
