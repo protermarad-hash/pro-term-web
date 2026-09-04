@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://pro-term.ro/livrare-si-plata' },
 };
 
-const updatedAt = '07.06.2026';
+const updatedAt = '04.09.2026';
 
 export default function DeliveryPaymentPage() {
   return (
@@ -28,6 +28,13 @@ export default function DeliveryPaymentPage() {
               <p>Costurile de livrare, transport, manipulare sau deplasare se comunică înainte de confirmarea finală a comenzii sau ofertei. Dacă un cost nu este inclus în prețul produsului sau serviciului, acesta va fi comunicat separat și va necesita acordul clientului.</p>
               <h2>3. Termene de livrare și programare</h2>
               <p>Termenele de livrare sau intervenție sunt estimative și depind de stoc, furnizor, curier, localitate, complexitatea lucrării și programarea echipei tehnice. Termenul final se confirmă telefonic, prin e-mail sau prin alt canal agreat.</p>
+
+              <div className="my-6 rounded-2xl border border-primary/15 bg-light-300 p-5 md:p-6">
+                <h3 className="font-heading text-lg font-bold text-dark md:text-xl">Termen estimat de livrare</h3>
+                <p className="mt-3 text-dark-300">Pentru produsele aflate în stoc, termenul estimat de livrare este de <strong className="text-dark">2–5 zile lucrătoare</strong> de la confirmarea comenzii.</p>
+                <p className="mt-3 text-dark-300">Pentru produsele care nu se află în stocul propriu PRO TERM, disponibilitatea și termenul estimat de livrare sunt confirmate individual clientului, telefonic sau prin e-mail, înainte de confirmarea finală a comenzii.</p>
+                <p className="mt-3 text-dark-300">Termenul poate varia în funcție de disponibilitatea furnizorului, localitatea de livrare, zilele nelucrătoare și situațiile independente de controlul PRO TERM. Dacă termenul comunicat nu este acceptat de client, comanda nu va fi confirmată.</p>
+              </div>
               <h2>4. Metode de plată</h2>
               <p>Plata se poate face prin transfer bancar, plată ramburs sau alte metode comunicate la confirmarea comenzii sau ofertei. Dacă vor fi activate plăți online, această pagină va fi actualizată cu informații despre procesatorul de plată.</p>
               <h2>5. Comenzi cu montaj sau servicii</h2>
