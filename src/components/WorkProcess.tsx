@@ -28,7 +28,7 @@ export default function WorkProcess() {
         <ol className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
             <li key={step.title} className="relative rounded-2xl border border-slate-100 bg-white p-6 shadow-card">
-              <span className="font-heading text-4xl font-bold text-primary/15">
+              <span className="font-heading text-4xl font-bold text-primary/25">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <h3 className="mt-3 font-heading text-lg font-bold text-dark">{step.title}</h3>

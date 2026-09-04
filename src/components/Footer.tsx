@@ -46,29 +46,29 @@ export default function Footer() {
                 className="h-10 w-auto object-contain brightness-200"
               />
             </Link>
-            <p className="text-white/60 text-sm leading-relaxed mb-1 max-w-xs">
+            <p className="text-white/75 text-sm leading-relaxed mb-1 max-w-xs">
               SC PRO TERM SRL — soluții HVAC, climatizare, montaj, service și mentenanță în Arad, Timișoara și proiecte naționale.
             </p>
-            <p className="text-white/40 text-xs mb-6">
+            <p className="text-white/55 text-xs mb-6">
               Herman Sebastian · Arad, România · suport tehnic HVAC
             </p>
 
             <div className="space-y-2">
               <a
                 href="tel:+40749025610"
-                className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
+                className="flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors"
               >
                 <Phone size={15} className="text-accent" />
                 0749 025 610
               </a>
               <a
                 href="mailto:office@pro-term.ro"
-                className="flex items-center gap-2 text-white/70 hover:text-white text-sm transition-colors"
+                className="flex items-center gap-2 text-white/80 hover:text-white text-sm transition-colors"
               >
                 <Mail size={15} className="text-brand" />
                 office@pro-term.ro
               </a>
-              <span className="flex items-center gap-2 text-white/70 text-sm">
+              <span className="flex items-center gap-2 text-white/80 text-sm">
                 <MapPin size={15} className="text-primary-300" />
                 Arad, România
               </span>
@@ -77,7 +77,7 @@ export default function Footer() {
 
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-4">
+              <h4 className="font-bold text-sm uppercase tracking-widest text-white/55 mb-4">
                 {category}
               </h4>
               <ul className="space-y-2">
@@ -85,7 +85,7 @@ export default function Footer() {
                   <li key={link.href + link.label}>
                     <Link
                       href={link.href}
-                      className="text-white/60 hover:text-white text-sm transition-colors"
+                      className="text-white/75 hover:text-white text-sm transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -105,8 +105,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
-          <h4 className="text-sm font-bold uppercase tracking-widest text-white/50">Protecția consumatorilor</h4>
-          <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-3">
+          <h4 className="text-sm font-bold uppercase tracking-widest text-white/60">Protecția consumatorilor</h4>
+          <div className="mt-3 grid gap-3 text-sm text-white/75 md:grid-cols-3">
             <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               PROTECȚIA CONSUMATORILOR - A.N.P.C.
             </a>
@@ -117,7 +117,7 @@ export default function Footer() {
               Soluționare online litigii - SOL/ODR
             </a>
           </div>
-          <p className="mt-3 text-xs text-white/40">
+          <p className="mt-3 text-xs text-white/55">
             Telefonul Consumatorilor: 0219551 · CJPC Arad: Str. Revoluției nr. 50, Arad · Tel. 0257/257.049 · reclamatii.arad@opc.ro
           </p>
         </div>
@@ -125,10 +125,10 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="container mx-auto px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-white/40 text-sm">
+          <p className="text-white/55 text-sm">
             © {new Date().getFullYear()} SC PRO TERM SRL. Toate drepturile rezervate.
           </p>
-          <p className="text-white/30 text-xs text-center md:text-right">
+          <p className="text-white/50 text-xs text-center md:text-right">
             Toate prețurile afișate includ TVA de 21% · Arad, România
           </p>
         </div>

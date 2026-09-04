@@ -31,10 +31,10 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const textColor = scrolled ? 'text-dark-300' : 'text-slate-100';
+  const textColor = 'text-dark-300';
   const bgClass = scrolled
     ? 'bg-white/95 backdrop-blur-xl shadow-card py-3 border-b border-slate-100'
-    : 'bg-primary/85 backdrop-blur-xl py-4 border-b border-white/10';
+    : 'bg-white/95 backdrop-blur-xl py-4 border-b border-slate-100';
 
   const accountHref  = user ? '/cont/profil' : '/cont/autentificare';
   const accountLabel = user ? 'Contul meu' : 'Intră în cont';
@@ -42,10 +42,10 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgClass}`}>
       {!scrolled && (
-        <div className="hidden justify-center gap-2 border-b border-white/10 bg-primary-700/95 py-1.5 text-center text-xs font-medium tracking-wide text-white/75 sm:flex sm:items-center">
+        <div className="hidden justify-center gap-2 border-b border-primary-100 bg-light-300 py-1.5 text-center text-xs font-medium tracking-wide text-primary-400 sm:flex sm:items-center">
           <span className="uppercase tracking-[0.18em]">Climatizare • Încălzire • Ventilație</span>
-          <span aria-hidden className="text-white/30">|</span>
-          <a href={contactPhoneHref} className="font-semibold hover:text-white">{contactPhone}</a>
+          <span aria-hidden className="text-primary-200">|</span>
+          <a href={contactPhoneHref} className="font-semibold hover:text-primary-600">{contactPhone}</a>
         </div>
       )}
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -77,9 +77,7 @@ export default function Header() {
         <div className="hidden lg:flex items-center gap-3">
           <a
             href={contactPhoneHref}
-            className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
-              scrolled ? 'text-primary hover:text-accent' : 'text-white hover:text-accent-200'
-            }`}
+            className="flex items-center gap-1.5 text-sm font-bold text-primary transition-colors hover:text-accent"
           >
             <Phone size={15} />
             {contactPhone}
@@ -87,9 +85,7 @@ export default function Header() {
 
           <button
             onClick={openCart}
-            className={`relative p-2.5 rounded-xl transition-colors ${
-              scrolled ? 'hover:bg-slate-100 text-dark' : 'hover:bg-white/10 text-white'
-            }`}
+            className="relative p-2.5 rounded-xl text-dark transition-colors hover:bg-slate-100"
             aria-label="Coș de cumpărături"
           >
             <ShoppingCart size={20} />
@@ -103,11 +99,7 @@ export default function Header() {
           {!authLoading && (
             <Link
               href={accountHref}
-              className={`flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${
-                scrolled
-                  ? 'border border-slate-200 text-dark hover:border-primary hover:text-primary'
-                  : 'border border-white/30 text-white hover:bg-white/10'
-              }`}
+              className="flex items-center gap-1.5 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-primary hover:text-primary"
             >
               <User size={15} />
               {accountLabel}
@@ -122,7 +114,7 @@ export default function Header() {
         <div className="lg:hidden flex items-center gap-2">
           <button
             onClick={openCart}
-            className={`relative p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
+            className="relative p-2 rounded-xl text-dark"
             aria-label="Coș"
           >
             <ShoppingCart size={22} />
@@ -135,14 +127,14 @@ export default function Header() {
           {!authLoading && (
             <Link
               href={accountHref}
-              className={`p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
+              className="p-2 rounded-xl text-dark"
               aria-label={accountLabel}
             >
               <User size={22} />
             </Link>
           )}
           <button
-            className={`p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
+            className="p-2 rounded-xl text-dark"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Meniu"
           >
