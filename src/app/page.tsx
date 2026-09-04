@@ -1,27 +1,26 @@
 import type { Metadata } from 'next';
 import Header from '@/components/Header';
-import Hero from '@/components/Hero';
-import FeaturedProducts from '@/components/FeaturedProducts';
-import PartnerBanners from '@/components/PartnerBanners';
-import MideaBanner from '@/components/MideaBanner';
-import BannerSlider from '@/components/BannerSlider';
-import Services from '@/components/Services';
-import About from '@/components/About';
-import ProiecteRealizate from '@/components/ProiecteRealizate';
-import WhyUs from '@/components/WhyUs';
-import Contact from '@/components/Contact';
-import ConsumerProtectionNotice from '@/components/ConsumerProtectionNotice';
+import HomepageHero from '@/components/HomepageHero';
+import TrustBar from '@/components/TrustBar';
+import ProductCategories from '@/components/ProductCategories';
+import ConsultationSection from '@/components/ConsultationSection';
+import InstallationServiceSection from '@/components/InstallationServiceSection';
+import HeatPumpSection from '@/components/HeatPumpSection';
+import CommercialIndustrialSection from '@/components/CommercialIndustrialSection';
+import WorkProcess from '@/components/WorkProcess';
+import WhyProTerm from '@/components/WhyProTerm';
+import HomepageFinalCTA from '@/components/HomepageFinalCTA';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
-  title: 'Dealer Autorizat Midea, Gree, Yamato | Montaj Aer Condiționat Arad | PRO TERM SRL',
+  title: 'Climatizare, Încălzire și Ventilație HVAC | PRO TERM SRL Arad',
   description:
-    'PRO TERM SRL — dealer autorizat Midea, Gree și Yamato în România. Montaj și service aer condiționat în Arad și Timiș. Livrare în toată România. Proiecte VRV comerciale. Sună: 0749 025 610.',
+    'PRO TERM SRL — magazin, consultanță, montaj și service HVAC: aer condiționat, pompe de căldură și ventilație. Dealer autorizat Midea, Gree, Yamato. Arad și Timiș, proiecte comerciale în România. Sună: 0749 025 610.',
   alternates: { canonical: 'https://pro-term.ro' },
   openGraph: {
-    title: 'Dealer Autorizat Midea, Gree, Yamato | PRO TERM SRL Arad',
+    title: 'Climatizare, Încălzire și Ventilație HVAC | PRO TERM SRL',
     description:
-      'Dealer autorizat Midea, Gree și Yamato. Montaj și service HVAC în Arad și Timiș. Livrare echipamente în toată România. Sisteme VRV comerciale național.',
+      'Magazin, consultanță, montaj și service HVAC: aer condiționat, pompe de căldură, ventilație. Dealer autorizat Midea, Gree, Yamato. Proiecte comerciale și industriale în România.',
     url: 'https://pro-term.ro',
     images: [{ url: '/logo-proterm.jpg', width: 930, height: 640, alt: 'PRO TERM' }],
   },
@@ -32,22 +31,16 @@ export default function Home() {
     <>
       <Header />
       <main>
-        <Hero />
-        <MideaBanner />
-        <section className="container mx-auto px-4 py-8">
-          <h2 className="mb-4 font-heading text-2xl font-bold text-dark md:text-3xl">
-            De ce să alegi Midea Breezeless E?
-          </h2>
-          <BannerSlider />
-        </section>
-        <FeaturedProducts />
-        <PartnerBanners />
-        <Services />
-        <About />
-        <ProiecteRealizate />
-        <WhyUs />
-        <ConsumerProtectionNotice />
-        <Contact />
+        <HomepageHero />
+        <TrustBar />
+        <ProductCategories />
+        <ConsultationSection />
+        <InstallationServiceSection />
+        <HeatPumpSection />
+        <CommercialIndustrialSection />
+        <WorkProcess />
+        <WhyProTerm />
+        <HomepageFinalCTA />
       </main>
       <Footer />
     </>

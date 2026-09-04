@@ -6,16 +6,14 @@ import Link from 'next/link';
 import { Phone, Menu, X, ShoppingCart, User } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useAuth } from '@/lib/auth-context';
-import { SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 
 const navLinks = [
-  { label: 'Servicii',       href: '/servicii' },
-  { label: 'Produse',        href: '/produse' },
-  { label: 'Multisplit',     href: '/multisplit' },
-  { label: 'Calculator BTU', href: '/calculator-btu' },
-  { label: 'Blog',           href: '/blog' },
-  { label: 'Despre noi',     href: '/despre' },
-  { label: 'Contact',        href: '/#contact' },
+  { label: 'Magazin',              href: '/produse' },
+  { label: 'Servicii',             href: '/servicii' },
+  { label: 'Pompe de căldură',     href: '/produse' },
+  { label: 'Proiecte profesionale', href: '/servicii/proiecte-hvac-romania' },
+  { label: 'Despre noi',           href: '/despre' },
+  { label: 'Contact',              href: '/contact' },
 ];
 
 const contactPhone = '0749 025 610';
@@ -44,8 +42,10 @@ export default function Header() {
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${bgClass}`}>
       {!scrolled && (
-        <div className="bg-primary/95 border-b border-white/10 py-1.5 text-center text-xs font-medium text-white/80">
-          Transport gratuit la comenzi peste {SHIPPING_FREE_THRESHOLD.toLocaleString('ro-RO')} RON
+        <div className="hidden justify-center gap-2 border-b border-white/10 bg-primary-700/95 py-1.5 text-center text-xs font-medium tracking-wide text-white/75 sm:flex sm:items-center">
+          <span className="uppercase tracking-[0.18em]">Climatizare • Încălzire • Ventilație</span>
+          <span aria-hidden className="text-white/30">|</span>
+          <a href={contactPhoneHref} className="font-semibold hover:text-white">{contactPhone}</a>
         </div>
       )}
       <div className="container mx-auto px-4 flex items-center justify-between">
@@ -62,7 +62,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-7">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -74,7 +74,7 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <a
             href={contactPhoneHref}
             className={`flex items-center gap-1.5 text-sm font-bold transition-colors ${
@@ -114,12 +114,12 @@ export default function Header() {
             </Link>
           )}
 
-          <Link href="/#contact" className="btn-primary py-2.5 px-5 text-sm">
-            Ofertă gratuită
+          <Link href="/contact" className="btn-primary py-2.5 px-5 text-sm">
+            Cere ofertă
           </Link>
         </div>
 
-        <div className="md:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center gap-2">
           <button
             onClick={openCart}
             className={`relative p-2 rounded-xl ${scrolled ? 'text-dark' : 'text-white'}`}
@@ -152,7 +152,7 @@ export default function Header() {
       </div>
 
       {menuOpen && (
-        <div className="md:hidden bg-white border-t border-slate-100 shadow-lg">
+        <div className="lg:hidden bg-white border-t border-slate-100 shadow-lg">
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
@@ -179,8 +179,8 @@ export default function Header() {
               <Phone size={16} />
               {contactPhone}
             </a>
-            <Link href="/#contact" className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
-              Ofertă gratuită
+            <Link href="/contact" className="btn-primary text-center" onClick={() => setMenuOpen(false)}>
+              Cere ofertă
             </Link>
           </nav>
         </div>
