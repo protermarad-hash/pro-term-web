@@ -102,7 +102,7 @@ export default function Footer() {
             <NetopiaLogo />
           </div>
           <p className="text-xs text-dark-400 sm:text-sm">
-            Plăți online procesate securizat prin NETOPIA Payments
+            Plată online prin NETOPIA Payments — disponibilă în curând.
           </p>
         </div>
 
