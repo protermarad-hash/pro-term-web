@@ -65,7 +65,7 @@ export default function Header() {
         <nav className="hidden lg:flex items-center gap-6 xl:gap-7">
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.label}
               href={link.href}
               className={`font-semibold text-sm transition-colors hover:text-accent ${textColor}`}
             >
@@ -148,7 +148,7 @@ export default function Header() {
           <nav className="container mx-auto px-4 py-4 flex flex-col gap-3">
             {navLinks.map((link) => (
               <Link
-                key={link.href}
+                key={link.label}
                 href={link.href}
                 className="text-dark-300 font-semibold py-2 hover:text-accent transition-colors"
                 onClick={() => setMenuOpen(false)}
