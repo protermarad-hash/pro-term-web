@@ -131,7 +131,7 @@ export default function ProductPageClient({ product, related }: Props) {
           </div>
 
           <div className="mb-14 grid gap-10 lg:grid-cols-2">
-            <div>
+            <div className="min-w-0">
               <div className={`relative flex aspect-square flex-col items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br ${BRAND_GRADIENT[product.brand]}`}>
                 {selectedImage ? (
                   <Image
