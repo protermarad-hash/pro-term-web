@@ -3,7 +3,7 @@ import { Phone } from 'lucide-react';
 
 export default function HomepageFinalCTA() {
   return (
-    <section className="border-y border-accent/15 bg-accent-50 py-20">
+    <section className="border-y border-accent/15 bg-accent-50 py-14 lg:py-20">
       <div className="container mx-auto px-4 text-center">
         <h2 className="mx-auto max-w-2xl font-heading text-3xl font-bold text-primary md:text-4xl">
           Hai să găsim soluția potrivită pentru spațiul tău.

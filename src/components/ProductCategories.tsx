@@ -37,7 +37,7 @@ const categories = [
  */
 export default function ProductCategories() {
   return (
-    <section className="bg-light-200 py-20">
+    <section className="bg-light-200 py-14 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="max-w-2xl">
           <h2 className="section-title">Tot ce ai nevoie pentru confortul casei tale</h2>

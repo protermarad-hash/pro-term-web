@@ -19,7 +19,7 @@ const steps = [
 
 export default function WorkProcess() {
   return (
-    <section className="bg-light-200 py-20">
+    <section className="bg-light-200 py-14 lg:py-20">
       <div className="container mx-auto px-4">
         <h2 className="section-title mx-auto max-w-2xl text-center">
           Simplu pentru tine. Gestionat complet de noi.

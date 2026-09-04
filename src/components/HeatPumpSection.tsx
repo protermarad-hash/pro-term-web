@@ -3,7 +3,7 @@ import { Flame } from 'lucide-react';
 
 export default function HeatPumpSection() {
   return (
-    <section className="bg-gradient-to-b from-light-300 to-white py-20">
+    <section className="bg-gradient-to-b from-light-300 to-white py-14 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>

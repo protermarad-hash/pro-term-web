@@ -12,7 +12,7 @@ const services = [
 
 export default function InstallationServiceSection() {
   return (
-    <section className="bg-light-200 py-20">
+    <section className="bg-light-200 py-14 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="grid items-start gap-12 lg:grid-cols-2">
           <div>

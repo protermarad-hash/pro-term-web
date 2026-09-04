@@ -3,7 +3,7 @@ import { Lightbulb } from 'lucide-react';
 
 export default function ConsultationSection() {
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-14 lg:py-20">
       <div className="container mx-auto px-4">
         <div className="grid items-center gap-10 rounded-2xl border border-primary/10 bg-card-gradient p-8 md:grid-cols-[auto_1fr_auto] md:p-12">
           <div className="hidden h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-primary text-white md:flex">

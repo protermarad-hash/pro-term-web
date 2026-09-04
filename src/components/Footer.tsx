@@ -97,8 +97,10 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center gap-4 rounded-2xl bg-white p-4">
-          <NetopiaLogo />
+        <div className="mt-10 flex flex-wrap items-center gap-3 overflow-hidden rounded-2xl bg-white p-3 sm:gap-4 sm:p-4">
+          <div className="flex-shrink-0">
+            <NetopiaLogo />
+          </div>
           <p className="text-xs text-dark-400 sm:text-sm">
             Plăți online procesate securizat prin NETOPIA Payments
           </p>
