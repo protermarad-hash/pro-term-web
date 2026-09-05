@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
-import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, getProductAvailability } from '@/lib/products';
+import { type Product, BRAND_GRADIENT, getCategoryLabel, getProductAvailability, hasVerifiedReviewSummary } from '@/lib/products';
 
 function getDiscountPercent(product: Product) {
   if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
@@ -16,7 +16,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const hasPrice = product.price > 0;
-  const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
+  const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : getCategoryLabel(product.category));
   const availability = getProductAvailability(product);
   const discountPercent = getDiscountPercent(product);
   const hasImage = Boolean(product.imageUrl);
@@ -45,7 +45,7 @@ export default function ProductCard({ product }: { product: Product }) {
                   {product.brand}
                 </span>
                 <span className="block font-heading text-2xl font-bold text-primary">
-                  {CATEGORY_LABEL[product.category]}
+                  {getCategoryLabel(product.category)}
                 </span>
               </div>
             </div>
@@ -99,7 +99,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.brand}
           </span>
           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-dark-300">
-            {CATEGORY_LABEL[product.category]}
+            {getCategoryLabel(product.category)}
           </span>
         </div>
 
@@ -114,22 +114,24 @@ export default function ProductCard({ product }: { product: Product }) {
           {availability.detail && <p className="text-dark-300/90">{availability.detail}</p>}
         </div>
 
-        <div className="mb-4 flex items-center gap-1">
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                size={12}
-                className={
-                  star <= Math.round(product.rating)
-                    ? 'fill-accent text-accent'
-                    : 'fill-slate-200 text-slate-200'
-                }
-              />
-            ))}
+        {hasVerifiedReviewSummary(product) && (
+          <div className="mb-4 flex items-center gap-1">
+            <div className="flex">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Star
+                  key={star}
+                  size={12}
+                  className={
+                    star <= Math.round(product.rating)
+                      ? 'fill-accent text-accent'
+                      : 'fill-slate-200 text-slate-200'
+                  }
+                />
+              ))}
+            </div>
+            <span className="text-xs text-dark-300">({product.reviews})</span>
           </div>
-          <span className="text-xs text-dark-300">({product.reviews})</span>
-        </div>
+        )}
 
         <div className="mt-auto border-t border-slate-100 pt-4">
           {discountPercent && (

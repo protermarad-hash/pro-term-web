@@ -24,8 +24,9 @@ import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
 import {
   BRAND_GRADIENT,
-  CATEGORY_LABEL,
+  getCategoryLabel,
   getProductAvailability,
+  hasVerifiedReviewSummary,
   type Product,
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
@@ -106,7 +107,7 @@ export default function ProductPageClient({ product, related }: Props) {
   }
 
   const hasPrice = product.price > 0;
-  const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : CATEGORY_LABEL[product.category]);
+  const capacity = product.capacityLabel ?? (product.btu ? `${product.btu.toLocaleString('ro-RO')} BTU` : getCategoryLabel(product.category));
   const availability = getProductAvailability(product);
   const customerDescription = cleanCustomerText(product.description);
   const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
@@ -151,7 +152,7 @@ export default function ProductPageClient({ product, related }: Props) {
                       <div className="mb-2 font-heading text-4xl font-bold opacity-70 md:text-5xl">
                         {capacity}
                       </div>
-                      <div className="text-lg text-white/80">{CATEGORY_LABEL[product.category]}</div>
+                      <div className="text-lg text-white/80">{getCategoryLabel(product.category)}</div>
                     </div>
                   </>
                 )}
@@ -200,24 +201,26 @@ export default function ProductPageClient({ product, related }: Props) {
                     Dealer Autorizat
                   </span>
                 )}
-                <span className="text-sm text-dark-300">{CATEGORY_LABEL[product.category]}</span>
+                <span className="text-sm text-dark-300">{getCategoryLabel(product.category)}</span>
               </div>
 
               <h1 className="mb-3 font-heading text-3xl font-bold text-dark">{product.name}</h1>
 
-              <div className="mb-4 flex items-center gap-2">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      size={16}
-                      className={star <= Math.round(product.rating) ? 'fill-accent text-accent' : 'fill-gray-300 text-gray-300'}
-                    />
-                  ))}
+              {hasVerifiedReviewSummary(product) && (
+                <div className="mb-4 flex items-center gap-2">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        size={16}
+                        className={star <= Math.round(product.rating) ? 'fill-accent text-accent' : 'fill-gray-300 text-gray-300'}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-dark">{product.rating}</span>
+                  <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
                 </div>
-                <span className="text-sm font-semibold text-dark">{product.rating}</span>
-                <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
-              </div>
+              )}
 
               <p className="mb-6 leading-relaxed text-dark-300">{customerDescription || 'Pentru detalii, disponibilitate și recomandarea potrivită spațiului tău, contactează echipa PRO TERM.'}</p>
 

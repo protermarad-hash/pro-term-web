@@ -2,7 +2,7 @@ import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getSupabaseServiceClient, dbProductToProduct } from '@/lib/supabase';
-import { CATEGORY_LABEL, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
+import { getCategoryLabel, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
 import ProductPageClient from './ProductPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -50,7 +50,7 @@ function buildSeoDescription(product: Product): string {
     return cleaned.length > 155 ? cleaned.slice(0, 152) + '...' : cleaned;
   }
 
-  const parts: string[] = [`${product.brand} ${CATEGORY_LABEL[product.category]}`];
+  const parts: string[] = [`${product.brand} ${getCategoryLabel(product.category)}`];
   if (product.btu) parts.push(`${product.btu.toLocaleString('ro-RO')} BTU`);
   if (product.energyClass) parts.push(`Clasa ${product.energyClass}`);
   parts.push('Dealer autorizat PRO TERM — montaj și service în Arad și Timiș.');

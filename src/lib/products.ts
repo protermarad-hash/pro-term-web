@@ -1,3 +1,5 @@
+import type { ProductDetails } from './product-details/types';
+
 export type Brand =
   | 'Midea'
   | 'Gree'
@@ -22,7 +24,11 @@ export type Category =
   | 'termostate-automatizari'
   | 'service-montaj'
   | 'multisplit'
-  | 'multisplit-pachet';
+  | 'multisplit-pachet'
+  | 'comercial-duct'
+  | 'comercial-caseta'
+  | 'comercial-podea'
+  | 'accesorii';
 
 export type StockStatus = 'in_stock' | 'la_comanda' | 'out_of_stock' | 'low_stock';
 
@@ -56,6 +62,12 @@ export interface Product {
   stockQty?: number;
   imageUrl?: string;
   galleryImages?: string[];
+  /**
+   * Additive, optional enrichment payload (typed technical spec, provenance, media,
+   * documents, GPSR, or service schema — see src/lib/product-details). Never required;
+   * never derived automatically from `specs`/`features`/`description`.
+   */
+  details?: ProductDetails;
 }
 
 export const BRAND_GRADIENT: Record<Brand, string> = {
@@ -84,7 +96,35 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   'service-montaj': 'Service & montaj',
   multisplit: 'Sistem multisplit',
   'multisplit-pachet': 'Pachet multisplit',
+  'comercial-duct': 'Unități comerciale duct',
+  'comercial-caseta': 'Unități comerciale tip casetă',
+  'comercial-podea': 'Unități comerciale de pardoseală',
+  accesorii: 'Accesorii HVAC',
 };
+
+/**
+ * True when `category` is one of the known `Category` values (i.e. has an entry in
+ * `CATEGORY_LABEL`). Historical or future DB values outside this set are still valid
+ * data — this only distinguishes "known" from "unknown" for display/validation.
+ */
+export function isKnownCategory(category: string): category is Category {
+  return Object.prototype.hasOwnProperty.call(CATEGORY_LABEL, category);
+}
+
+/**
+ * Defensive replacement for `CATEGORY_LABEL[product.category]`. Never returns
+ * `undefined` and never throws — an unrecognized category (historical data, a new
+ * DB value not yet mapped here) falls back to a human-readable formatting of the
+ * raw slug instead of breaking the UI.
+ */
+export function getCategoryLabel(category: string): string {
+  if (isKnownCategory(category)) return CATEGORY_LABEL[category];
+  return category
+    .split('-')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
 export function normalizeStockStatus(status?: string | null): StockStatus {
   switch (status) {
@@ -159,6 +199,23 @@ export function getProductAvailability(product: Pick<Product, 'brand' | 'name' |
         isService: false,
       };
   }
+}
+
+/**
+ * True only when the product has a genuine review summary worth rendering. All 73
+ * live products currently carry a placeholder `rating: 4.7, reviews: 0` — this keeps
+ * stars/rating/"N recenzii" out of the UI until real reviews exist, without touching
+ * the underlying Supabase values.
+ */
+export function hasVerifiedReviewSummary(product: Pick<Product, 'rating' | 'reviews'>): boolean {
+  const { rating, reviews } = product;
+  return (
+    Number.isFinite(reviews) &&
+    reviews > 0 &&
+    Number.isFinite(rating) &&
+    rating >= 1 &&
+    rating <= 5
+  );
 }
 
 export const products: Product[] = [];
