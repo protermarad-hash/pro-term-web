@@ -60,6 +60,13 @@ export interface EnergyZoneProfile {
   seasonalEfficiency?: SourcedValue<number>;
   energyClass?: SourcedValue<EnergyClass>;
   annualConsumption?: SourcedValue<Measurement<'kWh/an'>>;
+  /**
+   * Bivalent/operating-limit temperature for THIS zone specifically. Heat pumps commonly
+   * publish different Tbiv/Tol per climate zone (e.g. average vs warmer) — distinct from
+   * the single overall figures on `PerformanceSpec`, which some simpler products still use.
+   */
+  tBiv?: SourcedValue<Measurement<'°C'>>;
+  tol?: SourcedValue<Measurement<'°C'>>;
 }
 
 // 4. Acoustics

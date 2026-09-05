@@ -32,6 +32,7 @@ import {
 import { VAT_RATE, vatAmount } from '@/lib/constants';
 import { getMontajForBtu } from '@/lib/montaj';
 import BannerSlider from '@/components/BannerSlider';
+import PhysicalDetailsSection from '@/components/product-details/PhysicalDetailsSection';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -401,6 +402,8 @@ export default function ProductPageClient({ product, related }: Props) {
               </div>
             </div>
           </div>
+
+          {product.details?.kind === 'physical' && <PhysicalDetailsSection details={product.details.physical} />}
 
           {serviceProduct && (
             <div className="mb-14 grid gap-6 lg:grid-cols-3">

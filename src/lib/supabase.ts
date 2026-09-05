@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { normalizeStockStatus, type Product } from '@/lib/products';
+import { withProductDetails } from '@/lib/product-details/catalog';
 
 // Browser singleton — ensures onAuthStateChange fires correctly across all callers
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,7 +123,7 @@ export function dbProductToProduct(p: DbProduct): Product {
   const galleryImages = Array.isArray(p.gallery_images) ? p.gallery_images.filter(Boolean) : [];
   const imageUrl = p.image_url ?? galleryImages[0] ?? undefined;
 
-  return {
+  return withProductDetails({
     id: p.id,
     slug: p.slug,
     name: p.name,
@@ -147,7 +148,7 @@ export function dbProductToProduct(p: DbProduct): Product {
     stockQty: p.stock_qty ?? undefined,
     imageUrl,
     galleryImages,
-  };
+  });
 }
 
 export function slugify(input: string) {
