@@ -4,7 +4,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ChevronDown, ShieldCheck, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
-import { CATEGORY_LABEL, type Brand, type Category, type Product } from '@/lib/products';
+import { getCategoryLabel, type Brand, type Category, type Product } from '@/lib/products';
 
 const AUTHORIZED_BRANDS: Brand[] = ['Midea', 'Gree', 'Yamato'];
 
@@ -25,6 +25,8 @@ const BRANDS: Brand[] = [
 
 const CATEGORIES: Category[] = [
   'aer-conditionat',
+  'multisplit',
+  'multisplit-pachet',
   'centrale-termice',
   'pompe-caldura',
   'accesorii-montaj-ac',
@@ -32,6 +34,10 @@ const CATEGORIES: Category[] = [
   'condens-drenaj',
   'termostate-automatizari',
   'service-montaj',
+  'comercial-duct',
+  'comercial-caseta',
+  'comercial-podea',
+  'accesorii',
 ];
 
 const BTU_OPTIONS = [9000, 12000, 18000, 24000];
@@ -140,7 +146,7 @@ export default function ProductCatalog({ products }: { products: Product[] }) {
               onChange={() => setSelectedCategories(toggle(selectedCategories, c))}
               className="h-4 w-4 accent-primary"
             />
-            <span className="text-sm text-dark-300">{CATEGORY_LABEL[c]}</span>
+            <span className="text-sm text-dark-300">{getCategoryLabel(c)}</span>
           </label>
         ))}
       </div>
