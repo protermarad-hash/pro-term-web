@@ -15,6 +15,8 @@
   "git.confirmSync": true,
   "git.enableSmartCommit": false,
   "git.postCommitCommand": "none",
+  "git.branchProtection": ["main"],
+  "git.branchProtectionPrompt": "alwaysCommitToNewBranch",
   "terminal.integrated.cwd": "${workspaceFolder}",
   "files.exclude": {
     "**/node_modules": true,
