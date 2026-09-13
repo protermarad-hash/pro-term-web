@@ -2,7 +2,6 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { normalizeStockStatus, type Product } from '@/lib/products';
 
 // Browser singleton — ensures onAuthStateChange fires correctly across all callers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _anonClient: SupabaseClient<any> | null = null;
 
 export interface DbProduct {
@@ -53,7 +52,6 @@ export function getSupabaseAnonClient() {
   if (!_anonClient) {
     // persistSession defaults to true — session stored in localStorage
     // required for router.push redirects to work correctly after login
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _anonClient = createClient(url, anonKey) as SupabaseClient<any>;
   }
 

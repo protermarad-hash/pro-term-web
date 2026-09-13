@@ -1,0 +1,40 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PRO TERM: Verifică ESLint",
+      "type": "npm",
+      "script": "lint",
+      "problemMatcher": [
+        "$eslint-stylish"
+      ]
+    },
+    {
+      "label": "PRO TERM: Verifică TypeScript",
+      "type": "process",
+      "command": "${workspaceFolder}\\node_modules\\.bin\\tsc.cmd",
+      "args": [
+        "--noEmit"
+      ],
+      "problemMatcher": [
+        "$tsc"
+      ]
+    },
+    {
+      "label": "PRO TERM: Build de verificare",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "PRO TERM: Verificare completă",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "PRO TERM: Verifică ESLint",
+        "PRO TERM: Verifică TypeScript",
+        "PRO TERM: Build de verificare"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}
