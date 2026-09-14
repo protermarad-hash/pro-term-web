@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { fetchWithOptionalAuth } from '@/lib/client-auth-fetch';
 
 const IBAN = 'RO15BTRLRONCRT0CK3829101';
 
@@ -56,7 +57,7 @@ export default function ComandaConfirmataClient() {
 
   useEffect(() => {
     if (!id) return;
-    fetch(`/api/orders/${id}`)
+    fetchWithOptionalAuth(`/api/orders/${id}`)
       .then((r) => r.json())
       .then(({ order: o, error: e }) => {
         if (e) setError(e);

@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MultisplitClientSection from '@/components/MultisplitClientSection';
-import { getSupabaseServiceClient, dbProductToProduct } from '@/lib/supabase';
+import { dbProductToProduct } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 import type { Product } from '@/lib/products';
 import { AlertTriangle } from 'lucide-react';
 

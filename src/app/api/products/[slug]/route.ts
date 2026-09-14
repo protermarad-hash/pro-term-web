@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { dbProductToProduct, getSupabaseServiceClient } from '@/lib/supabase';
+import { dbProductToProduct } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;

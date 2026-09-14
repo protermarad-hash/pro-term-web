@@ -20,6 +20,7 @@ import { useAuth } from '@/lib/auth-context';
 import { BRAND_GRADIENT } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 import { getSupabaseAnonClient } from '@/lib/supabase';
+import { getCurrentAccessToken } from '@/lib/client-auth-fetch';
 
 const JUDETE = [
   'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
@@ -109,12 +110,20 @@ export default function CheckoutClient() {
     }));
 
     try {
+      const headers = new Headers({ 'Content-Type': 'application/json' });
+      if (user) {
+        const token = await getCurrentAccessToken();
+        if (!token) {
+          throw new Error('Sesiunea a expirat. Autentifică-te din nou înainte de comandă.');
+        }
+        headers.set('Authorization', `Bearer ${token}`);
+      }
+
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           ...form,
-          userId: user?.id ?? null,
           items: orderItems,
           subtotal: totalPrice,
           paymentMethod,
@@ -129,8 +138,12 @@ export default function CheckoutClient() {
 
       clearCart();
       router.push(`/comanda-confirmata/${data.orderId}`);
-    } catch {
-      setError('Eroare de rețea. Verifică conexiunea și încearcă din nou.');
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Eroare de rețea. Verifică conexiunea și încearcă din nou.',
+      );
     } finally {
       setSubmitting(false);
     }

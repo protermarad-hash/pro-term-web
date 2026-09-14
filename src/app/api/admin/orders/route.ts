@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/server-auth';
 
 const VALID_STATUSES = ['nou', 'confirmat', 'in-livrare', 'livrat', 'anulat'] as const;
 
-export async function GET() {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) {
-    return NextResponse.json({ error: 'Server config error.' }, { status: 500 });
-  }
+export async function GET(request: Request) {
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const { data, error } = await supabase
     .from('orders')
@@ -16,20 +15,16 @@ export async function GET() {
     .limit(50);
 
   if (error) {
-    if (error.code === '42P01') {
-      return NextResponse.json({ orders: [], warning: 'Tabela orders nu există. Rulează scripts/create-orders-table.sql.' });
-    }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Nu am putut încărca comenzile.' }, { status: 500 });
   }
 
   return NextResponse.json({ orders: data ?? [] });
 }
 
 export async function PATCH(request: Request) {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) {
-    return NextResponse.json({ error: 'Server config error.' }, { status: 500 });
-  }
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const body = await request.json();
   const { id, status } = body;
@@ -46,6 +41,6 @@ export async function PATCH(request: Request) {
     .select('id, status')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Statusul comenzii nu a putut fi actualizat.' }, { status: 500 });
   return NextResponse.json({ order: data });
 }

@@ -1,7 +1,8 @@
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { getSupabaseServiceClient, dbProductToProduct } from '@/lib/supabase';
+import { dbProductToProduct } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 import { CATEGORY_LABEL, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
 import ProductPageClient from './ProductPageClient';
 

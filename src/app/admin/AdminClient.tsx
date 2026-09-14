@@ -19,6 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/lib/products';
+import { adminFetch } from '@/lib/client-auth-fetch';
 
 const BRANDS: Brand[] = ['Gree', 'Midea', 'Yamato', 'Fujitsu', 'Yukon', 'Habitat', 'Bosch', 'Vaillant', 'Immergas', 'Viessmann', 'Generic', 'PRO TERM'];
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
@@ -155,13 +156,14 @@ function OrdersSection() {
 
   async function loadOrders() {
     setLoading(true);
+    setWarning('');
     try {
-      const res = await fetch('/api/admin/orders', { cache: 'no-store' });
+      const res = await adminFetch('/api/admin/orders', { cache: 'no-store' });
       const data = await res.json();
-      if (data.warning) setWarning(data.warning);
+      if (!res.ok) throw new Error(data.error ?? 'Nu am putut încărca comenzile.');
       setOrders(data.orders ?? []);
-    } catch {
-      setWarning('Nu am putut încărca comenzile.');
+    } catch (error) {
+      setWarning(error instanceof Error ? error.message : 'Nu am putut încărca comenzile.');
     } finally {
       setLoading(false);
     }
@@ -172,14 +174,19 @@ function OrdersSection() {
   async function changeStatus(orderId: string, newStatus: string) {
     setUpdatingId(orderId);
     try {
-      const res = await fetch('/api/admin/orders', {
+      const res = await adminFetch('/api/admin/orders', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: orderId, status: newStatus }),
       });
       if (res.ok) {
         setOrders((prev) => prev.map((o) => o.id === orderId ? { ...o, status: newStatus } : o));
+      } else {
+        const data = await res.json();
+        throw new Error(data.error ?? 'Nu am putut actualiza statusul comenzii.');
       }
+    } catch (error) {
+      setWarning(error instanceof Error ? error.message : 'Nu am putut actualiza statusul comenzii.');
     } finally {
       setUpdatingId(null);
     }
@@ -367,10 +374,13 @@ function BlogSection() {
 
   async function loadPosts() {
     try {
-      const res = await fetch('/api/admin/blog', { cache: 'no-store' });
+      const res = await adminFetch('/api/admin/blog', { cache: 'no-store' });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Nu am putut încărca articolele.');
       setPosts(data.posts ?? []);
-    } catch { /* silent */ }
+    } catch (error) {
+      setErr(error instanceof Error ? error.message : 'Nu am putut încărca articolele.');
+    }
   }
 
   useEffect(() => { loadPosts(); }, []);
@@ -399,7 +409,7 @@ function BlogSection() {
         tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
         read_time: parseInt(form.readTime) || 5,
       };
-      const res = await fetch('/api/admin/blog', {
+      const res = await adminFetch('/api/admin/blog', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -419,8 +429,15 @@ function BlogSection() {
 
   async function handleDelete(id: string, title: string) {
     if (!confirm(`Ștergi articolul "${title}"?`)) return;
-    await fetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
-    await loadPosts();
+    setErr('');
+    try {
+      const res = await adminFetch(`/api/admin/blog?id=${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? 'Nu am putut șterge articolul.');
+      await loadPosts();
+    } catch (error) {
+      setErr(error instanceof Error ? error.message : 'Nu am putut șterge articolul.');
+    }
   }
 
   function editPost(post: BlogPost & Record<string, unknown>) {
@@ -565,7 +582,7 @@ export default function AdminClient() {
 
   async function loadProducts() {
     try {
-      const response = await fetch('/api/admin/products', { cache: 'no-store' });
+      const response = await adminFetch('/api/admin/products', { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Nu am putut încărca produsele.');
       setProducts(data.products || []);
@@ -596,7 +613,7 @@ export default function AdminClient() {
     setError('');
 
     try {
-      const response = await fetch('/api/admin/products', {
+      const response = await adminFetch('/api/admin/products', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
@@ -627,7 +644,7 @@ export default function AdminClient() {
       Array.from(files).forEach((file) => formData.append('files', file));
       formData.append('productName', form.name || 'produs');
 
-      const response = await fetch('/api/admin/product-images', {
+      const response = await adminFetch('/api/admin/product-images', {
         method: 'POST',
         body: formData,
       });
@@ -681,7 +698,7 @@ export default function AdminClient() {
     setError('');
 
     try {
-      const response = await fetch(`/api/admin/products?id=${product.id}`, { method: 'DELETE' });
+      const response = await adminFetch(`/api/admin/products?id=${product.id}`, { method: 'DELETE' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Produsul nu a fost șters.');
       setMessage('Produs șters cu succes.');

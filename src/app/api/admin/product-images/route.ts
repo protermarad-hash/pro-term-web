@@ -1,27 +1,13 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServiceClient, slugify } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/server-auth';
+import { slugify } from '@/lib/supabase';
 
 const BUCKET = 'product-images';
 
-function getMissingSupabaseEnv() {
-  return [
-    ['NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL],
-    ['SUPABASE_SERVICE_ROLE_KEY', process.env.SUPABASE_SERVICE_ROLE_KEY],
-  ]
-    .filter(([, value]) => !value)
-    .map(([name]) => name);
-}
-
 export async function POST(request: Request) {
-  const supabase = getSupabaseServiceClient();
-  const missing = getMissingSupabaseEnv();
-
-  if (!supabase) {
-    return NextResponse.json(
-      { error: `Supabase Storage nu este configurat. Lipsesc: ${missing.join(', ') || 'cheile server'}.` },
-      { status: 500 },
-    );
-  }
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const formData = await request.formData();
   const files = formData.getAll('files').filter((item): item is File => item instanceof File);
@@ -51,7 +37,7 @@ export async function POST(request: Request) {
 
     if (error) {
       return NextResponse.json(
-        { error: `Nu am putut încărca imaginea ${file.name}: ${error.message}` },
+        { error: 'Nu am putut încărca imaginea.' },
         { status: 500 },
       );
     }

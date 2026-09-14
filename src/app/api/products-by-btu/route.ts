@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { normalizeStockStatus } from '@/lib/products';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
