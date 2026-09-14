@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { requireAdmin } from '@/lib/server-auth';
 
-export async function GET() {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return NextResponse.json({ posts: [] });
+export async function GET(request: Request) {
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const { data, error } = await supabase
     .from('blog_posts')
@@ -11,18 +12,16 @@ export async function GET() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    if (error.code === '42P01') {
-      return NextResponse.json({ posts: [], warning: 'Tabela blog_posts nu există. Rulează scripts/create-blog-table.sql.' });
-    }
-    return NextResponse.json({ posts: [], error: error.message });
+    return NextResponse.json({ error: 'Nu am putut încărca articolele.' }, { status: 500 });
   }
 
   return NextResponse.json({ posts: data ?? [] });
 }
 
 export async function POST(request: Request) {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const body = await request.json();
   const { data, error } = await supabase
@@ -44,13 +43,14 @@ export async function POST(request: Request) {
     .select('id')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Articolul nu a putut fi salvat.' }, { status: 500 });
   return NextResponse.json({ post: data });
 }
 
 export async function PUT(request: Request) {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const body = await request.json();
   if (!body.id) return NextResponse.json({ error: 'ID lipsă' }, { status: 400 });
@@ -76,19 +76,20 @@ export async function PUT(request: Request) {
     .select('id')
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Articolul nu a putut fi actualizat.' }, { status: 500 });
   return NextResponse.json({ post: data });
 }
 
 export async function DELETE(request: Request) {
-  const supabase = getSupabaseServiceClient();
-  if (!supabase) return NextResponse.json({ error: 'Server config error' }, { status: 500 });
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'ID lipsă' }, { status: 400 });
 
   const { error } = await supabase.from('blog_posts').delete().eq('id', id);
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Articolul nu a putut fi șters.' }, { status: 500 });
   return NextResponse.json({ deleted: true });
 }

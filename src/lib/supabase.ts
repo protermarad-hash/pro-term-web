@@ -58,19 +58,6 @@ export function getSupabaseAnonClient() {
   return _anonClient;
 }
 
-export function getSupabaseServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    return null;
-  }
-
-  return createClient(url, serviceKey, {
-    auth: { persistSession: false },
-  });
-}
-
 const SPEC_KEY_LABELS: Record<string, string> = {
   model: 'Model',
   agent_frigorific: 'Agent frigorific',
