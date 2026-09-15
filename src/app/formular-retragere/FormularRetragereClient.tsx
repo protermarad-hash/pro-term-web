@@ -114,15 +114,15 @@ export default function FormularRetragereClient() {
           detalii: form.details || null,
           metoda_rambursare: form.refundMethod,
           iban: form.iban || null,
-          status: 'nou',
         });
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
+        return;
+      }
       setSubmitted(true);
-    } catch (err: unknown) {
-      setServerError(
-        err instanceof Error ? err.message : 'Eroare la înregistrare. Încercați din nou.',
-      );
+    } catch {
+      setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
     } finally {
       setSubmitting(false);
     }
