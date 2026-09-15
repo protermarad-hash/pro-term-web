@@ -87,14 +87,13 @@ export default function ProfilClient() {
   }, [user]);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user) return;
     const supabase = getSupabaseAnonClient();
     if (!supabase) { setRetrageriLoading(false); return; }
 
     supabase
       .from('retrageri')
       .select('id, created_at, numar_comanda, produs, pret, status, motiv')
-      .eq('email', user.email)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setRetrageri((data as Retragere[]) ?? []);
@@ -109,11 +108,23 @@ export default function ProfilClient() {
     if (!supabase) return;
     setSaving(true);
     setSaveMsg('');
-    const { error } = await supabase
+    const updatedAt = new Date().toISOString();
+    const { data: updatedProfiles, error: updateError } = await supabase
       .from('profiles')
-      .upsert({ id: user.id, ...profile, updated_at: new Date().toISOString() });
+      .update({ ...profile, updated_at: updatedAt })
+      .eq('id', user.id)
+      .select('id');
+
+    let saveError = updateError;
+    if (!saveError && (updatedProfiles?.length ?? 0) === 0) {
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({ id: user.id, ...profile, updated_at: updatedAt });
+      saveError = insertError;
+    }
+
     setSaving(false);
-    setSaveMsg(error ? 'Eroare la salvare.' : 'Modificările au fost salvate.');
+    setSaveMsg(saveError ? 'Eroare la salvare.' : 'Modificările au fost salvate.');
     setTimeout(() => setSaveMsg(''), 4000);
   }
 
