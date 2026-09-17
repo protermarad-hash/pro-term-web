@@ -88,7 +88,7 @@ const ACTIVE_SERVICES = [
   {
     icon: Thermometer,
     title: 'Climatizare comercială',
-    description: 'Soluții complete de climatizare pentru spații comerciale și industriale mari, în colaborare cu antreprenori.',
+    description: 'Soluții și sisteme de climatizare pentru spații comerciale și industriale: split comercial, multisplit, VRV/VRF, rooftop și chiller.',
     href: '/servicii/climatizare-comerciala-industriala-romania',
     tarifHref: null,
     badge: null,
