@@ -4,14 +4,14 @@ import Footer from '@/components/Footer';
 import NationalProjectPage from '@/components/NationalProjectPage';
 
 export const metadata: Metadata = {
-  title: 'Proiecte HVAC Comerciale și Industriale România | PRO TERM',
+  title: 'Proiecte HVAC Complete la Cheie România | PRO TERM',
   description:
-    'PRO TERM realizează proiecte HVAC comerciale și industriale la nivel național: climatizare VRV/VRF, sisteme multi-split, montaj, service și mentenanță pentru spații mari, retail și birouri.',
+    'PRO TERM gestionează proiecte HVAC complete la cheie pentru clienți comerciali și industriali din România: proiectare, furnizare echipamente, execuție și punere în funcțiune.',
   alternates: { canonical: 'https://pro-term.ro/servicii/proiecte-hvac-romania' },
   openGraph: {
-    title: 'Proiecte HVAC Comerciale și Industriale România | PRO TERM',
+    title: 'Proiecte HVAC Complete la Cheie România | PRO TERM',
     description:
-      'Sisteme HVAC pentru spații comerciale, industriale și birouri la nivel național. VRV/VRF, multi-split, consultanță și mentenanță.',
+      'Proiectare, furnizare, execuție și punere în funcțiune pentru proiecte HVAC comerciale și industriale, la nivel național.',
     url: 'https://pro-term.ro/servicii/proiecte-hvac-romania',
   },
 };
