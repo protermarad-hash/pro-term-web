@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import FooterAccountLink from './FooterAccountLink';
+import NetopiaLogo from './NetopiaLogo';
 
 const footerLinks = {
   Servicii: [
@@ -96,7 +97,14 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="mt-10 flex flex-wrap items-center gap-4 rounded-2xl bg-white p-4">
+          <NetopiaLogo />
+          <p className="text-xs text-dark-400 sm:text-sm">
+            Plăți online procesate securizat prin NETOPIA Payments
+          </p>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white/50">Protecția consumatorilor</h4>
           <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-3">
             <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">

@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
+import { authenticateRequest } from '@/lib/server-auth';
+import {
+  createOrderConfirmationToken,
+  ORDER_CONFIRMATION_COOKIE,
+  ORDER_CONFIRMATION_MAX_AGE_SECONDS,
+} from '@/lib/order-confirmation';
 import { calculateShipping } from '@/lib/shipping';
 import {
   sendOrderConfirmationToClient,
@@ -8,6 +14,9 @@ import {
 } from '@/lib/email';
 
 export async function POST(request: Request) {
+  const auth = await authenticateRequest(request, { optional: true });
+  if (!auth.ok) return auth.response;
+
   const supabase = getSupabaseServiceClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Server config error.' }, { status: 500 });
@@ -38,9 +47,10 @@ export async function POST(request: Request) {
   const paymentMethod = ['ramburs', 'transfer'].includes(String(body.paymentMethod))
     ? String(body.paymentMethod)
     : 'ramburs';
+  const confirmation = auth.user ? null : createOrderConfirmationToken();
 
   const orderPayload = {
-    user_id: body.userId ? String(body.userId) : null,
+    user_id: auth.user?.id ?? null,
     first_name: String(body.firstName).trim(),
     last_name: String(body.lastName).trim(),
     email: String(body.email).trim().toLowerCase(),
@@ -56,6 +66,7 @@ export async function POST(request: Request) {
     total,
     payment_method: paymentMethod,
     status: 'nou',
+    confirmation_token_hash: confirmation?.hash ?? null,
   };
 
   const { data: order, error } = await supabase
@@ -67,7 +78,7 @@ export async function POST(request: Request) {
   if (error) {
     console.error('[orders] insert error:', error);
     return NextResponse.json(
-      { error: error.code === '42P01' ? 'Tabela orders nu există. Rulează scripts/create-orders-table.sql în Supabase SQL Editor.' : error.message },
+      { error: 'Comanda nu a putut fi salvată.' },
       { status: 500 },
     );
   }
@@ -103,5 +114,17 @@ export async function POST(request: Request) {
     ),
   ]);
 
-  return NextResponse.json({ orderId: order.id, orderRef });
+  const response = NextResponse.json({ orderId: order.id, orderRef });
+  if (confirmation) {
+    response.cookies.set({
+      name: ORDER_CONFIRMATION_COOKIE,
+      value: confirmation.token,
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: ORDER_CONFIRMATION_MAX_AGE_SECONDS,
+      path: `/api/orders/${order.id}`,
+    });
+  }
+  return response;
 }

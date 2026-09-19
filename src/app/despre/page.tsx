@@ -1,98 +1,54 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import {
-  CheckCircle2,
-  Calendar,
-  Building2,
-  BadgeCheck,
-  Users,
   ArrowRight,
-  Award,
+  Building2,
+  ClipboardCheck,
+  MapPinned,
+  Users,
+  Wrench,
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Despre PRO TERM SRL | 25+ ani experiență HVAC',
+  title: 'Despre PRO TERM | HVAC din 1999',
   description:
-    'PRO TERM SRL — firmă din Arad fondată în 1999, dealer autorizat Midea, Gree și Yamato. Montaj, service și mentenanță HVAC în Arad și Timiș, proiecte comerciale la nivel național.',
+    'PRO TERM activează în domeniul HVAC din 1999: echipamente la nivel național, montaj și service local în Arad și proiecte comerciale și industriale complete în toată România.',
   alternates: { canonical: 'https://pro-term.ro/despre' },
   openGraph: {
-    title: 'Despre PRO TERM SRL | 25+ ani experiență HVAC',
+    title: 'Despre PRO TERM | HVAC din 1999',
     description:
-      'Dealer autorizat Midea, Gree, Yamato, fondați în 1999. Echipă certificată F-Gas, proiecte HVAC rezidențiale și comerciale în România.',
+      'Echipamente HVAC la nivel național, servicii locale în Arad și proiecte comerciale și industriale complete în toată România.',
     url: 'https://pro-term.ro/despre',
   },
 };
 
-const timeline = [
-  {
-    year: '1999',
-    title: 'Fondarea companiei',
-    description:
-      'PRO TERM SRL este înregistrată în Arad. Primele lucrări au vizat soluții de climatizare și instalații pentru clienți rezidențiali și comerciali din zona Aradului.',
-  },
-  {
-    year: '2008',
-    title: 'Certificare ISO 9001',
-    description:
-      'Compania consolidează procedurile interne de lucru și management al calității prin certificarea ISO 9001.',
-  },
-  {
-    year: '2015',
-    title: 'Dezvoltare pe zona HVAC',
-    description:
-      'Extindem activitatea pe vânzare, instalare, service și mentenanță pentru echipamente HVAC, lucrând cu mai mulți producători și furnizori din domeniu.',
-  },
-  {
-    year: '2020',
-    title: 'Service și intervenții organizate',
-    description:
-      'Punem accent pe intervenții rapide, diagnostic corect, mentenanță preventivă și suport tehnic pentru echipamente de climatizare.',
-  },
-  {
-    year: '2024',
-    title: '25 de ani de activitate',
-    description:
-      'Continuăm activitatea cu o echipă locală de 6 specialiști, concentrată pe lucrări corecte, comunicare directă și suport după instalare.',
-  },
-];
-
-const values = [
-  {
-    icon: CheckCircle2,
-    title: 'Lucrări corecte',
-    description:
-      'Recomandăm echipamente potrivite pentru spațiul clientului și executăm lucrările cu atenție la detalii, nu doar după prețul cel mai mic.',
-  },
-  {
-    icon: Users,
-    title: 'Echipă locală de 6 specialiști',
-    description:
-      'Comunicarea este directă, iar responsabilitatea pentru montaj, service și suport este clară de la început.',
-  },
+const whatWeDo = [
   {
     icon: Building2,
-    title: 'Rezidențial și comercial',
+    title: 'Echipamente HVAC la nivel național',
     description:
-      'Oferim soluții pentru locuințe, spații comerciale, birouri, magazine și alte aplicații unde confortul și fiabilitatea contează.',
+      'Livrăm echipamente de climatizare, încălzire și ventilație oriunde în România, pentru clienți rezidențiali și comerciali.',
   },
   {
-    icon: Award,
-    title: 'Responsabilitate față de client',
+    icon: Wrench,
+    title: 'Montaj, service și igienizare în Arad și zona apropiată',
     description:
-      'Promovăm soluții eficiente energetic și servicii de mentenanță care ajută echipamentele să funcționeze corect pe termen lung.',
+      'Pentru intervenții uzuale — montaj, service, igienizare și mentenanță — activăm în principal în Arad și localitățile din apropiere.',
+  },
+  {
+    icon: MapPinned,
+    title: 'Proiecte HVAC comerciale și industriale în toată România',
+    description:
+      'Pentru proiecte de amploare comercială sau industrială, ne deplasăm oriunde în țară, în funcție de complexitate și calendar.',
   },
 ];
 
-const authorizations = [
-  { label: 'ISO 9001', description: 'Sistem de management al calității certificat' },
-  { label: 'F-Gas / AGFR', description: 'Certificat pentru lucrări cu agenți frigorifici' },
-  { label: 'Gree', description: 'Reprezentant și service autorizat zonal' },
-  { label: 'Midea', description: 'Reprezentant și service autorizat zonal' },
-  { label: 'Yamato', description: 'Reprezentant și service autorizat zonal' },
-  { label: 'Fujitsu', description: 'Instalare, mentenanță și service pentru echipamente HVAC' },
+const howWeWork = [
+  'Pentru proiecte mai ample, putem gestiona întregul proces: proiectare prin proiectanți colaboratori, furnizare de echipamente și materiale, execuție, punere în funcțiune și predare la cheie.',
+  'Lucrăm și după proiectul tehnic pus la dispoziție de beneficiar, atunci când acesta există deja.',
+  'Pentru disciplinele care nu sunt acoperite intern, colaborăm transparent cu parteneri specializați — proiectul rămâne coordonat unitar de echipa PRO TERM.',
 ];
 
 export default function DesprePage() {
@@ -112,60 +68,59 @@ export default function DesprePage() {
           <div className="absolute top-1/4 -right-32 w-80 h-80 bg-brand/20 rounded-full blur-3xl" />
 
           <div className="relative container mx-auto px-4 text-center">
-            <span className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 text-white/80 text-sm mb-6">
-              <Calendar size={14} />
-              Fondată în 1999 · 25+ ani de experiență
-            </span>
             <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 leading-tight">
               Despre <span className="text-brand">PRO TERM</span>
             </h1>
             <p className="text-lg text-white/75 max-w-2xl mx-auto leading-relaxed">
-              Firmă din Arad specializată în climatizare, HVAC, montaj, service și mentenanță,
-              cu echipă locală de 6 specialiști.
+              PRO TERM activează în domeniul HVAC din 1999. Vindem echipamente la nivel național,
+              asigurăm montaj, service și igienizare în Arad și zona apropiată și ne deplasăm în
+              toată țara pentru proiecte comerciale și industriale de amploare.
             </p>
           </div>
         </section>
 
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
+            <div className="text-center mb-14">
+              <span className="text-brand font-semibold text-sm uppercase tracking-widest">
+                Ce facem
+              </span>
+              <h2 className="section-title mt-2">Trei tipuri de activitate, o singură echipă</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {whatWeDo.map(({ icon: Icon, title, description }) => (
+                <div key={title} className="card">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon size={22} className="text-primary" />
+                  </div>
+                  <h3 className="font-bold font-heading text-dark mb-2">{title}</h3>
+                  <p className="text-dark-300 text-sm leading-relaxed">{description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 bg-light-200">
+          <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-14 items-center">
               <div>
                 <span className="text-brand font-semibold text-sm uppercase tracking-widest">
-                  Cine suntem
+                  Experiență și coordonare
                 </span>
-                <h2 className="section-title mt-2 mb-5">
-                  25 de ani în slujba confortului tău
-                </h2>
+                <h2 className="section-title mt-2 mb-5">Din 1999, cu coordonare directă</h2>
                 <p className="text-dark-300 leading-relaxed mb-4">
-                  PRO TERM SRL a luat naștere în 1999 în Arad, pornind de la lucrări de climatizare
-                  pentru clienți rezidențiali și comerciali. În timp, activitatea s-a dezvoltat spre
-                  soluții HVAC, montaj, service și mentenanță.
+                  PRO TERM activează în domeniul HVAC din 1999. Conducerea actuală este implicată
+                  direct în companie din 2008, atât în coordonarea tehnică, cât și în cea
+                  administrativă.
                 </p>
-                <p className="text-dark-300 leading-relaxed mb-4">
-                  Astăzi, PRO TERM înseamnă o echipă de 6 specialiști, certificare ISO 9001 și
-                  certificat F-Gas / AGFR. Suntem reprezentant și service autorizat zonal pentru
-                  Gree, Midea și Yamato și oferim suport pentru echipamente Fujitsu și alți producători.
+                <p className="text-dark-300 leading-relaxed">
+                  Această continuitate ne permite să gestionăm atât intervenții curente, cât și
+                  proiecte HVAC complexe, cu aceeași atenție la detalii.
                 </p>
-                <p className="text-dark-300 leading-relaxed mb-8">
-                  Oferim consultanță, vânzare echipamente, instalare, service și mentenanță pentru
-                  clienți care vor soluții corecte și suport după instalare.
-                </p>
-                <div className="grid grid-cols-3 gap-4">
-                  {[
-                    { val: '1999', lbl: 'Fondată în Arad' },
-                    { val: '25+', lbl: 'Ani de experiență' },
-                    { val: '6', lbl: 'Specialiști în echipă' },
-                  ].map(({ val, lbl }) => (
-                    <div key={lbl} className="text-center">
-                      <div className="text-3xl font-bold font-heading text-primary">{val}</div>
-                      <div className="text-xs text-dark-300 mt-1">{lbl}</div>
-                    </div>
-                  ))}
-                </div>
               </div>
-
               <div className="relative">
-                <div className="aspect-[4/3] rounded-3xl bg-hero-gradient shadow-primary overflow-hidden">
+                <div className="aspect-[4/3] rounded-3xl bg-hero-gradient shadow-primary overflow-hidden flex items-center justify-center">
                   <div
                     className="absolute inset-0 opacity-20"
                     style={{
@@ -173,63 +128,16 @@ export default function DesprePage() {
                       backgroundSize: '24px 24px',
                     }}
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center p-10">
-                    <Image
-                      src="/logo-proterm.jpg"
-                      alt="PRO TERM SRL"
-                      width={220}
-                      height={66}
-                      className="h-16 w-auto object-contain opacity-90 mb-4"
-                    />
-                    <p className="text-white/70 text-sm text-center">
-                      Soluții HVAC Complete · 1999-prezent
+                  <div className="relative text-center px-8">
+                    <Users size={40} className="text-white/80 mx-auto mb-4" />
+                    <p className="text-white/80 text-xs font-bold uppercase tracking-widest mb-2">
+                      Activitate HVAC din 1999
+                    </p>
+                    <p className="text-white/80 text-sm leading-relaxed">
+                      Conducerea actuală este implicată direct în PRO TERM din 2008.
                     </p>
                   </div>
                 </div>
-                <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl shadow-card-hover p-4 w-40">
-                  <div className="text-3xl font-bold text-brand font-heading">25+</div>
-                  <div className="text-dark-300 text-xs mt-0.5 leading-tight">
-                    Ani de experiență continuă
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-light-200">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-14">
-              <span className="text-brand font-semibold text-sm uppercase tracking-widest">
-                Istoria noastră
-              </span>
-              <h2 className="section-title mt-2">De la 1999 până azi</h2>
-              <p className="section-subtitle mx-auto text-center">
-                25 de ani de activitate, servicii HVAC și suport tehnic pentru clienți.
-              </p>
-            </div>
-
-            <div className="relative max-w-3xl mx-auto">
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-primary/20 hidden md:block" />
-              <div className="space-y-8">
-                {timeline.map((item, i) => (
-                  <div key={item.year} className="flex gap-6">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-hero-gradient flex items-center justify-center shadow-primary z-10 relative">
-                      <span className="text-white text-[10px] font-bold leading-none text-center">
-                        {item.year}
-                      </span>
-                    </div>
-                    <div className={`card flex-1 mb-0 ${i % 2 === 1 ? 'border-l-4 border-brand/30' : 'border-l-4 border-primary/30'}`}>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                          {item.year}
-                        </span>
-                      </div>
-                      <h3 className="font-bold font-heading text-dark mb-1">{item.title}</h3>
-                      <p className="text-dark-300 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
@@ -239,49 +147,40 @@ export default function DesprePage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-14">
               <span className="text-brand font-semibold text-sm uppercase tracking-widest">
-                Misiune & valori
+                Cum lucrăm
               </span>
-              <h2 className="section-title mt-2">Ce ne ghidează în fiecare proiect</h2>
+              <h2 className="section-title mt-2">Proiecte gestionate complet, de la idee la predare</h2>
             </div>
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              {values.map(({ icon: Icon, title, description }) => (
-                <div key={title} className="card flex gap-4">
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon size={20} className="text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold font-heading text-dark mb-1">{title}</h3>
-                    <p className="text-dark-300 text-sm leading-relaxed">{description}</p>
-                  </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {howWeWork.map((text) => (
+                <div key={text} className="card flex gap-4">
+                  <ClipboardCheck size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                  <p className="text-dark-300 text-sm leading-relaxed">{text}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-light-200">
+        <section className="py-16 bg-light-200">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <span className="text-brand font-semibold text-sm uppercase tracking-widest">
-                Certificări & branduri
-              </span>
-              <h2 className="section-title mt-2">Lucrăm certificat și cu parteneri de încredere</h2>
-              <p className="section-subtitle mx-auto text-center">
-                Informațiile afișate aici reflectă autorizările și colaborările declarate de PRO TERM.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-4xl mx-auto">
-              {authorizations.map(({ label, description }) => (
-                <div key={label} className="card flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-hero-gradient flex items-center justify-center flex-shrink-0">
-                    <BadgeCheck size={20} className="text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold font-heading text-dark">{label}</div>
-                    <div className="text-dark-300 text-xs mt-1 leading-relaxed">{description}</div>
-                  </div>
-                </div>
-              ))}
+            <div className="rounded-3xl bg-primary p-8 md:p-10 text-white shadow-card md:flex md:items-center md:justify-between md:gap-8">
+              <div>
+                <h2 className="font-heading text-2xl font-bold">
+                  Ai un proiect HVAC comercial sau industrial?
+                </h2>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80">
+                  Vezi cum arată un proiect complet la PRO TERM: proiectare, furnizare, execuție,
+                  punere în funcțiune și predare la cheie.
+                </p>
+              </div>
+              <Link
+                href="/servicii/proiecte-hvac-romania"
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-bold text-primary transition hover:bg-light-200 md:mt-0"
+              >
+                Vezi proiecte HVAC
+                <ArrowRight size={18} />
+              </Link>
             </div>
           </div>
         </section>
@@ -289,21 +188,22 @@ export default function DesprePage() {
         <section className="py-20 bg-hero-gradient">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold font-heading text-white mb-4">
-              Hai să construim ceva împreună
+              Ai nevoie de echipamente, service sau un proiect HVAC?
             </h2>
             <p className="text-white/75 text-lg mb-10 max-w-xl mx-auto">
-              Experiența noastră este la dispoziția ta. Contactează-ne pentru consultanță tehnică.
+              Spune-ne ce ai nevoie, iar noi îți putem propune pașii potriviți pentru evaluare și
+              ofertare.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Link href="/#contact" className="btn-primary px-8 py-4 text-base">
-                Solicită consultanță
+                Solicită o ofertă
                 <ArrowRight size={20} />
               </Link>
               <Link
                 href="/produse"
                 className="inline-flex items-center gap-2 px-8 py-4 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-primary transition-all text-base"
               >
-                Vezi produsele noastre
+                Vezi produsele
               </Link>
             </div>
           </div>

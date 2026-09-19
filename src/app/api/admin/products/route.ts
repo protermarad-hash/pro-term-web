@@ -1,15 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSupabaseServiceClient, slugify } from '@/lib/supabase';
-
-function getMissingSupabaseEnv() {
-  return [
-    ['NEXT_PUBLIC_SUPABASE_URL', process.env.NEXT_PUBLIC_SUPABASE_URL],
-    ['NEXT_PUBLIC_SUPABASE_ANON_KEY', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY],
-    ['SUPABASE_SERVICE_ROLE_KEY', process.env.SUPABASE_SERVICE_ROLE_KEY],
-  ]
-    .filter(([, value]) => !value)
-    .map(([name]) => name);
-}
+import { requireAdmin } from '@/lib/server-auth';
+import { slugify } from '@/lib/supabase';
 
 function splitLines(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).map((v) => v.trim()).filter(Boolean);
@@ -59,34 +50,31 @@ function buildPayload(body: Record<string, unknown>) {
     specs: parseSpecs(body.specs),
     smartbill_code: String(body.smartbillCode ?? body.smartbill_code ?? '').trim() || null,
     manage_stock: body.manageStock !== false && body.manage_stock !== false,
-    stock_status: String(body.stockStatus ?? body.stock_status ?? 'on-request'),
+    stock_status: String(body.stockStatus ?? body.stock_status ?? 'la_comanda'),
     stock_qty: body.stockQty ?? body.stock_qty ? Number(body.stockQty ?? body.stock_qty) : null,
     image_url: imageUrl,
+    gallery_images: galleryImages,
     active: body.active !== false,
     updated_at: new Date().toISOString(),
   };
 }
 
-function getSupabaseOrError() {
-  const missing = getMissingSupabaseEnv();
-  const supabase = getSupabaseServiceClient();
-
-  if (!supabase) {
-    return {
-      supabase: null,
-      response: NextResponse.json(
-        { error: `Supabase nu este configurat. Lipsesc: ${missing.join(', ') || 'cheile server'}.` },
-        { status: 500 },
-      ),
-    };
-  }
-
-  return { supabase, response: null };
+function hasGalleryKey(body: Record<string, unknown>) {
+  return Object.prototype.hasOwnProperty.call(body, 'galleryImages')
+    || Object.prototype.hasOwnProperty.call(body, 'gallery_images');
 }
 
-export async function GET() {
-  const { supabase, response } = getSupabaseOrError();
-  if (!supabase) return response;
+function hasValidGalleryImages(body: Record<string, unknown>) {
+  const value = body.galleryImages ?? body.gallery_images;
+  return value === undefined || typeof value === 'string' || (
+    Array.isArray(value) && value.every((item) => typeof item === 'string')
+  );
+}
+
+export async function GET(request: Request) {
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const { data, error } = await supabase
     .from('products')
@@ -94,21 +82,25 @@ export async function GET() {
     .order('created_at', { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Nu am putut încărca produsele.' }, { status: 500 });
   }
 
   return NextResponse.json({ products: data ?? [] });
 }
 
 export async function POST(request: Request) {
-  const { supabase, response } = getSupabaseOrError();
-  if (!supabase) return response;
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const body = await request.json();
   const name = String(body.name ?? '').trim();
 
   if (!name) {
     return NextResponse.json({ error: 'Numele produsului este obligatoriu.' }, { status: 400 });
+  }
+  if (!hasValidGalleryImages(body)) {
+    return NextResponse.json({ error: 'Galeria trebuie să conțină numai texte.' }, { status: 400 });
   }
 
   const { data, error } = await supabase
@@ -118,15 +110,16 @@ export async function POST(request: Request) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Produsul nu a putut fi salvat.' }, { status: 500 });
   }
 
   return NextResponse.json({ product: data });
 }
 
 export async function PUT(request: Request) {
-  const { supabase, response } = getSupabaseOrError();
-  if (!supabase) return response;
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const body = await request.json();
   const id = String(body.id ?? '').trim();
@@ -139,24 +132,35 @@ export async function PUT(request: Request) {
   if (!name) {
     return NextResponse.json({ error: 'Numele produsului este obligatoriu.' }, { status: 400 });
   }
+  if (!hasValidGalleryImages(body)) {
+    return NextResponse.json({ error: 'Galeria trebuie să conțină numai texte.' }, { status: 400 });
+  }
+
+  const payload = buildPayload(body);
+  if (!hasGalleryKey(body)) {
+    // Key entirely absent from the request: leave the existing gallery untouched
+    // instead of wiping it with the [] that buildPayload defaults missing values to.
+    delete (payload as { gallery_images?: string[] }).gallery_images;
+  }
 
   const { data, error } = await supabase
     .from('products')
-    .update(buildPayload(body))
+    .update(payload)
     .eq('id', id)
     .select('*')
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Produsul nu a putut fi actualizat.' }, { status: 500 });
   }
 
   return NextResponse.json({ product: data });
 }
 
 export async function DELETE(request: Request) {
-  const { supabase, response } = getSupabaseOrError();
-  if (!supabase) return response;
+  const admin = await requireAdmin(request);
+  if (!admin.ok) return admin.response;
+  const supabase = admin.serviceClient;
 
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id');
@@ -168,7 +172,7 @@ export async function DELETE(request: Request) {
   const { error } = await supabase.from('products').delete().eq('id', id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Produsul nu a putut fi șters.' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true });

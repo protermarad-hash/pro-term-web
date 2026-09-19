@@ -4,7 +4,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCatalog from '@/components/ProductCatalog';
 import { products as fallbackProducts } from '@/lib/products';
-import { dbProductToProduct, getSupabaseServiceClient } from '@/lib/supabase';
+import { dbProductToProduct } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 
 export const metadata: Metadata = {
   title: 'Produse HVAC România | Aer condiționat, pompe de căldură, centrale | PRO TERM',

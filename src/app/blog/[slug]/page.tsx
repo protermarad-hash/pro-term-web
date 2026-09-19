@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, Phone, Tag } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 
 interface BlogPost {
   id: string;

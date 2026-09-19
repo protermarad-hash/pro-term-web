@@ -30,6 +30,7 @@ import {
   getStockBadge,
   isProductAvailable,
   isServiceProduct,
+  getProductAvailability,
   type Product,
 } from '@/lib/products';
 import { VAT_RATE, vatAmount } from '@/lib/constants';
@@ -87,7 +88,6 @@ function getDiscountPercent(product: Product) {
   return Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100);
 }
 
-
 interface Props {
   product: Product;
   related: Product[];
@@ -123,6 +123,7 @@ export default function ProductPageClient({ product, related }: Props) {
     : 99;
   const availableToAdd = Math.max(0, stockMax - cartQty);
 
+  const availability = getProductAvailability(product);
   const customerDescription = cleanCustomerText(product.description);
   const publicSpecs = product.specs.filter((spec) => isPublicSpec(spec.label, spec.value));
   const officialUrl = getOfficialUrl(product);
@@ -237,6 +238,13 @@ export default function ProductPageClient({ product, related }: Props) {
               </div>
 
               <p className="mb-6 leading-relaxed text-dark-300">{customerDescription || 'Pentru detalii, disponibilitate și recomandarea potrivită spațiului tău, contactează echipa PRO TERM.'}</p>
+
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-sm font-bold text-dark">{availability.title}</p>
+                {availability.detail && (
+                  <p className="mt-1 text-sm text-dark-300">{availability.detail}</p>
+                )}
+              </div>
 
               <div className="mb-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-white p-4 shadow-card">

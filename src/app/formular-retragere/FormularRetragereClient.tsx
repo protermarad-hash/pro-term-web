@@ -52,7 +52,7 @@ export default function FormularRetragereClient() {
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [refId, setRefId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState('');
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
@@ -70,6 +70,9 @@ export default function FormularRetragereClient() {
     if (!form.orderNumber.trim()) e.orderNumber = 'Câmp obligatoriu';
     if (!form.products.trim()) e.products = 'Câmp obligatoriu';
     if (!form.quantity.trim()) e.quantity = 'Câmp obligatoriu';
+    else if (!Number.isInteger(Number(form.quantity)) || Number(form.quantity) <= 0) {
+      e.quantity = 'Introdu un număr întreg pozitiv';
+    }
     if (!form.pricePaid.trim()) e.pricePaid = 'Câmp obligatoriu';
     else if (isNaN(Number(form.pricePaid.replace(',', '.')))) e.pricePaid = 'Valoare numerică';
     if (!form.orderDate) e.orderDate = 'Câmp obligatoriu';
@@ -94,7 +97,7 @@ export default function FormularRetragereClient() {
 
     setSubmitting(true);
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('retrageri')
         .insert({
           nume: form.name,
@@ -103,7 +106,7 @@ export default function FormularRetragereClient() {
           email: form.email,
           numar_comanda: form.orderNumber,
           produs: form.products,
-          cantitate: form.quantity,
+          cantitate: Number.parseInt(form.quantity, 10),
           pret: parseFloat(form.pricePaid.replace(',', '.')),
           data_comanda: form.orderDate,
           data_primire: form.deliveryDate,
@@ -111,24 +114,21 @@ export default function FormularRetragereClient() {
           detalii: form.details || null,
           metoda_rambursare: form.refundMethod,
           iban: form.iban || null,
-          status: 'nou',
-        })
-        .select('id')
-        .single();
+        });
 
-      if (error) throw new Error(error.message);
-      const shortId = (data.id as string).slice(0, 8).toUpperCase();
-      setRefId(shortId);
-    } catch (err: unknown) {
-      setServerError(
-        err instanceof Error ? err.message : 'Eroare la înregistrare. Încercați din nou.',
-      );
+      if (error) {
+        setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (refId) {
+  if (submitted) {
     return (
       <div className="mx-auto max-w-xl rounded-3xl bg-white p-8 shadow-card text-center">
         <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
@@ -143,14 +143,9 @@ export default function FormularRetragereClient() {
           </svg>
         </div>
         <h2 className="font-heading text-2xl font-bold text-dark mb-3">Cerere înregistrată</h2>
-        <div className="rounded-2xl border-2 border-dashed border-accent px-6 py-4 mb-5">
-          <span className="font-heading text-2xl font-bold text-accent tracking-wider">
-            RET-{refId}
-          </span>
-        </div>
         <p className="text-sm text-dark-300 mb-4">
-          Cererea ta de retragere <strong>RET-{refId}</strong> a fost înregistrată. Te vom contacta
-          în maxim <strong>14 zile lucrătoare</strong>.
+          Cererea ta de retragere a fost înregistrată. Te vom contacta în maxim{' '}
+          <strong>14 zile lucrătoare</strong>.
         </p>
         <p className="text-sm text-dark-300">
           Întrebări?{' '}

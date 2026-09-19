@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Clock, Tag } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { getSupabaseServiceClient } from '@/lib/supabase';
+import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 
 export const metadata: Metadata = {
   title: 'Blog HVAC | Sfaturi aer condiționat, montaj și service | PRO TERM',

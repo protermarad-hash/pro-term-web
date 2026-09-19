@@ -1,8 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import type { Product } from '@/lib/products';
+import { normalizeStockStatus, type Product } from '@/lib/products';
 
 // Browser singleton — ensures onAuthStateChange fires correctly across all callers
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let _anonClient: SupabaseClient<any> | null = null;
 
 export interface DbProduct {
@@ -53,24 +52,10 @@ export function getSupabaseAnonClient() {
   if (!_anonClient) {
     // persistSession defaults to true — session stored in localStorage
     // required for router.push redirects to work correctly after login
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     _anonClient = createClient(url, anonKey) as SupabaseClient<any>;
   }
 
   return _anonClient;
-}
-
-export function getSupabaseServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url || !serviceKey) {
-    return null;
-  }
-
-  return createClient(url, serviceKey, {
-    auth: { persistSession: false },
-  });
 }
 
 const SPEC_KEY_LABELS: Record<string, string> = {
@@ -143,7 +128,7 @@ export function dbProductToProduct(p: DbProduct): Product {
     specs: parseSpecs(p.specs),
     smartbillCode: p.smartbill_code ?? undefined,
     manageStock: p.manage_stock,
-    stockStatus: p.stock_status as Product['stockStatus'],
+    stockStatus: normalizeStockStatus(p.stock_status),
     stockQty: p.stock_qty ?? undefined,
     imageUrl,
     galleryImages,
