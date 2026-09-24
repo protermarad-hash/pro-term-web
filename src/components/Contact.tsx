@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Phone, Mail, MapPin, Send, Clock, UserRound } from 'lucide-react';
+import { Phone, Mail, MapPin, Send, Clock, UserRound, Loader2, AlertTriangle } from 'lucide-react';
 
 const contactInfo = [
   {
@@ -36,15 +36,26 @@ const contactInfo = [
   },
 ];
 
+const GENERIC_ERROR =
+  'Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou sau să ne contactezi telefonic.';
+
+type Status = 'idle' | 'submitting' | 'success' | 'error';
+
+const emptyForm = {
+  name: '',
+  phone: '',
+  email: '',
+  service: '',
+  message: '',
+};
+
 export default function Contact() {
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    service: '',
-    message: '',
-  });
-  const [sent, setSent] = useState(false);
+  const [form, setForm] = useState(emptyForm);
+  const [honeypot, setHoneypot] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const isSubmitting = status === 'submitting';
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -52,9 +63,46 @@ export default function Contact() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    if (isSubmitting) return;
+
+    setStatus('submitting');
+    setErrorMessage('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          interest: form.service,
+          details: form.message,
+          honeypot,
+        }),
+      });
+
+      let payload: { ok?: boolean; error?: string } = {};
+      try {
+        payload = await response.json();
+      } catch {
+        // răspuns fără corp JSON valid — tratat mai jos ca eroare generică
+      }
+
+      if (response.ok && payload.ok) {
+        setStatus('success');
+        setForm(emptyForm);
+        setHoneypot('');
+      } else {
+        setStatus('error');
+        setErrorMessage(GENERIC_ERROR);
+      }
+    } catch {
+      setStatus('error');
+      setErrorMessage(GENERIC_ERROR);
+    }
   };
 
   return (
@@ -114,8 +162,8 @@ export default function Contact() {
           </div>
 
           <div className="lg:col-span-3 card">
-            {sent ? (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
+            {status === 'success' ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center" role="status" aria-live="polite">
                 <div className="w-16 h-16 rounded-full bg-secondary/20 flex items-center justify-center mb-4">
                   <Send size={28} className="text-secondary" />
                 </div>
@@ -137,10 +185,11 @@ export default function Contact() {
                       type="text"
                       name="name"
                       required
+                      disabled={isSubmitting}
                       value={form.name}
                       onChange={handleChange}
                       placeholder="Ion Popescu"
-                      className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                     />
                   </div>
                   <div>
@@ -151,10 +200,11 @@ export default function Contact() {
                       type="tel"
                       name="phone"
                       required
+                      disabled={isSubmitting}
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="07XX XXX XXX"
-                      className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                      className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -166,10 +216,11 @@ export default function Contact() {
                   <input
                     type="email"
                     name="email"
+                    disabled={isSubmitting}
                     value={form.email}
                     onChange={handleChange}
                     placeholder="email@companie.ro"
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-60 disabled:cursor-not-allowed"
                   />
                 </div>
 
@@ -179,9 +230,10 @@ export default function Contact() {
                   </label>
                   <select
                     name="service"
+                    disabled={isSubmitting}
                     value={form.service}
                     onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     <option value="">Selectează opțiunea...</option>
                     <option>Vreau să comand un produs</option>
@@ -200,16 +252,64 @@ export default function Contact() {
                   <textarea
                     name="message"
                     rows={4}
+                    disabled={isSubmitting}
                     value={form.message}
                     onChange={handleChange}
                     placeholder="Ex: apartament 2 camere, 45 mp, Arad; mă interesează aparat 12.000 BTU cu montaj."
-                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
+                    className="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none disabled:opacity-60 disabled:cursor-not-allowed"
                   />
                 </div>
 
-                <button type="submit" className="btn-primary w-full justify-center">
-                  <Send size={18} />
-                  Trimite cererea de ofertă
+                {/* Honeypot — invizibil pentru utilizatori reali, nu type="hidden" ca să rămână relevant pentru boți simpli */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: '1px',
+                    height: '1px',
+                    overflow: 'hidden',
+                  }}
+                >
+                  <label htmlFor="contact-website">Nu completa acest câmp</label>
+                  <input
+                    type="text"
+                    id="contact-website"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
+                  />
+                </div>
+
+                {status === 'error' && (
+                  <div
+                    role="alert"
+                    aria-live="assertive"
+                    className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                  >
+                    <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="btn-primary w-full justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" />
+                      Se trimite...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={18} />
+                      Trimite cererea de ofertă
+                    </>
+                  )}
                 </button>
 
                 <p className="text-xs text-dark-300 text-center">

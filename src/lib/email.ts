@@ -4,6 +4,15 @@ const IBAN = 'RO15BTRLRONCRT0CK3829101';
 const ADMIN_EMAIL = 'proterm.arad@gmail.com';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'comenzi@pro-term.ro';
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export type OrderEmailData = {
   orderId: string;
   orderRef: string; // e.g. "2778C492"
@@ -192,4 +201,66 @@ export async function sendOrderNotificationToAdmin(d: OrderEmailData) {
     subject: `Comandă nouă #${d.orderRef} — ${d.firstName} ${d.lastName}`,
     html: buildAdminHtml(d),
   });
+}
+
+export type ContactRequestData = {
+  name: string;
+  phone: string;
+  email?: string;
+  interest: string;
+  details: string;
+};
+
+function buildContactHtml(d: ContactRequestData, submittedAt: string) {
+  return `<!DOCTYPE html>
+<html lang="ro">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+  <tr><td style="background:#1f2937;padding:24px 40px;">
+    <h1 style="color:#fff;margin:0;font-size:20px;">Solicitare nouă de pe site</h1>
+    <p style="color:#9ca3af;margin:4px 0 0;font-size:13px;">Trimisă la ${escapeHtml(submittedAt)}</p>
+  </td></tr>
+  <tr><td style="padding:28px 40px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+      <tr><td style="padding:6px 0;color:#6b7280;width:120px;vertical-align:top;">Nume</td><td style="padding:6px 0;font-weight:600;">${escapeHtml(d.name)}</td></tr>
+      <tr><td style="padding:6px 0;color:#6b7280;vertical-align:top;">Telefon</td><td style="padding:6px 0;font-weight:600;">${escapeHtml(d.phone)}</td></tr>
+      ${d.email ? `<tr><td style="padding:6px 0;color:#6b7280;vertical-align:top;">Email</td><td style="padding:6px 0;">${escapeHtml(d.email)}</td></tr>` : ''}
+      <tr><td style="padding:6px 0;color:#6b7280;vertical-align:top;">Interes</td><td style="padding:6px 0;">${escapeHtml(d.interest)}</td></tr>
+      <tr><td style="padding:6px 0;color:#6b7280;vertical-align:top;">Detalii</td><td style="padding:6px 0;white-space:pre-wrap;">${escapeHtml(d.details)}</td></tr>
+    </table>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+/**
+ * Trimite o solicitare de contact către adresa de admin, prin Resend.
+ * Aruncă o eroare dacă trimiterea nu poate fi confirmată — apelantul (route-ul API)
+ * este responsabil să trateze eroarea și să NU raporteze succes fals către client.
+ */
+export async function sendContactRequest(d: ContactRequestData): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY lipsă — trimitere indisponibilă.');
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const submittedAt = new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+
+  const result = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
+    replyTo: d.email || undefined,
+    subject: `Solicitare ofertă — ${d.name}`,
+    html: buildContactHtml(d, submittedAt),
+  });
+
+  if (result.error) {
+    throw new Error(`Resend error: ${result.error.message || 'trimitere eșuată'}`);
+  }
 }
