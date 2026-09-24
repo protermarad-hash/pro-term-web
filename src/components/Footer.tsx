@@ -17,7 +17,7 @@ const footerLinks = {
   Companie: [
     { label: 'Despre noi', href: '/despre' },
     { label: 'Produse', href: '/produse' },
-    { label: 'Certificări', href: '/#avantaje' },
+    { label: 'De ce PRO TERM', href: '/#despre' },
     { label: 'Contact', href: '/#contact' },
   ],
   Legal: [

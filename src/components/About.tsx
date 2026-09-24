@@ -1,21 +1,35 @@
-import { CheckCircle2, FileCheck2, ShieldCheck, UsersRound, Wrench } from 'lucide-react';
+import { Calendar, CheckCircle2, Layers, UsersRound, Network } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-const highlights = [
-  'Firmă din Arad cu activitate în HVAC din 1999',
-  'Echipă de 6 specialiști, cu comunicare directă și responsabilitate clară',
-  'Dealer oficial și service zonal pentru Gree, Midea și Yamato',
-  'Certificare ISO 9001 pentru managementul calității',
-  'Certificat F-Gas / AGFR pentru lucrări cu agenți frigorifici',
-  'Vânzare echipamente, consultanță, montaj, service și mentenanță',
+const cards = [
+  {
+    icon: Calendar,
+    title: 'Din 1999 în HVAC',
+    text: 'Activitate continuă în climatizare, încălzire și ventilație.',
+  },
+  {
+    icon: UsersRound,
+    title: 'Implicare directă',
+    text: 'Conducerea actuală coordonează direct activitatea din 2008.',
+  },
+  {
+    icon: Layers,
+    title: 'Rezidențial, comercial, industrial',
+    text: 'Soluții adaptate tipului de spațiu și complexității proiectului.',
+  },
+  {
+    icon: Network,
+    title: 'Colaboratori specializați',
+    text: 'Pentru disciplinele neacoperite intern, lucrăm coordonat cu parteneri de execuție.',
+  },
 ];
 
-const cards = [
-  { icon: UsersRound, title: '6 specialiști', text: 'Echipă locală, implicată direct în recomandare, montaj și suport.' },
-  { icon: ShieldCheck, title: 'Dealer oficial', text: 'Partener Gree, Midea și Yamato pentru vânzare și service zonal.' },
-  { icon: FileCheck2, title: 'ISO 9001 & F-Gas', text: 'Certificări pentru calitate și lucrări cu agenți frigorifici.' },
-  { icon: Wrench, title: 'Montaj & service', text: 'Nu vindem doar produsul: putem asigura și instalarea corectă.' },
+const highlights = [
+  'Activitate HVAC din 1999, cu implicare directă a conducerii actuale din 2008',
+  'Echipamente, montaj/service și proiecte HVAC complexe, sub aceeași coordonare',
+  'Soluții pentru spații rezidențiale, comerciale și industriale',
+  'Colaboratori specializați, folosiți transparent acolo unde proiectul o cere',
 ];
 
 export default function About() {
@@ -43,25 +57,24 @@ export default function About() {
                 </div>
               </div>
             </div>
-
-            <div className="absolute -bottom-6 -right-3 rounded-2xl bg-accent p-5 text-white shadow-accent sm:-right-6">
-              <div className="font-heading text-4xl font-bold">25+</div>
-              <div className="mt-1 max-w-32 text-sm leading-tight text-white/85">ani experiență în domeniu</div>
-            </div>
           </div>
 
           <div>
             <span className="text-sm font-bold uppercase tracking-widest text-accent">
-              Despre PRO TERM
+              De ce PRO TERM
             </span>
             <h2 className="section-title mt-3 mb-5">
-              Dealer oficial și service zonal pentru Gree, Midea și Yamato.
+              Activitate HVAC din 1999, abordare coordonată pentru fiecare proiect.
             </h2>
             <p className="mb-4 leading-relaxed text-dark-300">
-              PRO TERM este o firmă din Arad care lucrează în domeniul HVAC din 1999. Ne concentrăm pe soluții practice: alegerea echipamentului potrivit, montaj corect, service și suport după instalare.
+              PRO TERM activează în domeniul HVAC din 1999. Conducerea actuală este implicată
+              direct în activitatea firmei din 2008, atât pe partea tehnică, cât și administrativă.
             </p>
             <p className="mb-8 leading-relaxed text-dark-300">
-              Suntem o echipă de 6 specialiști, cu certificare ISO 9001 și certificat F-Gas / AGFR. Pentru magazinul online păstrăm aceeași abordare: poți vedea produse și prețuri, dar poți cere și verificare tehnică înainte să cumperi.
+              Oferim soluții pentru spații rezidențiale, comerciale și industriale: de la
+              recomandarea și vânzarea echipamentului potrivit, până la montaj, service și
+              proiecte HVAC complexe. Pentru specializările pe care nu le acoperim intern,
+              lucrăm transparent cu colaboratori specializați.
             </p>
 
             <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
