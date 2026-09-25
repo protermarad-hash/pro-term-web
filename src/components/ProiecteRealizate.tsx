@@ -1,48 +1,34 @@
-import { Building2, Factory, Store, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Building2, Home, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 const proiecte = [
   {
     icon: Building2,
-    tag: 'Sistem VRV',
-    title: 'Centru comercial — 2.400 mp',
-    location: 'Craiova, 2023',
+    tag: 'Proiect HVAC complet',
+    title: 'Sediu de presă',
+    location: 'Arad',
     specs: [
-      'Sistem VRV 48 kW — 4 unități exterioare',
-      '32 unități interioare tip casetă 4 căi',
-      'Control centralizat BMS cu programare pe zone',
-      'Recuperare căldură între zone simultan',
+      'Ventilație cu tubulatură',
+      'Răcire cu apă răcită de la chiller',
+      'Două centrale pe gaz de 50 kW, punct termic, pompe și distribuții',
+      'Furnizare materiale/echipamente, proiectare prin colaboratori, execuție completă',
     ],
     color: 'from-blue-600/20 to-cyan-500/10 border-blue-500/20',
     iconColor: 'bg-blue-600/10 text-blue-600',
   },
   {
-    icon: Factory,
-    tag: 'Climatizare industrială',
-    title: 'Hală de producție — 6.000 mp',
-    location: 'Zona Vest, 2022',
+    icon: Home,
+    tag: 'Proiect HVAC + sanitar',
+    title: 'Casa Tineretului',
+    location: 'Vladimirescu',
     specs: [
-      'Chiller industrial 120 kW apă glacială',
-      'Sistem ventiloconvectoare 48 unități',
-      'Distribuție aer cald/rece pe circuite separate',
-      'Automatizare cu senzori de temperatură/umiditate',
+      'Ventilație (CTA) și răcire cu chiller',
+      'Centrale pe gaz și încălzire cu radiatoare',
+      'Instalații sanitare pentru băi și bucătării',
+      'Furnizare materiale/echipamente, proiectare prin colaboratori, execuție completă',
     ],
     color: 'from-emerald-600/20 to-green-500/10 border-emerald-500/20',
     iconColor: 'bg-emerald-600/10 text-emerald-600',
-  },
-  {
-    icon: Store,
-    tag: 'Rețea retail',
-    title: '14 puncte de vânzare — Arad & Timiș',
-    location: 'Arad și Timiș, 2021–prezent',
-    specs: [
-      '14 sisteme split/multi-split 9.000–18.000 BTU',
-      'Montaj și punere în funcțiune uniformizată',
-      'Contract mentenanță preventivă anual activ',
-      'Intervenție service garantată în 4 ore',
-    ],
-    color: 'from-violet-600/20 to-purple-500/10 border-violet-500/20',
-    iconColor: 'bg-violet-600/10 text-violet-600',
   },
 ];
 
@@ -52,16 +38,16 @@ export default function ProiecteRealizate() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-14">
           <span className="text-brand font-semibold text-sm uppercase tracking-widest">
-            Referințe comerciale
+            Proiecte reale
           </span>
-          <h2 className="section-title mt-2">Proiecte Reprezentative</h2>
+          <h2 className="section-title mt-2">Proiecte HVAC executate de PRO TERM</h2>
           <p className="section-subtitle mx-auto text-center">
-            Executăm proiecte HVAC complexe pentru retail, industrie și spații comerciale —
-            în colaborare cu antreprenori generali din toată România.
+            Proiecte complete: proiectare prin colaboratori, furnizare echipamente și materiale,
+            execuție și punere în funcțiune.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
           {proiecte.map((p) => {
             const Icon = p.icon;
             return (
@@ -97,20 +83,20 @@ export default function ProiecteRealizate() {
         <div className="bg-dark rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <p className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-1">
-              Proiecte mari & colaborări cu antreprenori
+              Proiecte HVAC comerciale și industriale
             </p>
             <h3 className="text-xl font-bold font-heading text-white">
-              Lucrezi pe proiecte VRV sau climatizare comercială?
+              Ai un proiect HVAC comercial sau industrial?
             </h3>
             <p className="text-white/60 text-sm mt-1">
-              Colaborăm cu antreprenori generali și instalatori pentru proiecte la nivel național.
+              Coordonăm proiectarea, furnizarea și execuția, la nivel național.
             </p>
           </div>
           <Link
-            href="/#contact"
+            href="/servicii/proiecte-hvac-romania"
             className="flex items-center gap-2 bg-white text-dark font-semibold px-6 py-3 rounded-lg hover:bg-white/90 transition-colors whitespace-nowrap"
           >
-            Discutăm proiectul
+            Vezi Proiecte HVAC
             <ArrowRight size={18} />
           </Link>
         </div>

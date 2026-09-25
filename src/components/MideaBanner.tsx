@@ -36,26 +36,26 @@ export default function MideaBanner() {
             </div>
             <div className="flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-bold backdrop-blur-sm">
               <ShieldCheck size={15} className="text-green-300" />
-              Partener Oficial Midea
+              Echipamente Midea
             </div>
           </div>
 
           {/* Content */}
           <div className="flex-1 text-center lg:text-left">
             <p className="mb-2 text-sm font-bold uppercase tracking-widest text-blue-300">
-              Dealer Autorizat în România
+              Branduri disponibile
             </p>
             <h2 className="mb-3 font-heading text-3xl font-bold md:text-4xl">
               Aparate de aer condiționat Midea
             </h2>
             <p className="mb-6 max-w-xl text-blue-200 leading-relaxed">
-              Cel mai mare producător mondial de climatizare. Tehnologie AI EcoMaster, eficiență energetică A+++ și garanție completă prin PRO TERM SRL.
+              Tehnologie AI EcoMaster și eficiență energetică A+++, disponibile prin PRO TERM SRL.
             </p>
 
             <div className="mb-6 flex flex-wrap justify-center gap-4 lg:justify-start">
               {[
                 { icon: <Zap size={14} />, text: 'Eficiență A+++' },
-                { icon: <ShieldCheck size={14} />, text: 'Garanție oficială' },
+                { icon: <ShieldCheck size={14} />, text: 'Consultanță tehnică' },
                 { icon: <Award size={14} />, text: 'Produse originale' },
               ].map((item) => (
                 <div key={item.text} className="flex items-center gap-1.5 text-sm font-semibold text-blue-100">
