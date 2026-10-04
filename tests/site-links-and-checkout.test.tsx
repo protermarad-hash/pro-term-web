@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import CheckoutGuaranteeInfo from '@/components/legal/CheckoutGuaranteeInfo';
 import GuaranteesPage from '@/app/garantii/page';
 import TermsPage from '@/app/termeni-si-conditii/page';
+import LegalInfoPage from '@/app/informatii-legale/page';
 import sitemap from '@/app/sitemap';
 import { AuthProvider } from '@/lib/auth-context';
 import { CartProvider } from '@/lib/cart-context';
@@ -170,6 +171,25 @@ describe('terms and conditions – section 11 (complaints)', () => {
     assert.match(section, /href="https:\/\/reclamatiisal\.anpc\.ro"/);
     assert.match(section, /instanțelor competente/);
   });
+});
+
+describe('no references to the abolished EU ODR platform (Reg. (UE) 2024/3228)', () => {
+  const ODR = /ODR|SOL\/|platforma SOL|ec\.europa\.eu\/consumers\/odr|online dispute|soluționare online/i;
+  const pages = {
+    footer: () => renderToStaticMarkup(<AuthProvider><Footer /></AuthProvider>),
+    'informații legale': () => renderToStaticMarkup(<AuthProvider><CartProvider><LegalInfoPage /></CartProvider></AuthProvider>),
+    'termeni și condiții': () => renderToStaticMarkup(<AuthProvider><CartProvider><TermsPage /></CartProvider></AuthProvider>),
+    '/garantii': () => renderToStaticMarkup(<AuthProvider><CartProvider><GuaranteesPage /></CartProvider></AuthProvider>),
+  };
+
+  for (const [name, render] of Object.entries(pages)) {
+    it(`${name}: no ODR link or text, ANPC and SAL kept`, () => {
+      const html = render();
+      assert.doesNotMatch(html, ODR);
+      assert.match(html, /href="https:\/\/anpc\.ro"/);
+      assert.match(html, /href="https:\/\/reclamatiisal\.anpc\.ro"/);
+    });
+  }
 });
 
 describe('order confirmation e-mail', () => {

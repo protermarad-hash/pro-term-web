@@ -65,7 +65,6 @@ export default function LegalInfoPage() {
               <ul>
                 <li><a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a></li>
                 <li><a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer">SAL ANPC</a></li>
-                <li><a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">Platforma SOL/ODR a Comisiei Europene</a></li>
               </ul>
 
               <h2>6. Documente conexe</h2>
