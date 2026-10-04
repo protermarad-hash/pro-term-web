@@ -22,6 +22,7 @@ const footerLinks = {
   ],
   Legal: [
     { label: 'Informații legale comerciant', href: '/informatii-legale' },
+    { label: 'Garanții și drepturile consumatorului', href: '/garantii' },
     { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
     { label: 'Livrare și plată', href: '/livrare-si-plata' },
     { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },

@@ -1,4 +1,10 @@
 import { Resend } from 'resend';
+import {
+  GUARANTEES_PAGE_PATH,
+  LEGAL_NOTICE_PNG_PATH,
+  YOUR_EUROPE_LEGAL_GUARANTEE_LABEL,
+  YOUR_EUROPE_LEGAL_GUARANTEE_URL,
+} from './consumer-guarantee';
 
 const IBAN = 'RO15BTRLRONCRT0CK3829101';
 const ADMIN_EMAIL = 'proterm.arad@gmail.com';
@@ -69,6 +75,23 @@ function paymentInfo(d: OrderEmailData) {
     </div>`;
 }
 
+const SITE_URL = 'https://pro-term.ro';
+
+/**
+ * Official EU harmonised notice (Commission RGB file, unmodified) in the order
+ * confirmation, as recommended by the Commission guidelines (April 2026, 2.3).
+ */
+export function legalGuaranteeNoticeHtml() {
+  const noticeUrl = `${SITE_URL}${LEGAL_NOTICE_PNG_PATH}`;
+  return `
+    <div style="border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin:24px 0;">
+      <p style="font-weight:700;color:#374151;margin:0 0 8px;font-size:14px;">Garanția legală de conformitate</p>
+      <p style="margin:0 0 12px;font-size:13px;color:#6b7280;line-height:1.5;">Notificarea armonizată UE privind garanția legală. Detalii despre garanții și sesizarea unei neconformități: <a href="${SITE_URL}${GUARANTEES_PAGE_PATH}" style="color:#0066cc;">pro-term.ro/garantii</a>.</p>
+      <a href="${noticeUrl}"><img src="${noticeUrl}" width="520" alt="Notificarea armonizată UE privind garanția legală de conformitate" style="display:block;width:100%;max-width:520px;height:auto;border:0;"></a>
+      <p style="margin:12px 0 0;font-size:13px;"><a href="${YOUR_EUROPE_LEGAL_GUARANTEE_URL}" style="color:#0066cc;">${YOUR_EUROPE_LEGAL_GUARANTEE_LABEL}</a></p>
+    </div>`;
+}
+
 function buildClientHtml(d: OrderEmailData) {
   return `<!DOCTYPE html>
 <html lang="ro">
@@ -109,6 +132,8 @@ function buildClientHtml(d: OrderEmailData) {
       <p style="font-weight:700;color:#374151;margin:0 0 8px;font-size:14px;">Adresa de livrare</p>
       <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.6;">${d.firstName} ${d.lastName}<br>${d.address}<br>${d.city}, ${d.county}${d.postalCode ? ', ' + d.postalCode : ''}</p>
     </div>
+
+    ${legalGuaranteeNoticeHtml()}
 
     <p style="color:#374151;font-size:14px;margin:24px 0 8px;">Te vom contacta la <strong>${d.phone}</strong> pentru confirmarea livrării.</p>
     <p style="color:#6b7280;font-size:13px;margin:0;">Ai întrebări? Sună la <strong>0749 025 610</strong> sau scrie la <a href="mailto:office@pro-term.ro" style="color:#0066cc;">office@pro-term.ro</a>.</p>

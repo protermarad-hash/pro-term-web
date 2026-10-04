@@ -18,6 +18,9 @@ export default function ConsumerProtectionNotice() {
             <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="rounded-xl bg-primary px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-primary-600">
               PROTECȚIA CONSUMATORILOR - A.N.P.C.
             </a>
+            <Link href="/garantii" className="rounded-xl border border-primary px-5 py-3 text-center text-sm font-bold text-primary transition hover:bg-primary hover:text-white">
+              Garanții și drepturile consumatorului
+            </Link>
             <Link href="/informatii-legale" className="rounded-xl border border-primary px-5 py-3 text-center text-sm font-bold text-primary transition hover:bg-primary hover:text-white">
               Informații legale PRO TERM
             </Link>

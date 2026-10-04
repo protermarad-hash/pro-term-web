@@ -20,6 +20,12 @@ import {
 } from 'lucide-react';
 import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/lib/products';
 import { adminFetch } from '@/lib/client-auth-fetch';
+import {
+  DURABILITY_LABEL_ADMIN_WARNING,
+  GUARANTEE_INPUT_KEYS,
+  MAX_MANUFACTURER_NAME_LENGTH,
+  MAX_MODEL_IDENTIFIER_LENGTH,
+} from '@/lib/consumer-guarantee';
 
 const BRANDS: Brand[] = ['Gree', 'Midea', 'Yamato', 'Fujitsu', 'Yukon', 'Habitat', 'Bosch', 'Vaillant', 'Immergas', 'Viessmann', 'Generic', 'PRO TERM'];
 const CATEGORIES = Object.keys(CATEGORY_LABEL) as Category[];
@@ -60,6 +66,18 @@ interface AdminProduct {
   gallery_images?: string[] | null;
   active: boolean;
   created_at: string;
+  // Present only after migration 20261004120000_product_consumer_guarantee_info.
+  durability_guarantee_eligible?: boolean;
+  durability_guarantee_years?: number | string | null;
+  durability_guarantee_source?: string | null;
+  manufacturer_name?: string | null;
+  manufacturer_model_identifier?: string | null;
+  commercial_warranty_terms?: string | null;
+  commercial_warranty_conditions_url?: string | null;
+  after_sales_service_info?: string | null;
+  spare_parts_info?: string | null;
+  repair_info?: string | null;
+  software_updates_info?: string | null;
 }
 
 interface AdminOrder {
@@ -101,9 +119,41 @@ const initialForm = {
   isNew: false,
   isBestseller: false,
   active: true,
+  // Consumer guarantee information — never pre-filled, never inferred.
+  durabilityGuaranteeEligible: false,
+  durabilityGuaranteeYears: '',
+  durabilityGuaranteeSource: '',
+  manufacturerName: '',
+  manufacturerModelIdentifier: '',
+  commercialWarrantyTerms: '',
+  commercialWarrantyConditionsUrl: '',
+  afterSalesServiceInfo: '',
+  sparePartsInfo: '',
+  repairInfo: '',
+  softwareUpdatesInfo: '',
 };
 
 type ProductForm = typeof initialForm;
+
+/** True when the admin filled in any guarantee field. */
+function hasGuaranteeData(form: ProductForm) {
+  return GUARANTEE_INPUT_KEYS.some((key) => {
+    const value = form[key];
+    return typeof value === 'boolean' ? value : value.trim() !== '';
+  });
+}
+
+/**
+ * Before the guarantee migration is applied the columns do not exist, so the
+ * fields are only sent when the DB has them or when the admin filled them in
+ * (in which case the API explains that the migration is missing).
+ */
+function toRequestBody(form: ProductForm, guaranteeColumnsAvailable: boolean): Record<string, unknown> {
+  if (guaranteeColumnsAvailable || hasGuaranteeData(form)) return { ...form };
+  const body: Record<string, unknown> = { ...form };
+  GUARANTEE_INPUT_KEYS.forEach((key) => delete body[key]);
+  return body;
+}
 
 function specsToText(specs: AdminProduct['specs']) {
   return Array.isArray(specs) ? specs.map((spec) => `${spec.label}: ${spec.value}`).join('\n') : '';
@@ -134,6 +184,20 @@ function productToForm(product: AdminProduct): ProductForm {
     isNew: Boolean(product.is_new),
     isBestseller: Boolean(product.is_bestseller),
     active: product.active !== false,
+    durabilityGuaranteeEligible: product.durability_guarantee_eligible === true,
+    durabilityGuaranteeYears:
+      product.durability_guarantee_years === null || product.durability_guarantee_years === undefined
+        ? ''
+        : String(product.durability_guarantee_years).replace('.', ','),
+    durabilityGuaranteeSource: product.durability_guarantee_source ?? '',
+    manufacturerName: product.manufacturer_name ?? '',
+    manufacturerModelIdentifier: product.manufacturer_model_identifier ?? '',
+    commercialWarrantyTerms: product.commercial_warranty_terms ?? '',
+    commercialWarrantyConditionsUrl: product.commercial_warranty_conditions_url ?? '',
+    afterSalesServiceInfo: product.after_sales_service_info ?? '',
+    sparePartsInfo: product.spare_parts_info ?? '',
+    repairInfo: product.repair_info ?? '',
+    softwareUpdatesInfo: product.software_updates_info ?? '',
   };
 }
 
@@ -579,13 +643,16 @@ export default function AdminClient() {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [guaranteeColumnsAvailable, setGuaranteeColumnsAvailable] = useState(false);
 
   async function loadProducts() {
     try {
       const response = await adminFetch('/api/admin/products', { cache: 'no-store' });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Nu am putut încărca produsele.');
-      setProducts(data.products || []);
+      const loaded: AdminProduct[] = data.products || [];
+      setProducts(loaded);
+      setGuaranteeColumnsAvailable(loaded.some((product) => 'durability_guarantee_eligible' in product));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Eroare necunoscută.');
     }
@@ -616,7 +683,10 @@ export default function AdminClient() {
       const response = await adminFetch('/api/admin/products', {
         method: editingId ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingId ? { ...form, id: editingId } : form),
+        body: JSON.stringify({
+          ...toRequestBody(form, guaranteeColumnsAvailable),
+          ...(editingId ? { id: editingId } : {}),
+        }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Produsul nu a fost salvat.');
@@ -684,9 +754,14 @@ export default function AdminClient() {
       slug: '',
       btu: duplicated.btu || '',
       capacityLabel: duplicated.capacityLabel || '',
+      // A durability guarantee is granted per model: never copy it to another product.
+      durabilityGuaranteeEligible: false,
+      durabilityGuaranteeYears: '',
+      durabilityGuaranteeSource: '',
+      manufacturerModelIdentifier: '',
     });
     setEditingId(null);
-    setMessage('Produs duplicat în formular. Schimbă capacitatea/prețul și salvează ca produs nou.');
+    setMessage('Produs duplicat în formular. Schimbă capacitatea/prețul și salvează ca produs nou. Datele etichetei GARAN nu au fost copiate.');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -872,6 +947,74 @@ export default function AdminClient() {
                 <span className="mb-1 block text-sm font-bold text-dark">Specificații, format Label: Valoare</span>
                 <textarea value={form.specs} onChange={(e) => updateField('specs', e.target.value)} rows={6} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" />
               </label>
+
+              <fieldset className="md:col-span-2 rounded-2xl border border-slate-200 p-4" data-testid="admin-guarantee-fieldset">
+                <legend className="px-2 text-sm font-bold text-dark">Garanții și informații pentru consumatori</legend>
+                <p className="mb-4 text-xs text-dark-300">
+                  Completează numai cu informații din documentele producătorului sau din politica PRO TERM. Câmpurile goale nu apar pe site.
+                  {!guaranteeColumnsAvailable && ' Atenție: câmpurile pot fi salvate doar după aplicarea migrației de garanții în Supabase.'}
+                </p>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <label className="md:col-span-2">
+                    <span className="mb-1 block text-sm font-bold text-dark">Garanție comercială (din certificatul de garanție)</span>
+                    <textarea value={form.commercialWarrantyTerms} onChange={(e) => updateField('commercialWarrantyTerms', e.target.value)} rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="Ex.: durata și condițiile exact ca în certificatul producătorului/importatorului" />
+                  </label>
+                  <label className="md:col-span-2">
+                    <span className="mb-1 block text-sm font-bold text-dark">Link condiții garanție comercială (https://)</span>
+                    <input value={form.commercialWarrantyConditionsUrl} onChange={(e) => updateField('commercialWarrantyConditionsUrl', e.target.value)} type="url" className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="https://..." />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-bold text-dark">Servicii post-vânzare</span>
+                    <textarea value={form.afterSalesServiceInfo} onChange={(e) => updateField('afterSalesServiceInfo', e.target.value)} rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-bold text-dark">Piese de schimb (disponibilitate, cost estimat, comandă)</span>
+                    <textarea value={form.sparePartsInfo} onChange={(e) => updateField('sparePartsInfo', e.target.value)} rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-bold text-dark">Reparare și întreținere (instrucțiuni, restricții)</span>
+                    <textarea value={form.repairInfo} onChange={(e) => updateField('repairInfo', e.target.value)} rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" />
+                  </label>
+                  <label>
+                    <span className="mb-1 block text-sm font-bold text-dark">Actualizări software (doar bunuri cu elemente digitale)</span>
+                    <textarea value={form.softwareUpdatesInfo} onChange={(e) => updateField('softwareUpdatesInfo', e.target.value)} rows={3} className="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:border-primary" placeholder="Perioada minimă comunicată de producător (ex. până la o dată)" />
+                  </label>
+                </div>
+
+                <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                  <p className="text-sm font-bold text-dark">Eticheta UE GARAN – garanția comercială de durabilitate a producătorului</p>
+                  <p role="note" className="mt-2 flex items-start gap-2 text-sm font-semibold text-amber-900" data-testid="admin-durability-warning">
+                    <AlertCircle size={16} className="mt-0.5 flex-shrink-0" aria-hidden="true" />
+                    {DURABILITY_LABEL_ADMIN_WARNING}
+                  </p>
+                  <p className="mt-1 text-xs text-amber-900">
+                    Nu folosi eticheta pentru garanții comerciale obișnuite (ex. garanții extinse cu condiții, garanții doar pentru compresor). Informația trebuie să provină de la producător.
+                  </p>
+                  <label className="mt-3 flex items-center gap-2 text-sm font-semibold text-dark">
+                    <input type="checkbox" checked={form.durabilityGuaranteeEligible} onChange={(e) => updateField('durabilityGuaranteeEligible', e.target.checked)} className="h-4 w-4 accent-primary" />
+                    Afișează eticheta GARAN pentru acest produs
+                  </label>
+                  <div className="mt-3 grid gap-4 md:grid-cols-2">
+                    <label>
+                      <span className="mb-1 block text-sm font-bold text-dark">Durata garanției de durabilitate (ani)</span>
+                      <input value={form.durabilityGuaranteeYears} onChange={(e) => updateField('durabilityGuaranteeYears', e.target.value)} inputMode="decimal" className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-primary" placeholder="ex. 5 sau 2,5 (peste 2 ani)" />
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-sm font-bold text-dark">Producător (exact ca pe etichetă)</span>
+                      <input value={form.manufacturerName} onChange={(e) => updateField('manufacturerName', e.target.value)} maxLength={MAX_MANUFACTURER_NAME_LENGTH} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-primary" />
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-sm font-bold text-dark">Identificator model producător</span>
+                      <input value={form.manufacturerModelIdentifier} onChange={(e) => updateField('manufacturerModelIdentifier', e.target.value)} maxLength={MAX_MODEL_IDENTIFIER_LENGTH} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-primary" />
+                    </label>
+                    <label>
+                      <span className="mb-1 block text-sm font-bold text-dark">Document producător (intern, nu apare pe site)</span>
+                      <input value={form.durabilityGuaranteeSource} onChange={(e) => updateField('durabilityGuaranteeSource', e.target.value)} className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-primary" placeholder="ex. declarația producătorului nr./data" />
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
 
               <div className="md:col-span-2 flex flex-wrap gap-4 rounded-2xl bg-light-200 p-4">
                 <label className="flex items-center gap-2 text-sm font-semibold text-dark">

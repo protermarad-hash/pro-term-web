@@ -21,6 +21,7 @@ import { BRAND_GRADIENT } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 import { getSupabaseAnonClient } from '@/lib/supabase';
 import { getCurrentAccessToken } from '@/lib/client-auth-fetch';
+import CheckoutGuaranteeInfo from '@/components/legal/CheckoutGuaranteeInfo';
 
 const JUDETE = [
   'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
@@ -304,6 +305,10 @@ export default function CheckoutClient() {
                   <strong className="text-primary">Informații precontractuale:</strong> Prețurile sunt în RON cu TVA 21% inclus. Stocul și disponibilitatea livrării se confirmă de PRO TERM înainte de procesare. Drept de retragere 14 zile conform OUG 34/2014.
                 </div>
 
+                <CheckoutGuaranteeInfo
+                  items={items.map(({ product }) => ({ id: product.id, name: product.name }))}
+                />
+
                 <label className="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-sm text-dark-300">
                   <input type="checkbox" required className="mt-1" />
                   <span>
@@ -394,7 +399,7 @@ export default function CheckoutClient() {
 
                 <div className="card space-y-3">
                   {[
-                    'Garanție legală și comercială conform documentelor produsului',
+                    'Garanție legală de conformitate de minimum 2 ani pentru consumatori',
                     'Instalare profesională disponibilă în Arad și Timiș',
                     'Plată ramburs sau transfer bancar',
                     'Drept de retragere 14 zile pentru consumatori',

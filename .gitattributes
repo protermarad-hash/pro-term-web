@@ -1,0 +1,3 @@
+# Official EU files (Reg. (UE) 2025/1960): keep them byte-identical to the
+# Commission downloads — no line-ending conversion. Hashes: tests/legal-assets.test.ts
+public/legal/** -text

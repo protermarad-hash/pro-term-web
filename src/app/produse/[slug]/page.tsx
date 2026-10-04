@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import { dbProductToProduct } from '@/lib/supabase';
 import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 import { CATEGORY_LABEL, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
+import { EMPTY_GUARANTEE_INFO } from '@/lib/consumer-guarantee';
+import { fetchProductGuaranteeInfo } from '@/lib/consumer-guarantee-server';
 import ProductPageClient from './ProductPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -34,8 +36,11 @@ const getProductData = cache(async (slug: string) => {
     .neq('id', data.id)
     .limit(4);
 
+  const guarantees = await fetchProductGuaranteeInfo(supabase, [data.id]);
+
   return {
     product,
+    guarantee: guarantees.get(data.id) ?? EMPTY_GUARANTEE_INFO,
     related: (relatedData ?? []).map(dbProductToProduct),
   };
 });
@@ -98,7 +103,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   if (!data) notFound();
 
-  const { product, related } = data;
+  const { product, guarantee, related } = data;
   const description = buildSeoDescription(product);
   const canonical = `https://pro-term.ro/produse/${params.slug}`;
   const availability = getProductAvailability(product);
@@ -137,7 +142,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <ProductPageClient product={product} related={related} />
+      <ProductPageClient product={product} guarantee={guarantee} related={related} />
     </>
   );
 }

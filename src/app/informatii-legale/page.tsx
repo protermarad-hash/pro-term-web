@@ -70,6 +70,7 @@ export default function LegalInfoPage() {
 
               <h2>6. Documente conexe</h2>
               <ul>
+                <li><Link href="/garantii">Garanții și drepturile consumatorului</Link></li>
                 <li><Link href="/termeni-si-conditii">Termeni și condiții</Link></li>
                 <li><Link href="/livrare-si-plata">Livrare și plată</Link></li>
                 <li><Link href="/politica-confidentialitate">Politica de confidențialitate / GDPR</Link></li>
