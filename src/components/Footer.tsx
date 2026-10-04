@@ -27,7 +27,7 @@ const footerLinks = {
     { label: 'Livrare și plată', href: '/livrare-si-plata' },
     { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
     { label: 'Politica de retur', href: '/politica-retur' },
-    { label: 'Formular de retragere', href: '/formular-retragere' },
+    { label: 'Retrageți-vă din contract aici', href: '/formular-retragere' },
     { label: 'Politica cookies', href: '/politica-cookies' },
   ],
 };
