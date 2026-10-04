@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://pro-term.ro/termeni-si-conditii' },
 };
 
-const updatedAt = '07.06.2026';
+const updatedAt = '04.10.2026';
 
 export default function TermsPage() {
   return (
@@ -89,10 +89,19 @@ export default function TermsPage() {
 
               <h2>9. Garanții, conformitate și asistență post-vânzare</h2>
               <p>
-                Produsele beneficiază de garanția legală de conformitate și/sau de garanția comercială acordată de producător/importator, conform documentelor de garanție. Garanția poate fi condiționată de montaj autorizat, utilizare corectă și respectarea instrucțiunilor producătorului.
+                <strong>Garanția legală de conformitate.</strong> Pentru bunurile vândute consumatorilor, PRO TERM, în calitate de vânzător, răspunde pentru orice neconformitate care există în momentul livrării și care este constatată în termen de doi ani de la livrare, potrivit OUG nr. 140/2021. Garanția legală se aplică prin efectul legii, este gratuită și nu depinde de existența unei garanții comerciale sau a unui certificat de garanție. În caz de neconformitate, consumatorul beneficiază de măsurile corective prevăzute de lege: repararea sau înlocuirea bunului fără costuri ori, în cazurile prevăzute de lege, reducerea proporțională a prețului sau încetarea contractului.
               </p>
               <p>
-                Pentru intervenții în garanție pot fi solicitate factura, certificatul de garanție și documentele de montaj/punere în funcțiune, după caz. Asistența post-vânzare se oferă prin telefon, e-mail sau programare tehnică, în funcție de situație.
+                <strong>Garanții comerciale.</strong> Pe lângă garanția legală, producătorul, importatorul sau vânzătorul pot oferi, opțional, o garanție comercială. Aceasta se aplică numai pentru produsele pentru care este oferită, în condițiile din certificatul de garanție comercială (de exemplu montaj autorizat, utilizare corectă și respectarea instrucțiunilor producătorului), și nu afectează drepturile consumatorului din garanția legală de conformitate. Când un producător oferă o garanție comercială de durabilitate fără costuri suplimentare, pentru întregul bun și pentru o durată mai mare de doi ani, produsul este marcat cu eticheta armonizată UE GARAN.
+              </p>
+              <p>
+                <strong>Informare.</strong> Notificarea armonizată UE privind garanția legală de conformitate, diferența față de garanțiile comerciale și procedura de sesizare a unei neconformități sunt prezentate în pagina <Link href="/garantii">Garanții și drepturile consumatorului</Link>, conform OUG nr. 34/2014, astfel cum a fost modificată prin OUG nr. 18/2026.
+              </p>
+              <p>
+                <strong>Sesizarea unei neconformități.</strong> Pentru garanția legală este suficientă o dovadă a achiziției, de exemplu factura, chitanța sau un extras de cont. Pentru o garanție comercială pot fi solicitate și documentele prevăzute în certificatul acesteia, de exemplu certificatul de garanție sau documentele de montaj/punere în funcțiune. Asistența post-vânzare se oferă prin telefon, e-mail sau programare tehnică, în funcție de situație.
+              </p>
+              <p>
+                <strong>Clienți persoane juridice.</strong> Garanția legală de conformitate descrisă mai sus se aplică consumatorilor (persoane fizice care cumpără în afara activității lor comerciale sau profesionale). Pentru achizițiile făcute de persoane juridice sau în scop profesional se aplică regimul general al Codului civil și condițiile contractuale; garanțiile comerciale se aplică în condițiile din certificatele de garanție.
               </p>
 
               <h2>10. Retur, retragere și formular de retragere</h2>
@@ -108,7 +117,7 @@ export default function TermsPage() {
                 Reclamațiile pot fi transmise la <a href="mailto:office@pro-term.ro">office@pro-term.ro</a> sau telefonic la <a href="tel:+40749025610">0749 025 610</a>. Vom încerca soluționarea amiabilă într-un termen rezonabil.
               </p>
               <p>
-                Consumatorii pot apela și la ANPC, la mecanismele de soluționare alternativă a litigiilor sau la platforma SOL/ODR a Comisiei Europene, conform legislației aplicabile. Linkurile sunt disponibile în pagina <Link href="/informatii-legale">Informații legale comerciant</Link>.
+                Consumatorii se pot adresa și Autorității Naționale pentru Protecția Consumatorilor (<a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a>), pot apela la procedurile de soluționare alternativă a litigiilor (<a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer">SAL</a>), conform legislației aplicabile, sau se pot adresa instanțelor competente. Datele de contact ale PRO TERM sunt disponibile în pagina <Link href="/informatii-legale">Informații legale comerciant</Link>.
               </p>
 
               <h2>12. Comunicări comerciale</h2>

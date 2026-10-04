@@ -1,6 +1,31 @@
 import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/server-auth';
 import { slugify } from '@/lib/supabase';
+import { buildGuaranteePayload, hasGuaranteeInput } from '@/lib/consumer-guarantee';
+
+const GUARANTEE_MIGRATION_MISSING =
+  'Câmpurile de garanție nu există încă în baza de date. Aplică migrația 20261004120000_product_consumer_guarantee_info.sql înainte de a salva aceste informații.';
+
+/** PostgREST: unknown column in the payload (migration not applied yet). */
+function isMissingColumnError(error: { code?: string } | null) {
+  return error?.code === 'PGRST204' || error?.code === '42703';
+}
+
+type PayloadResult =
+  | { ok: true; payload: ReturnType<typeof buildPayload> & Record<string, unknown> }
+  | { ok: false; response: NextResponse };
+
+/** Product fields plus, when sent, the validated consumer guarantee fields. */
+function buildFullPayload(body: Record<string, unknown>): PayloadResult {
+  const payload: ReturnType<typeof buildPayload> & Record<string, unknown> = buildPayload(body);
+  if (!hasGuaranteeInput(body)) return { ok: true, payload };
+
+  const guarantee = buildGuaranteePayload(body);
+  if (!guarantee.ok) {
+    return { ok: false, response: NextResponse.json({ error: guarantee.error }, { status: 400 }) };
+  }
+  return { ok: true, payload: { ...payload, ...guarantee.payload } };
+}
 
 function splitLines(value: unknown): string[] {
   if (Array.isArray(value)) return value.map(String).map((v) => v.trim()).filter(Boolean);
@@ -103,13 +128,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Galeria trebuie să conțină numai texte.' }, { status: 400 });
   }
 
+  const built = buildFullPayload(body);
+  if (!built.ok) return built.response;
+
   const { data, error } = await supabase
     .from('products')
-    .insert(buildPayload(body))
+    .insert(built.payload)
     .select('*')
     .single();
 
   if (error) {
+    if (isMissingColumnError(error)) {
+      return NextResponse.json({ error: GUARANTEE_MIGRATION_MISSING }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Produsul nu a putut fi salvat.' }, { status: 500 });
   }
 
@@ -136,7 +167,9 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Galeria trebuie să conțină numai texte.' }, { status: 400 });
   }
 
-  const payload = buildPayload(body);
+  const built = buildFullPayload(body);
+  if (!built.ok) return built.response;
+  const { payload } = built;
   if (!hasGalleryKey(body)) {
     // Key entirely absent from the request: leave the existing gallery untouched
     // instead of wiping it with the [] that buildPayload defaults missing values to.
@@ -151,6 +184,9 @@ export async function PUT(request: Request) {
     .single();
 
   if (error) {
+    if (isMissingColumnError(error)) {
+      return NextResponse.json({ error: GUARANTEE_MIGRATION_MISSING }, { status: 409 });
+    }
     return NextResponse.json({ error: 'Produsul nu a putut fi actualizat.' }, { status: 500 });
   }
 

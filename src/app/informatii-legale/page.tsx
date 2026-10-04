@@ -65,11 +65,11 @@ export default function LegalInfoPage() {
               <ul>
                 <li><a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a></li>
                 <li><a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer">SAL ANPC</a></li>
-                <li><a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer">Platforma SOL/ODR a Comisiei Europene</a></li>
               </ul>
 
               <h2>6. Documente conexe</h2>
               <ul>
+                <li><Link href="/garantii">Garanții și drepturile consumatorului</Link></li>
                 <li><Link href="/termeni-si-conditii">Termeni și condiții</Link></li>
                 <li><Link href="/livrare-si-plata">Livrare și plată</Link></li>
                 <li><Link href="/politica-confidentialitate">Politica de confidențialitate / GDPR</Link></li>

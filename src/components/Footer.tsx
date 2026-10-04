@@ -22,6 +22,7 @@ const footerLinks = {
   ],
   Legal: [
     { label: 'Informații legale comerciant', href: '/informatii-legale' },
+    { label: 'Garanții și drepturile consumatorului', href: '/garantii' },
     { label: 'Termeni și condiții', href: '/termeni-si-conditii' },
     { label: 'Livrare și plată', href: '/livrare-si-plata' },
     { label: 'Politica de confidențialitate', href: '/politica-confidentialitate' },
@@ -106,15 +107,12 @@ export default function Footer() {
 
         <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 p-5">
           <h4 className="text-sm font-bold uppercase tracking-widest text-white/50">Protecția consumatorilor</h4>
-          <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-3">
+          <div className="mt-3 grid gap-3 text-sm text-white/60 md:grid-cols-2">
             <a href="https://anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               PROTECȚIA CONSUMATORILOR - A.N.P.C.
             </a>
             <a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer" className="hover:text-white">
               Soluționare alternativă litigii - SAL
-            </a>
-            <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="hover:text-white">
-              Soluționare online litigii - SOL/ODR
             </a>
           </div>
           <p className="mt-3 text-xs text-white/40">

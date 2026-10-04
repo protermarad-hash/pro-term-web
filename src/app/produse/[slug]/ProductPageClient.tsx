@@ -31,6 +31,9 @@ import {
 import { VAT_RATE, vatAmount } from '@/lib/constants';
 import { getMontajForBtu } from '@/lib/montaj';
 import BannerSlider from '@/components/BannerSlider';
+import ProductGuaranteeSection from '@/components/legal/ProductGuaranteeSection';
+import ProductConsumerInfo from '@/components/legal/ProductConsumerInfo';
+import type { ProductGuaranteeInfo } from '@/lib/consumer-guarantee';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -85,10 +88,11 @@ function getDiscountPercent(product: Product) {
 
 interface Props {
   product: Product;
+  guarantee: ProductGuaranteeInfo;
   related: Product[];
 }
 
-export default function ProductPageClient({ product, related }: Props) {
+export default function ProductPageClient({ product, guarantee, related }: Props) {
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -348,6 +352,8 @@ export default function ProductPageClient({ product, related }: Props) {
                   Prețul, stocul și disponibilitatea montajului se confirmă înainte de livrare/intervenție.
                 </p>
               </div>
+
+              <ProductGuaranteeSection productName={product.name} guarantee={guarantee} />
             </div>
           </div>
 
@@ -397,6 +403,10 @@ export default function ProductPageClient({ product, related }: Props) {
                 <p className="text-xs text-dark-300">PRO TERM oferă consultanță pentru alegerea corectă a echipamentului și pentru condițiile de montaj.</p>
               </div>
             </div>
+          </div>
+
+          <div className="mb-14 empty:hidden">
+            <ProductConsumerInfo guarantee={guarantee} />
           </div>
 
           {serviceProduct && (

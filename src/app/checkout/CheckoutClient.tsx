@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -21,6 +21,9 @@ import { BRAND_GRADIENT } from '@/lib/products';
 import { calculateShipping, getShippingMessage, SHIPPING_FREE_THRESHOLD } from '@/lib/shipping';
 import { getSupabaseAnonClient } from '@/lib/supabase';
 import { getCurrentAccessToken } from '@/lib/client-auth-fetch';
+import CheckoutGuaranteeInfo from '@/components/legal/CheckoutGuaranteeInfo';
+import { useGuaranteeLabelCheck } from '@/components/legal/useGuaranteeLabelCheck';
+import { GUARANTEE_CHECK_ERROR_MESSAGE, GUARANTEE_CHECK_LOADING_MESSAGE } from '@/lib/guarantee-label-check';
 
 const JUDETE = [
   'Alba', 'Arad', 'Argeș', 'Bacău', 'Bihor', 'Bistrița-Năsăud', 'Botoșani',
@@ -55,6 +58,9 @@ export default function CheckoutClient() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('ramburs');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // EU GARAN labels must be verified (and shown) before the order can be placed.
+  const productIds = useMemo(() => items.map(({ product }) => product.id), [items]);
+  const guaranteeCheck = useGuaranteeLabelCheck(productIds);
 
   // Pre-fill form from profile if authenticated
   useEffect(() => {
@@ -96,6 +102,12 @@ export default function CheckoutClient() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    // Fail closed: never send the order unless the guarantee check succeeded,
+    // even if the disabled button were bypassed.
+    if (guaranteeCheck.status !== 'ready') {
+      setError(guaranteeCheck.status === 'loading' ? GUARANTEE_CHECK_LOADING_MESSAGE : GUARANTEE_CHECK_ERROR_MESSAGE);
+      return;
+    }
     setError('');
     setSubmitting(true);
 
@@ -304,6 +316,13 @@ export default function CheckoutClient() {
                   <strong className="text-primary">Informații precontractuale:</strong> Prețurile sunt în RON cu TVA 21% inclus. Stocul și disponibilitatea livrării se confirmă de PRO TERM înainte de procesare. Drept de retragere 14 zile conform OUG 34/2014.
                 </div>
 
+                <CheckoutGuaranteeInfo
+                  items={items.map(({ product }) => ({ id: product.id, name: product.name }))}
+                  status={guaranteeCheck.status}
+                  labels={guaranteeCheck.labels}
+                  onRetry={guaranteeCheck.retry}
+                />
+
                 <label className="flex items-start gap-3 rounded-xl border border-gray-200 p-4 text-sm text-dark-300">
                   <input type="checkbox" required className="mt-1" />
                   <span>
@@ -316,8 +335,10 @@ export default function CheckoutClient() {
 
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="btn-primary w-full justify-center py-4 text-base disabled:opacity-60"
+                  disabled={submitting || guaranteeCheck.status !== 'ready'}
+                  aria-describedby={guaranteeCheck.status !== 'ready' ? 'checkout-guarantee-title' : undefined}
+                  data-testid="checkout-submit"
+                  className="btn-primary w-full justify-center py-4 text-base disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {submitting ? (
                     <><Loader2 size={20} className="animate-spin" /> Se procesează...</>
@@ -394,7 +415,7 @@ export default function CheckoutClient() {
 
                 <div className="card space-y-3">
                   {[
-                    'Garanție legală și comercială conform documentelor produsului',
+                    'Garanție legală de conformitate de minimum 2 ani pentru consumatori',
                     'Instalare profesională disponibilă în Arad și Timiș',
                     'Plată ramburs sau transfer bancar',
                     'Drept de retragere 14 zile pentru consumatori',

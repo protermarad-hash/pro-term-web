@@ -24,6 +24,7 @@ const staticRoutes: { path: string; priority: number; changeFrequency: MetadataR
   { path: '/contact', priority: 0.65, changeFrequency: 'monthly' },
   { path: '/blog', priority: 0.65, changeFrequency: 'weekly' },
   { path: '/informatii-legale', priority: 0.4, changeFrequency: 'monthly' },
+  { path: '/garantii', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/termeni-si-conditii', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/livrare-si-plata', priority: 0.4, changeFrequency: 'monthly' },
   { path: '/politica-confidentialitate', priority: 0.4, changeFrequency: 'monthly' },
