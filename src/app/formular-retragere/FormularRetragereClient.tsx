@@ -1,429 +1,208 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { getSupabaseAnonClient } from '@/lib/supabase';
+import {
+  WITHDRAWAL_CONFIRM_LABEL,
+  WITHDRAWAL_ENTRY_LABEL,
+  buildWithdrawalStatement,
+} from '@/lib/withdrawal';
 
 type FormState = {
   name: string;
-  address: string;
-  phone: string;
-  email: string;
   orderNumber: string;
-  products: string;
-  quantity: string;
-  pricePaid: string;
-  orderDate: string;
-  deliveryDate: string;
-  reason: string;
+  confirmationEmail: string;
   details: string;
-  refundMethod: string;
-  iban: string;
-  confirmed: boolean;
 };
-
-const REASONS = [
-  'M-am răzgândit',
-  'Produsul nu corespunde descrierii',
-  'Produs deteriorat / defect la livrare',
-  'Am comandat din greșeală',
-  'Altul',
-];
 
 const EMPTY: FormState = {
   name: '',
-  address: '',
-  phone: '',
-  email: '',
   orderNumber: '',
-  products: '',
-  quantity: '',
-  pricePaid: '',
-  orderDate: '',
-  deliveryDate: '',
-  reason: '',
+  confirmationEmail: '',
   details: '',
-  refundMethod: 'Transfer bancar',
-  iban: '',
-  confirmed: false,
 };
+
+const INPUT =
+  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-dark outline-none transition-colors focus:border-accent focus:ring-2 focus:ring-accent/30';
 
 export default function FormularRetragereClient() {
   const [form, setForm] = useState<FormState>(EMPTY);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [submissionId] = useState(() => crypto.randomUUID());
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [result, setResult] = useState<{ reference: string; submittedAt: string } | null>(null);
 
-  function set<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: '' }));
-  }
+  const statement = useMemo(
+    () => buildWithdrawalStatement({ name: form.name.trim(), orderNumber: form.orderNumber.trim() }),
+    [form.name, form.orderNumber],
+  );
 
-  function validate(): boolean {
-    const e: Partial<Record<keyof FormState, string>> = {};
-    if (!form.name.trim()) e.name = 'Câmp obligatoriu';
-    if (!form.address.trim()) e.address = 'Câmp obligatoriu';
-    if (!form.phone.trim()) e.phone = 'Câmp obligatoriu';
-    if (!form.email.trim()) e.email = 'Câmp obligatoriu';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Email invalid';
-    if (!form.orderNumber.trim()) e.orderNumber = 'Câmp obligatoriu';
-    if (!form.products.trim()) e.products = 'Câmp obligatoriu';
-    if (!form.quantity.trim()) e.quantity = 'Câmp obligatoriu';
-    else if (!Number.isInteger(Number(form.quantity)) || Number(form.quantity) <= 0) {
-      e.quantity = 'Introdu un număr întreg pozitiv';
+  function validateStepOne() {
+    if (!form.name.trim()) return 'Completează numele.';
+    if (!form.orderNumber.trim()) return 'Completează numărul comenzii sau identificarea contractului.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.confirmationEmail.trim())) {
+      return 'Introdu o adresă de email validă pentru confirmare.';
     }
-    if (!form.pricePaid.trim()) e.pricePaid = 'Câmp obligatoriu';
-    else if (isNaN(Number(form.pricePaid.replace(',', '.')))) e.pricePaid = 'Valoare numerică';
-    if (!form.orderDate) e.orderDate = 'Câmp obligatoriu';
-    if (!form.deliveryDate) e.deliveryDate = 'Câmp obligatoriu';
-    if (!form.reason) e.reason = 'Selectați un motiv';
-    if (form.refundMethod === 'Transfer bancar' && !form.iban.trim()) e.iban = 'IBAN obligatoriu';
-    if (!form.confirmed) e.confirmed = 'Trebuie să confirmați';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    if (form.details.length > 2000) return 'Detaliile suplimentare sunt prea lungi.';
+    return '';
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function continueToConfirmation(e: React.FormEvent) {
     e.preventDefault();
-    setServerError('');
-    if (!validate()) return;
+    const error = validateStepOne();
+    setServerError(error);
+    if (!error) setStep(2);
+  }
 
-    const supabase = getSupabaseAnonClient();
-    if (!supabase) {
-      setServerError('Serviciul nu este configurat momentan. Contactați-ne la 0749 025 610.');
-      return;
-    }
-
+  async function confirmWithdrawal() {
     setSubmitting(true);
+    setServerError('');
     try {
-      const { error } = await supabase
-        .from('retrageri')
-        .insert({
-          nume: form.name,
-          adresa: form.address,
-          telefon: form.phone,
-          email: form.email,
-          numar_comanda: form.orderNumber,
-          produs: form.products,
-          cantitate: Number.parseInt(form.quantity, 10),
-          pret: parseFloat(form.pricePaid.replace(',', '.')),
-          data_comanda: form.orderDate,
-          data_primire: form.deliveryDate,
-          motiv: form.reason,
-          detalii: form.details || null,
-          metoda_rambursare: form.refundMethod,
-          iban: form.iban || null,
-        });
-
-      if (error) {
-        setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
+      const response = await fetch('/api/withdrawal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId,
+          name: form.name.trim(),
+          orderNumber: form.orderNumber.trim(),
+          confirmationEmail: form.confirmationEmail.trim(),
+          details: form.details.trim() || undefined,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setServerError(data.error || 'Retragerea nu a putut fi transmisă.');
+        if (data.recorded && data.reference) {
+          setResult({ reference: data.reference, submittedAt: data.submittedAt });
+        }
         return;
       }
-      setSubmitted(true);
+      setResult({ reference: data.reference, submittedAt: data.submittedAt });
+      setStep(3);
     } catch {
-      setServerError('Solicitarea nu a putut fi trimisă. Te rugăm să încerci din nou.');
+      setServerError('Eroare de rețea. Retragerea nu a putut fi confirmată. Încearcă din nou.');
     } finally {
       setSubmitting(false);
     }
   }
 
-  if (submitted) {
+  if (step === 3 && result) {
+    const submitted = new Date(result.submittedAt).toLocaleString('ro-RO', {
+      timeZone: 'Europe/Bucharest',
+      dateStyle: 'long',
+      timeStyle: 'medium',
+    });
     return (
-      <div className="mx-auto max-w-xl rounded-3xl bg-white p-8 shadow-card text-center">
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mx-auto">
-          <svg
-            className="h-8 w-8 text-green-600"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-card">
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">✓</div>
+        <h1 className="font-heading text-2xl font-bold text-dark">Retragerea a fost transmisă</h1>
+        <p className="mt-3 text-dark-300">
+          Referință: <strong>{result.reference}</strong><br />
+          Data și ora: <strong>{submitted}</strong>
+        </p>
+        <p className="mt-4 text-sm text-dark-300">
+          Am trimis la <strong>{form.confirmationEmail}</strong> confirmarea pe email cu conținutul declarației,
+          data și ora transmiterii. Păstrează acel email.
+        </p>
+        <Link href="/" className="mt-6 inline-flex rounded-xl bg-primary px-5 py-3 font-semibold text-white">
+          Înapoi la site
+        </Link>
+      </div>
+    );
+  }
+
+  if (step === 2) {
+    return (
+      <div className="mx-auto max-w-2xl rounded-3xl bg-white p-6 shadow-card md:p-10">
+        <p className="text-sm font-bold uppercase tracking-widest text-accent">Pasul 2 din 2</p>
+        <h1 className="mt-2 font-heading text-3xl font-bold text-dark">Verifică declarația</h1>
+        <p className="mt-3 text-sm text-dark-300">
+          Retragerea este transmisă numai după apăsarea butonului „{WITHDRAWAL_CONFIRM_LABEL}”.
+        </p>
+
+        <div className="mt-6 rounded-2xl border border-slate-200 bg-light-200 p-5 text-sm text-dark-300">
+          <p className="font-semibold text-dark">Declarația ta</p>
+          <p className="mt-2">{statement}</p>
+          <dl className="mt-5 grid gap-3">
+            <div><dt className="font-semibold text-dark">Nume</dt><dd>{form.name}</dd></div>
+            <div><dt className="font-semibold text-dark">Comandă / contract</dt><dd>{form.orderNumber}</dd></div>
+            <div><dt className="font-semibold text-dark">Confirmarea se trimite la</dt><dd>{form.confirmationEmail}</dd></div>
+            {form.details && <div><dt className="font-semibold text-dark">Detalii suplimentare</dt><dd>{form.details}</dd></div>}
+          </dl>
         </div>
-        <h2 className="font-heading text-2xl font-bold text-dark mb-3">Cerere înregistrată</h2>
-        <p className="text-sm text-dark-300 mb-4">
-          Cererea ta de retragere a fost înregistrată. Te vom contacta în maxim{' '}
-          <strong>14 zile lucrătoare</strong>.
-        </p>
-        <p className="text-sm text-dark-300">
-          Întrebări?{' '}
-          <a href="tel:+40749025610" className="text-accent hover:underline">
-            0749 025 610
-          </a>{' '}
-          sau{' '}
-          <a href="mailto:proterm.arad@gmail.com" className="text-accent hover:underline">
-            proterm.arad@gmail.com
-          </a>
-        </p>
+
+        {serverError && (
+          <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {serverError}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
+          <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-slate-300 px-5 py-3 font-semibold text-dark">
+            Modifică datele
+          </button>
+          <button
+            type="button"
+            data-testid="withdrawal-confirm"
+            onClick={confirmWithdrawal}
+            disabled={submitting}
+            className="flex-1 rounded-xl bg-accent px-5 py-3 font-semibold text-white disabled:opacity-60"
+          >
+            {submitting ? 'Se transmite…' : WITHDRAWAL_CONFIRM_LABEL}
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="mx-auto max-w-3xl rounded-3xl bg-white p-6 shadow-card md:p-10"
-    >
-      <p className="mb-3 text-sm font-bold uppercase tracking-widest text-accent">
-        Formular electronic
-      </p>
-      <h1 className="font-heading text-3xl font-bold text-dark md:text-4xl">
-        Retragere din contract
-      </h1>
-      <p className="mt-3 text-sm text-dark-300">
-        Conform OUG 34/2014, aveți dreptul de retragere în 14 zile calendaristice de la primirea
-        produsului. Completați formularul de mai jos.
+    <form onSubmit={continueToConfirmation} className="mx-auto max-w-2xl rounded-3xl bg-white p-6 shadow-card md:p-10">
+      <p className="text-sm font-bold uppercase tracking-widest text-accent">Funcție online de retragere</p>
+      <h1 className="mt-2 font-heading text-3xl font-bold text-dark">Retragere din contract</h1>
+      <p className="mt-3 text-sm leading-6 text-dark-300">
+        Pentru contractele la distanță încheiate online, poți transmite declarația de retragere prin această funcție.
+        Nu trebuie să justifici decizia. Dreptul și eventualele excepții sunt explicate în{' '}
+        <Link href="/politica-retur" className="font-semibold text-primary hover:underline">Politica de retur</Link>.
       </p>
 
-      <div className="my-8 border-t border-slate-100" />
-
-      {/* Date consumator */}
-      <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
-          1. Date consumator
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Nume și prenume *" error={errors.name}>
-            <input
-              type="text"
-              value={form.name}
-              onChange={(e) => set('name', e.target.value)}
-              className={inputCls(errors.name)}
-              placeholder="Ion Popescu"
-              autoComplete="name"
-            />
-          </Field>
-          <Field label="Adresă completă *" error={errors.address}>
-            <input
-              type="text"
-              value={form.address}
-              onChange={(e) => set('address', e.target.value)}
-              className={inputCls(errors.address)}
-              placeholder="Str. Exemplu nr. 1, Cluj-Napoca"
-              autoComplete="street-address"
-            />
-          </Field>
-          <Field label="Telefon *" error={errors.phone}>
-            <input
-              type="tel"
-              value={form.phone}
-              onChange={(e) => set('phone', e.target.value)}
-              className={inputCls(errors.phone)}
-              placeholder="07xx xxx xxx"
-              autoComplete="tel"
-            />
-          </Field>
-          <Field label="Email *" error={errors.email}>
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => set('email', e.target.value)}
-              className={inputCls(errors.email)}
-              placeholder="ion.popescu@email.ro"
-              autoComplete="email"
-            />
-          </Field>
-        </div>
-      </section>
-
-      {/* Date comandă */}
-      <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
-          2. Date comandă
-        </h2>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Număr comandă / factură *" error={errors.orderNumber}>
-            <input
-              type="text"
-              value={form.orderNumber}
-              onChange={(e) => set('orderNumber', e.target.value)}
-              className={inputCls(errors.orderNumber)}
-              placeholder="CMD-2024-001"
-            />
-          </Field>
-          <Field label="Preț plătit (RON) *" error={errors.pricePaid}>
-            <input
-              type="text"
-              inputMode="decimal"
-              value={form.pricePaid}
-              onChange={(e) => set('pricePaid', e.target.value)}
-              className={inputCls(errors.pricePaid)}
-              placeholder="1200.00"
-            />
-          </Field>
-          <Field label="Data comenzii *" error={errors.orderDate}>
-            <input
-              type="date"
-              value={form.orderDate}
-              onChange={(e) => set('orderDate', e.target.value)}
-              className={inputCls(errors.orderDate)}
-              max={new Date().toISOString().slice(0, 10)}
-            />
-          </Field>
-          <Field label="Data primirii produsului *" error={errors.deliveryDate}>
-            <input
-              type="date"
-              value={form.deliveryDate}
-              onChange={(e) => set('deliveryDate', e.target.value)}
-              className={inputCls(errors.deliveryDate)}
-              max={new Date().toISOString().slice(0, 10)}
-            />
-          </Field>
-          <Field label="Produse returnate *" error={errors.products} className="sm:col-span-2">
-            <input
-              type="text"
-              value={form.products}
-              onChange={(e) => set('products', e.target.value)}
-              className={inputCls(errors.products)}
-              placeholder="Aer condiționat Gree 9000 BTU, model ABC-12"
-            />
-          </Field>
-          <Field label="Cantitate *" error={errors.quantity}>
-            <input
-              type="text"
-              inputMode="numeric"
-              value={form.quantity}
-              onChange={(e) => set('quantity', e.target.value)}
-              className={inputCls(errors.quantity)}
-              placeholder="1"
-            />
-          </Field>
-          <Field label="Motiv retragere *" error={errors.reason}>
-            <select
-              value={form.reason}
-              onChange={(e) => set('reason', e.target.value)}
-              className={inputCls(errors.reason)}
-            >
-              <option value="">— Selectați —</option>
-              {REASONS.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        <div className="mt-4">
-          <Field label="Detalii suplimentare (opțional)" error="">
-            <textarea
-              value={form.details}
-              onChange={(e) => set('details', e.target.value)}
-              className={`${inputCls('')} resize-none`}
-              rows={3}
-              placeholder="Orice informație relevantă..."
-            />
-          </Field>
-        </div>
-      </section>
-
-      {/* Rambursare */}
-      <section className="mb-8">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wide text-dark/50">
-          3. Metodă rambursare
-        </h2>
-        <div className="flex flex-col gap-3">
-          {['Transfer bancar', 'Ramburs la ridicare'].map((method) => (
-            <label key={method} className="flex cursor-pointer items-center gap-3">
-              <input
-                type="radio"
-                name="refundMethod"
-                value={method}
-                checked={form.refundMethod === method}
-                onChange={() => set('refundMethod', method)}
-                className="h-4 w-4 accent-accent"
-              />
-              <span className="text-sm text-dark">{method}</span>
-            </label>
-          ))}
-        </div>
-        {form.refundMethod === 'Transfer bancar' && (
-          <div className="mt-4">
-            <Field label="IBAN *" error={errors.iban}>
-              <input
-                type="text"
-                value={form.iban}
-                onChange={(e) => set('iban', e.target.value.toUpperCase())}
-                className={inputCls(errors.iban)}
-                placeholder="RO49AAAA1B31007593840000"
-                maxLength={34}
-              />
-            </Field>
-          </div>
-        )}
-      </section>
-
-      {/* Confirmare */}
-      <div className="mb-6 rounded-2xl border border-slate-200 bg-light-200 p-4">
-        <label className="flex cursor-pointer items-start gap-3">
-          <input
-            type="checkbox"
-            checked={form.confirmed}
-            onChange={(e) => set('confirmed', e.target.checked)}
-            className="mt-0.5 h-4 w-4 accent-accent"
-          />
-          <span className="text-sm text-dark-300">
-            Confirm că informațiile sunt corecte și că doresc să exercit dreptul de retragere. Am
-            citit{' '}
-            <Link href="/politica-retur" className="text-accent hover:underline">
-              Politica de retur
-            </Link>{' '}
-            și{' '}
-            <Link href="/termeni-si-conditii" className="text-accent hover:underline">
-              Termenii și condițiile
-            </Link>
-            .
-          </span>
+      <div className="mt-7 space-y-5">
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-dark">Nume și prenume *</span>
+          <input className={INPUT} required autoComplete="name" value={form.name}
+            onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))} />
         </label>
-        {errors.confirmed && (
-          <p className="mt-2 text-xs text-red-500">{errors.confirmed}</p>
-        )}
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-dark">Număr comandă / identificarea contractului *</span>
+          <input className={INPUT} required value={form.orderNumber}
+            onChange={(e) => setForm((p) => ({ ...p, orderNumber: e.target.value }))} />
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-dark">Email pentru confirmarea retragerii *</span>
+          <input className={INPUT} type="email" required autoComplete="email" value={form.confirmationEmail}
+            onChange={(e) => setForm((p) => ({ ...p, confirmationEmail: e.target.value }))} />
+          <span className="mt-1 block text-xs text-dark-300">Confirmarea retragerii va fi trimisă pe această adresă.</span>
+        </label>
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-dark">Detalii suplimentare (opțional)</span>
+          <textarea className={`${INPUT} resize-none`} rows={3} maxLength={2000} value={form.details}
+            onChange={(e) => setForm((p) => ({ ...p, details: e.target.value }))} />
+        </label>
       </div>
 
       {serverError && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {serverError}
         </div>
       )}
 
       <button
         type="submit"
-        disabled={submitting}
-        className="w-full rounded-xl bg-accent py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-accent/90 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-60"
+        data-testid="withdrawal-entry"
+        className="mt-7 w-full rounded-xl bg-accent px-5 py-3.5 text-base font-semibold text-white"
       >
-        {submitting ? 'Se înregistrează...' : 'Trimite cererea de retragere'}
+        {WITHDRAWAL_ENTRY_LABEL}
       </button>
     </form>
   );
-}
-
-function Field({
-  label,
-  error,
-  children,
-  className = '',
-}: {
-  label: string;
-  error: string | undefined;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={className}>
-      <label className="mb-1.5 block text-sm font-medium text-dark">{label}</label>
-      {children}
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
-    </div>
-  );
-}
-
-function inputCls(error: string | undefined): string {
-  return [
-    'w-full rounded-xl border px-3.5 py-2.5 text-sm text-dark outline-none transition-colors',
-    'placeholder:text-dark-300/50',
-    'focus:border-accent focus:ring-2 focus:ring-accent/30',
-    error ? 'border-red-400 bg-red-50' : 'border-slate-200 bg-white hover:border-slate-300',
-  ].join(' ');
 }
