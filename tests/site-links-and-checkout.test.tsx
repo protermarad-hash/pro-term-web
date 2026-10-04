@@ -74,16 +74,43 @@ describe('checkout', () => {
     { id: '22222222-2222-4222-8222-222222222222', name: 'Produs fără etichetă' },
   ];
 
+  const noop = () => {};
+  const label = getDurabilityLabel(parseProductGuaranteeInfo(eligibleRow)) as DurabilityLabelData;
+  const render = (status: 'loading' | 'ready' | 'error', labels: Record<string, DurabilityLabelData> = {}) =>
+    renderToStaticMarkup(<CheckoutGuaranteeInfo items={items} status={status} labels={labels} onRetry={noop} />);
+
   it('always offers the official notice before the order is placed', () => {
-    const html = renderToStaticMarkup(<CheckoutGuaranteeInfo items={items} initialLabels={{}} />);
-    assert.match(html, /data-testid="legal-guarantee-notice-trigger"/);
-    assert.match(html, /href="\/garantii"/);
-    assert.doesNotMatch(html, /data-testid="checkout-durability-labels"/);
+    for (const status of ['loading', 'ready', 'error'] as const) {
+      const html = render(status);
+      assert.match(html, /data-testid="legal-guarantee-notice-trigger"/, status);
+      assert.match(html, /href="\/garantii"/, status);
+    }
   });
 
-  it('shows the GARAN label only for the eligible cart item', () => {
-    const label = getDurabilityLabel(parseProductGuaranteeInfo(eligibleRow)) as DurabilityLabelData;
-    const html = renderToStaticMarkup(<CheckoutGuaranteeInfo items={items} initialLabels={{ [items[0].id]: label }} />);
+  it('loading: shows the verification message and no label', () => {
+    const html = render('loading', { [items[0].id]: label });
+    assert.match(html, /data-guarantee-status="loading"/);
+    assert.match(html, /Se verifică informațiile de garanție…/);
+    assert.match(html, /role="status"/);
+    assert.doesNotMatch(html, /data-testid="garan-label-trigger"/);
+  });
+
+  it('error: shows the error message with a retry button, never labels', () => {
+    const html = render('error', { [items[0].id]: label });
+    assert.match(html, /role="alert"/);
+    assert.match(html, /Nu am putut verifica informațiile de garanție\. Reîncearcă înainte de plasarea comenzii\./);
+    assert.match(html, /data-testid="guarantee-check-retry"/);
+    assert.doesNotMatch(html, /data-testid="garan-label-trigger"/);
+  });
+
+  it('ready without eligible products: no label, no message', () => {
+    const html = render('ready');
+    assert.doesNotMatch(html, /data-testid="checkout-durability-labels"/);
+    assert.doesNotMatch(html, /guarantee-check-(loading|error)/);
+  });
+
+  it('ready: shows the GARAN label only for the eligible cart item', () => {
+    const html = render('ready', { [items[0].id]: label });
     assert.match(html, /data-testid="checkout-durability-labels"/);
     assert.match(html, /Produs eligibil/);
     assert.equal(html.match(/data-testid="garan-label-trigger"/g)?.length, 1);
@@ -120,6 +147,28 @@ describe('terms and conditions – section 9 (guarantees)', () => {
     assert.match(section, /href="\/garantii"/);
     assert.match(section, /persoane juridice/);
     assert.match(section, /este suficientă o dovadă a achiziției/);
+  });
+});
+
+describe('terms and conditions – section 11 (complaints)', () => {
+  const html = renderToStaticMarkup(
+    <AuthProvider>
+      <CartProvider>
+        <TermsPage />
+      </CartProvider>
+    </AuthProvider>,
+  );
+  const section = html.slice(html.indexOf('11. Reclamații'), html.indexOf('12. Comunicări'));
+
+  it('no longer refers to the EU ODR platform (abolished by Reg. (UE) 2024/3228 from 20.07.2025)', () => {
+    assert.ok(section.length > 0);
+    assert.doesNotMatch(section, /SOL\/ODR|ODR|platforma SOL|ec\.europa\.eu\/consumers\/odr/);
+  });
+
+  it('keeps ANPC, SAL and the competent courts', () => {
+    assert.match(section, /href="https:\/\/anpc\.ro"/);
+    assert.match(section, /href="https:\/\/reclamatiisal\.anpc\.ro"/);
+    assert.match(section, /instanțelor competente/);
   });
 });
 

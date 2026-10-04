@@ -11,6 +11,11 @@ import {
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_IDS = 50;
 
+/** PostgreSQL / PostgREST "unknown column" (guarantee migration not applied). */
+export function isMissingColumnError(error: { code?: string } | null | undefined): boolean {
+  return error?.code === '42703' || error?.code === 'PGRST204';
+}
+
 export function sanitizeProductIds(ids: readonly string[]): string[] {
   return Array.from(new Set(ids.map((id) => id.trim()).filter((id) => UUID_PATTERN.test(id)))).slice(0, MAX_IDS);
 }
@@ -24,6 +29,7 @@ export function sanitizeProductIds(ids: readonly string[]): string[] {
 export async function fetchProductGuaranteeInfo(
   supabase: SupabaseClient,
   ids: readonly string[],
+  options: { strict?: boolean } = {},
 ): Promise<Map<string, ProductGuaranteeInfo>> {
   const result = new Map<string, ProductGuaranteeInfo>();
   const validIds = sanitizeProductIds(ids);
@@ -35,7 +41,15 @@ export async function fetchProductGuaranteeInfo(
     .in('id', validIds)
     .eq('active', true);
 
-  if (error || !Array.isArray(data)) return result;
+  if (error || !Array.isArray(data)) {
+    // Strict mode (checkout gate): only "column does not exist" — the migration
+    // is not applied, so no product can carry a GARAN label — is a valid
+    // empty result. Any other failure must surface as an error.
+    if (options.strict && !(error && isMissingColumnError(error))) {
+      throw new Error('Guarantee data could not be read.');
+    }
+    return result;
+  }
 
   for (const row of data as unknown as (DbProductGuaranteeRow & { id: string })[]) {
     result.set(row.id, parseProductGuaranteeInfo(row));

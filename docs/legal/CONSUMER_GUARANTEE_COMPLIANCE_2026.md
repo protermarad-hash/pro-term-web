@@ -64,12 +64,19 @@ Copiate byte-cu-byte din pachetele Comisiei
 |---|---|---|
 | **Pagina produsului**, imediat sub preț / stoc / „Adaugă în coș” | Secțiunea „Garanție și drepturile consumatorului”: text despre răspunderea vânzătorului, buton „Drepturile tale privind garanția legală” → notificarea completă la primul clic; eticheta GARAN imbricată (doar pentru produse eligibile) → eticheta completă la primul clic; garanția comercială din certificat (dacă e completată); distincția consumator/firmă; link `/garantii` | `src/components/legal/ProductGuaranteeSection.tsx`, `src/app/produse/[slug]/*` |
 | Pagina produsului, sub specificații | „Service, piese de schimb și reparare” – doar câmpurile completate | `src/components/legal/ProductConsumerInfo.tsx` |
-| **Checkout**, direct deasupra butonului „Comandă cu obligație de plată” | Acces la notificare + eticheta GARAN pentru fiecare produs eligibil din coș (date citite proaspăt din server) | `src/components/legal/CheckoutGuaranteeInfo.tsx`, `src/app/api/products/guarantee-labels/route.ts` |
+| **Checkout**, direct deasupra butonului „Comandă cu obligație de plată” | Acces la notificare + eticheta GARAN pentru fiecare produs eligibil din coș (date citite proaspăt din server). **Fail-closed:** comanda este blocată până când verificarea GARAN reușește (vezi mai jos) | `src/components/legal/CheckoutGuaranteeInfo.tsx`, `src/components/legal/useGuaranteeLabelCheck.ts`, `src/lib/guarantee-label-check.ts`, `src/app/api/products/guarantee-labels/route.ts` |
 | **`/garantii`** (nou) | Notificarea completă afișată inline + garanția legală (cu articolele din OUG 140/2021), garanția comercială, eticheta GARAN, procedura de sesizare, servicii post-vânzare, clienți persoane juridice, contact, temei legal | `src/app/garantii/page.tsx` |
 | **Footer** | Link „Garanții și drepturile consumatorului” (secțiunea Legal) | `src/components/Footer.tsx` |
 | Homepage (bloc A.N.P.C.), Informații legale, sitemap | Link către `/garantii` | `ConsumerProtectionNotice.tsx`, `informatii-legale/page.tsx`, `sitemap.ts` |
 | **E-mailul de confirmare a comenzii** | Notificarea oficială (PNG RGB) + link Your Europe + link `/garantii` | `src/lib/email.ts` |
 | **Admin produse** | Secțiunea „Garanții și informații pentru consumatori”, cu avertismentul obligatoriu pentru GARAN | `src/app/admin/AdminClient.tsx`, `src/app/api/admin/products/route.ts` |
+
+**Verificarea GARAN în checkout (fail-closed).** Starea verificării este `loading` → `ready` sau `error`, legată exact de produsele din coș (orice schimbare a coșului repornește verificarea).
+- `loading`: butonul de comandă este dezactivat, iar mesajul „Se verifică informațiile de garanție…” este vizibil.
+- `ready`: doar după un răspuns valid al serverului. Etichetele se afișează, iar un răspuns valid fără produse eligibile este acceptat.
+- `error` (HTTP ≠ 2xx, eroare de rețea, răspuns invalid): butonul rămâne dezactivat, apare mesajul „Nu am putut verifica informațiile de garanție. Reîncearcă înainte de plasarea comenzii.” și butonul „Reîncearcă verificarea”. O eroare nu este tratată niciodată ca „fără etichete”.
+- `handleSubmit` verifică explicit `status === 'ready'` înainte de orice POST către `/api/orders`, deci comanda este blocată și dacă butonul dezactivat ar fi ocolit.
+- Pe server, `/api/products/guarantee-labels` răspunde 503 dacă datele nu pot fi citite. Singura excepție este coloana inexistentă (`42703`, migrația neaplicată), situație în care niciun produs nu poate fi eligibil.
 
 Componentele oficiale nu sunt stilizate. Doar containerul (bordură, fundal, spațiere, titlu) urmează designul PRO TERM.
 
@@ -132,8 +139,8 @@ Constrângeri: `products_durability_guarantee_requires_data` (eticheta necesită
 
 ## 8. Teste și validare
 
-- `npm test` – 42 de teste (Node test runner, fără dependențe noi): logica de eligibilitate, validarea din admin, integritatea fișierelor oficiale, transformarea etichetei, randarea paginii de produs, footer, `/garantii`, sitemap, checkout, e-mail.
-- `npm run test:e2e` – 12 verificări în Chrome real (DevTools Protocol, fără dependențe noi) pe un server pornit (`BASE_URL`): desktop 1280, tabletă 820, mobil 390, Z Fold 280; tastatură; QR ≥ 2 cm; contrast. Eticheta GARAN este testată în checkout prin interceptarea răspunsului API **în browser**, fără nicio scriere în baza de date.
+- `npm test` – 57 de teste (Node test runner, fără dependențe noi): logica de eligibilitate, validarea din admin, integritatea fișierelor oficiale, transformarea etichetei, randarea paginii de produs, footer, `/garantii`, sitemap, checkout, e-mail.
+- `npm run test:e2e` – 18 verificări în Chrome real (inclusiv stările loading / ready / error / retry ale verificării GARAN din checkout; `/api/orders` este interceptat în browser, deci nu se creează comenzi) (DevTools Protocol, fără dependențe noi) pe un server pornit (`BASE_URL`): desktop 1280, tabletă 820, mobil 390, Z Fold 280; tastatură; QR ≥ 2 cm; contrast. Eticheta GARAN este testată în checkout prin interceptarea răspunsului API **în browser**, fără nicio scriere în baza de date.
 - Migrația a fost testată pe Postgres izolat (PGlite, în afara proiectului): aplicare dublă, valori implicite, constrângeri, compatibilitate cu payload-ul vechi.
 
 ## 9. Ordinea de punere în producție

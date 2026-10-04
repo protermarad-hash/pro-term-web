@@ -10,7 +10,8 @@
 //
 // The GARAN label is exercised on the checkout page by answering
 // /api/products/guarantee-labels inside the browser (network interception):
-// no database row is created or modified.
+// no database row is created or modified. Requests to /api/orders are always
+// answered inside the browser as well, so the checks can never place an order.
 import { spawn } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -322,24 +323,82 @@ async function main() {
     });
 
     console.log('\nCheckout');
-    await page.send('Fetch.enable', { patterns: [{ urlPattern: '*/api/products/guarantee-labels*', requestStage: 'Request' }] });
+    // Network router. /api/orders is ALWAYS answered inside the browser and
+    // never continued to the server (the local server may use the production
+    // database): no order can be created by these checks.
+    const net = { garanModes: ['label'], held: [], garanRequests: 0, orderPosts: 0 };
+    const fulfillJson = (requestId, status, body) => page.send('Fetch.fulfillRequest', {
+      requestId,
+      responseCode: status,
+      responseHeaders: [{ name: 'Content-Type', value: 'application/json' }],
+      body: Buffer.from(JSON.stringify(body)).toString('base64'),
+    });
+    const answerGaran = (requestId, mode) => {
+      if (mode === 'label') return fulfillJson(requestId, 200, { labels: { [product.id]: TEST_LABEL } });
+      if (mode === 'empty') return fulfillJson(requestId, 200, { labels: {} });
+      if (mode === 'error500') return fulfillJson(requestId, 500, { error: 'e2e' });
+      if (mode === 'network') return page.send('Fetch.failRequest', { requestId, errorReason: 'Failed' });
+      throw new Error(`unknown GARAN mode ${mode}`);
+    };
+    await page.send('Fetch.enable', {
+      patterns: [
+        { urlPattern: '*/api/products/guarantee-labels*', requestStage: 'Request' },
+        { urlPattern: '*/api/orders*', requestStage: 'Request' },
+      ],
+    });
     browser.cdp.listeners.push((msg) => {
       if (msg.method !== 'Fetch.requestPaused') return;
-      const body = Buffer.from(JSON.stringify({ labels: { [product.id]: TEST_LABEL } })).toString('base64');
-      page.send('Fetch.fulfillRequest', {
-        requestId: msg.params.requestId,
-        responseCode: 200,
-        responseHeaders: [{ name: 'Content-Type', value: 'application/json' }],
-        body,
-      });
+      const { requestId, request } = msg.params;
+      if (request.url.includes('/api/orders')) {
+        if (request.method === 'POST') net.orderPosts += 1;
+        fulfillJson(requestId, request.method === 'POST' ? 200 : 404,
+          request.method === 'POST' ? { orderId: '00000000-0000-4000-8000-00000000e2e0', orderRef: 'E2EMOCK' } : { error: 'e2e' });
+        return;
+      }
+      net.garanRequests += 1;
+      // Modes are consumed per request; the last one repeats.
+      const mode = net.garanModes.length > 1 ? net.garanModes.shift() : net.garanModes[0];
+      if (mode === 'hold') net.held.push(requestId);
+      else answerGaran(requestId, mode);
     });
+    const releaseHeld = async (mode) => {
+      while (net.held.length) await answerGaran(net.held.shift(), mode);
+    };
+    const openCheckout = async (modes) => {
+      net.garanModes = [...modes];
+      net.held = [];
+      await page.goto(`${BASE_URL}/`);
+      await page.eval(`localStorage.setItem('proterm_cart', ${JSON.stringify(JSON.stringify([{ product, quantity: 1 }]))})`);
+      await page.goto(`${BASE_URL}/checkout`);
+    };
+    const STATUS = `document.querySelector('[data-testid="checkout-guarantee-info"]')?.dataset.guaranteeStatus`;
+    const SUBMIT_DISABLED = `document.querySelector('[data-testid="checkout-submit"]').disabled`;
+    const fillCheckoutForm = () => page.eval(`(() => {
+      const set = (el, value) => {
+        const proto = el.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype;
+        Object.getOwnPropertyDescriptor(proto, 'value').set.call(el, value);
+        el.dispatchEvent(new Event(el.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
+      };
+      const form = document.querySelector('form');
+      const values = { firstName: 'Test', lastName: 'E2E', email: 'e2e@example.invalid', phone: '0700000000', address: 'Strada Test 1', city: 'Arad' };
+      for (const [name, value] of Object.entries(values)) set(form.querySelector('[name="' + name + '"]'), value);
+      set(form.querySelector('select[name="county"]'), 'Arad');
+      const terms = form.querySelector('input[type="checkbox"][required]');
+      if (!terms.checked) terms.click();
+      return form.checkValidity();
+    })()`);
+    // Clicks the button AND submits programmatically (bypassing the disabled
+    // button), so the guard inside handleSubmit is exercised too.
+    const attemptSubmit = () => page.eval(`(() => {
+      document.querySelector('[data-testid="checkout-submit"]').click();
+      document.querySelector('form').requestSubmit();
+      return true;
+    })()`);
 
     for (const name of ['desktop', 'mobile', 'zfold']) {
       await check(`[${name}] guarantee info + GARAN label directly above the order button`, async () => {
         await page.viewport(name);
-        await page.goto(`${BASE_URL}/`);
-        await page.eval(`localStorage.setItem('proterm_cart', ${JSON.stringify(JSON.stringify([{ product, quantity: 1 }]))})`);
-        await page.goto(`${BASE_URL}/checkout`);
+        await openCheckout(['label']);
         await page.waitUntil(`!!document.querySelector('[data-testid="garan-label-trigger"] svg')`);
         const info = await page.eval(`(() => {
           const block = document.querySelector('[data-testid="checkout-guarantee-info"]');
@@ -365,7 +424,7 @@ async function main() {
 
     await check('[mobile] tap opens the complete GARAN label with producer, model and a ≥ 2 cm QR code', async () => {
       await page.viewport('mobile');
-      await page.goto(`${BASE_URL}/checkout`);
+      await openCheckout(['label']);
       await page.waitUntil(`!!document.querySelector('[data-testid="garan-label-trigger"] svg')`);
       await page.eval(`document.querySelector('[data-testid="garan-label-trigger"]').click()`);
       await page.waitUntil(`!!document.querySelector('dialog[open] [data-testid="garan-label-full"] svg[viewBox="0 0 269.29 283.46"]')`);
@@ -391,6 +450,80 @@ async function main() {
       assert(info.fullyVisible, 'the complete label is not fully visible in the dialog at 390 px');
       await page.screenshot('checkout-garan-full-label-mobile');
       await page.press('Escape');
+    });
+
+    console.log('\nCheckout – GARAN verification is fail-closed');
+    await page.viewport('desktop');
+
+    await check('TEST 1 loading: order button disabled and submit blocked while the check is pending', async () => {
+      await openCheckout(['hold']);
+      await page.waitUntil(`${STATUS} === 'loading' && !!document.querySelector('[data-testid="guarantee-check-loading"]')`);
+      assert(net.held.length > 0, 'GARAN request was not held');
+      assert(await fillCheckoutForm(), 'checkout form is not valid – the check would prove nothing');
+      assert(await page.eval(SUBMIT_DISABLED), 'order button enabled while the check is pending');
+      const postsBefore = net.orderPosts;
+      await attemptSubmit();
+      await delay(1000);
+      assert(net.orderPosts === postsBefore, 'POST /api/orders was sent during loading');
+      await page.screenshot('checkout-garan-loading');
+      await releaseHeld('empty');
+    });
+
+    await check('TEST 2 eligible product: label shown, button enabled only after the valid response', async () => {
+      await openCheckout(['hold']);
+      await page.waitUntil(`${STATUS} === 'loading'`);
+      assert(await page.eval(SUBMIT_DISABLED), 'button enabled before the response');
+      assert(!(await page.eval(`!!document.querySelector('[data-testid="garan-label-trigger"]')`)), 'label shown before the response');
+      await releaseHeld('label');
+      await page.waitUntil(`${STATUS} === 'ready' && !!document.querySelector('[data-testid="garan-label-trigger"] svg')`);
+      assert(!(await page.eval(SUBMIT_DISABLED)), 'button still disabled after a valid response');
+      await page.eval(`document.querySelector('[data-testid="checkout-guarantee-info"]').scrollIntoView({ block: 'center', behavior: 'instant' })`);
+      await page.screenshot('checkout-garan-ready-label');
+    });
+
+    await check('TEST 3 no eligible product: valid empty response → ready, button enabled, no label', async () => {
+      await openCheckout(['empty']);
+      await page.waitUntil(`${STATUS} === 'ready'`);
+      assert(!(await page.eval(SUBMIT_DISABLED)), 'button disabled although the check succeeded');
+      assert(!(await page.eval(`!!document.querySelector('[data-testid="checkout-durability-labels"]')`)), 'label shown without eligible product');
+    });
+
+    for (const mode of ['error500', 'network']) {
+      await check(`TEST 4 API ${mode === 'error500' ? 'HTTP 500' : 'network error'}: error shown, button disabled, no POST /api/orders`, async () => {
+        await openCheckout([mode]);
+        await page.waitUntil(`${STATUS} === 'error'`);
+        const message = await page.eval(`document.querySelector('[data-testid="guarantee-check-error"]').innerText`);
+        assert(message.includes('Nu am putut verifica informațiile de garanție. Reîncearcă înainte de plasarea comenzii.'), `unexpected message: ${message}`);
+        assert(await page.eval(`!!document.querySelector('[data-testid="guarantee-check-retry"]')`), 'retry button missing');
+        assert(await fillCheckoutForm(), 'checkout form is not valid');
+        assert(await page.eval(SUBMIT_DISABLED), 'order button enabled after a failed check');
+        const postsBefore = net.orderPosts;
+        await attemptSubmit();
+        await delay(1000);
+        assert(net.orderPosts === postsBefore, 'POST /api/orders was sent after a failed check');
+        assert(await page.eval(`location.pathname === '/checkout'`), 'left the checkout page');
+        if (mode === 'error500') {
+          await page.eval(`document.querySelector('[data-testid="checkout-guarantee-info"]').scrollIntoView({ block: 'center', behavior: 'instant' })`);
+          await page.screenshot('checkout-garan-error');
+        }
+      });
+    }
+
+    await check('TEST 5 retry: first request fails, retry succeeds → ready, order can be placed (mocked /api/orders)', async () => {
+      await openCheckout(['error500', 'empty']);
+      await page.waitUntil(`${STATUS} === 'error'`);
+      assert(await page.eval(SUBMIT_DISABLED), 'button enabled after the failed first request');
+      const requestsBefore = net.garanRequests;
+      await page.eval(`document.querySelector('[data-testid="guarantee-check-retry"]').click()`);
+      await page.waitUntil(`${STATUS} === 'ready'`);
+      assert(net.garanRequests === requestsBefore + 1, 'retry did not send a new request');
+      assert(!(await page.eval(SUBMIT_DISABLED)), 'button still disabled after a successful retry');
+      assert(await fillCheckoutForm(), 'checkout form is not valid');
+      const postsBefore = net.orderPosts;
+      await page.eval(`document.querySelector('[data-testid="checkout-submit"]').click()`);
+      const start = Date.now();
+      while (net.orderPosts === postsBefore && Date.now() - start < 5000) await delay(100);
+      assert(net.orderPosts === postsBefore + 1, 'the order was not submitted after a successful retry');
     });
   } finally {
     await browser.close();

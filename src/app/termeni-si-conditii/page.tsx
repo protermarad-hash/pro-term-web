@@ -117,7 +117,7 @@ export default function TermsPage() {
                 Reclamațiile pot fi transmise la <a href="mailto:office@pro-term.ro">office@pro-term.ro</a> sau telefonic la <a href="tel:+40749025610">0749 025 610</a>. Vom încerca soluționarea amiabilă într-un termen rezonabil.
               </p>
               <p>
-                Consumatorii pot apela și la ANPC, la mecanismele de soluționare alternativă a litigiilor sau la platforma SOL/ODR a Comisiei Europene, conform legislației aplicabile. Linkurile sunt disponibile în pagina <Link href="/informatii-legale">Informații legale comerciant</Link>.
+                Consumatorii se pot adresa și Autorității Naționale pentru Protecția Consumatorilor (<a href="https://anpc.ro" target="_blank" rel="noopener noreferrer">ANPC</a>), pot apela la procedurile de soluționare alternativă a litigiilor (<a href="https://reclamatiisal.anpc.ro" target="_blank" rel="noopener noreferrer">SAL</a>), conform legislației aplicabile, sau se pot adresa instanțelor competente. Datele de contact ale PRO TERM sunt disponibile în pagina <Link href="/informatii-legale">Informații legale comerciant</Link>.
               </p>
 
               <h2>12. Comunicări comerciale</h2>
