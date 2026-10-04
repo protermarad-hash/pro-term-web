@@ -34,6 +34,26 @@ De verificat/implementat:
 - verificare homepage, footer, informații legale și termeni;
 - test automat care previne reapariția URL-urilor ODR vechi.
 
+#### Stare LEGAL-2A (PR #13) — implementat, cu o decizie deschisă
+
+Text verificat în Portal Legislativ (Ordinul 449/2022, forma actualizată; Ordinul 270/2026, M.Of. nr. 420/19.05.2026):
+- art. 2 alin. (1): pictogramele din anexa nr. 2 se afișează „pe prima pagină a site-ului - home page”. Comunicatele de presă menționează și „bara de meniu”, dar textul ordinului nu o cere.
+- art. 2 alin. (2): pictograma are „250 (L) x 50 (H) pixeli” și „un link extern către platforma electronică SAL, disponibilă la adresa: https://reclamatiisal.anpc.ro”.
+- art. 2 alin. (3): pictograma se descarcă de pe site-ul oficial ANPC.
+
+| Cerință | Stare |
+|---|---|
+| Eliminare SOL/ODR (Reg. (UE) 2024/3228, platformă desființată la 20.07.2025) | ✅ Footer, Informații legale, Termeni secț. 11; teste regresive pe homepage, footer, Informații legale, Termeni, `/garantii` |
+| Pictograma SAL oficială pe homepage | ✅ `ConsumerProtectionNotice` (blocul „Informare consumatori”), lângă linkurile ANPC și `/garantii` |
+| Asset oficial, nemodificat | ✅ `public/legal/anpc-sal-pictograma.png` = „PICTOGRAMA SAL ONLINE” de pe <https://anpc.ro/sal> (`/download/sal/SAL-PICTOGRAMA.png`, Last-Modified 04.05.2026), byte-identic, SHA-256 `22c8a456…15d5ed` verificat în `tests/legal-assets.test.ts` |
+| 250 × 50 px | ✅ Zona-link și elementul imagine au exact 250 × 50 px în Chrome, la 1280, 390 și 280 px |
+| Link `https://reclamatiisal.anpc.ro` | ✅ href exact, filă nouă, accesibil de la tastatură, text alternativ |
+| Teste | ✅ `tests/homepage-sal.test.tsx` (homepage randat integral), E2E `npm run test:e2e` |
+
+**Decizie deschisă:** fișierul oficial ANPC are **201 × 50 px**, iar și versiunea vectorială (`pictogramaSAL.tif`, 680 × 169) are același raport (≈ 4,02 : 1). ANPC nu publică o variantă 250 × 50 (5 : 1). Ca să nu deformăm pictograma oficială, elementul are exact 250 × 50 px, iar graficul este afișat nedeformat în interior (`object-fit: contain`). Recomandare: confirmare cu ANPC (Direcția SAL). Dacă se cere întinderea, se schimbă doar clasa CSS.
+
+Rămâne în afara site-ului: **placheta SAL fizică** (art. 1, anexa nr. 1, minimum 16 × 16 cm) în spațiul de comercializare, dacă există spațiu deschis consumatorilor — acțiune manuală PRO TERM, descărcare de pe <https://anpc.ro/sal>.
+
 ## Prioritate P1 — produse fizice HVAC
 
 ### LEGAL-3 — GPSR / siguranța generală a produselor

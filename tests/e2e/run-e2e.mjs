@@ -255,6 +255,37 @@ async function main() {
       });
     }
 
+    console.log('\nHomepage – ANPC SAL pictogram (Ordinul ANPC 449/2022, mod. 270/2026)');
+    for (const name of ['desktop', 'mobile', 'zfold']) {
+      await check(`[${name}] SAL pictogram 250 × 50 px, linked to reclamatiisal.anpc.ro, no ODR`, async () => {
+        await page.viewport(name);
+        await page.goto(`${BASE_URL}/`);
+        await page.eval(`document.querySelector('[data-testid="anpc-sal-pictogram"]').scrollIntoView({ block: 'center', behavior: 'instant' })`);
+        await page.waitUntil(`(() => { const i = document.querySelector('[data-testid="anpc-sal-pictogram"] img'); return !!i && i.complete && i.naturalWidth > 0; })()`);
+        const info = await page.eval(`(() => {
+          const a = document.querySelector('[data-testid="anpc-sal-pictogram"]');
+          const img = a.querySelector('img');
+          const ar = a.getBoundingClientRect(), ir = img.getBoundingClientRect();
+          a.focus();
+          return { href: a.getAttribute('href'), target: a.getAttribute('target'),
+                   anchor: [ar.width, ar.height], img: [ir.width, ir.height],
+                   natural: [img.naturalWidth, img.naturalHeight], fit: getComputedStyle(img).objectFit,
+                   left: ar.left, right: ar.right, layoutWidth: window.innerWidth, requested: window.__e2eWidth,
+                   focused: document.activeElement === a,
+                   odr: /ODR|SOL\\/|platforma SOL|consumers\\/odr|online dispute|soluționare online/i.test(document.documentElement.outerHTML) };
+        })()`);
+        assert(info.href === 'https://reclamatiisal.anpc.ro', `href is ${info.href}`);
+        assert(info.anchor[0] === 250 && info.anchor[1] === 50, `link area is ${info.anchor.join(' × ')}`);
+        assert(info.img[0] === 250 && info.img[1] === 50, `pictogram box is ${info.img.join(' × ')}`);
+        assert(info.natural[0] === 201 && info.natural[1] === 50, `not the official file: ${info.natural.join(' × ')}`);
+        assert(info.fit === 'contain', 'pictogram could be distorted (object-fit is not contain)');
+        assert(info.left >= 0 && info.right <= info.requested, `pictogram outside the ${info.requested}px viewport (${info.left}–${info.right})`);
+        assert(info.focused, 'pictogram link is not keyboard-focusable');
+        assert(!info.odr, 'homepage still references the ODR platform');
+        await page.screenshot(`home-sal-${name}`);
+      });
+    }
+
     console.log('\nProduct page');
     for (const name of ['desktop', 'zfold']) {
       await check(`[${name}] guarantee section next to price/CTA, no GARAN label by default, section fits its column`, async () => {

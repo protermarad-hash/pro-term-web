@@ -4,6 +4,7 @@ Document intern PRO TERM. Ultima actualizare: **04.10.2026**.
 Branch de implementare: `feature/legal-guarantee-compliance-2026` (bază `origin/main` @ `a46c8ac`).
 
 > Acest document descrie implementarea tehnică și interpretarea folosită. Nu este consultanță juridică.
+> Celelalte obligații e-commerce (SOL/ODR, pictograma SAL ANPC, placheta SAL) sunt urmărite în [ECOMMERCE_LEGAL_COMPLIANCE_ROADMAP_2026.md](ECOMMERCE_LEGAL_COMPLIANCE_ROADMAP_2026.md).
 > Punctele marcate „Decizie necesară” trebuie confirmate de PRO TERM (eventual cu un jurist).
 
 ---
@@ -139,8 +140,8 @@ Constrângeri: `products_durability_guarantee_requires_data` (eticheta necesită
 
 ## 8. Teste și validare
 
-- `npm test` – 57 de teste (Node test runner, fără dependențe noi): logica de eligibilitate, validarea din admin, integritatea fișierelor oficiale, transformarea etichetei, randarea paginii de produs, footer, `/garantii`, sitemap, checkout, e-mail.
-- `npm run test:e2e` – 18 verificări în Chrome real (inclusiv stările loading / ready / error / retry ale verificării GARAN din checkout; `/api/orders` este interceptat în browser, deci nu se creează comenzi) (DevTools Protocol, fără dependențe noi) pe un server pornit (`BASE_URL`): desktop 1280, tabletă 820, mobil 390, Z Fold 280; tastatură; QR ≥ 2 cm; contrast. Eticheta GARAN este testată în checkout prin interceptarea răspunsului API **în browser**, fără nicio scriere în baza de date.
+- `npm test` – 67 de teste (Node test runner, fără dependențe noi): logica de eligibilitate, validarea din admin, integritatea fișierelor oficiale, transformarea etichetei, randarea paginii de produs, footer, `/garantii`, sitemap, checkout, e-mail.
+- `npm run test:e2e` – 21 de verificări în Chrome real (inclusiv stările loading / ready / error / retry ale verificării GARAN din checkout; `/api/orders` este interceptat în browser, deci nu se creează comenzi) (DevTools Protocol, fără dependențe noi) pe un server pornit (`BASE_URL`): desktop 1280, tabletă 820, mobil 390, Z Fold 280; tastatură; QR ≥ 2 cm; contrast. Eticheta GARAN este testată în checkout prin interceptarea răspunsului API **în browser**, fără nicio scriere în baza de date.
 - Migrația a fost testată pe Postgres izolat (PGlite, în afara proiectului): aplicare dublă, valori implicite, constrângeri, compatibilitate cu payload-ul vechi.
 
 ## 9. Ordinea de punere în producție

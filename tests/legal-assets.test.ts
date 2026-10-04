@@ -16,6 +16,9 @@ const OFFICIAL_FILES: Record<string, string> = {
   '/legal/eu-notificare-garantie-legala-ro.png': '51d641e25d29a9cd4d087a6540d474ade46fd52b2e38f1ac65befb1108caa032',
   '/legal/eu-eticheta-garan-color.svg': '3414c8366823db39702d2557e614f882b530487ce589e903afdc98b7225e1ab1',
   '/legal/eu-eticheta-garan-imbricata.svg': '1c1122b25f39333b329e4156b572b65f1f850592df0b061358b9404f43acb994',
+  // ANPC "PICTOGRAMA SAL ONLINE", https://www.anpc.ro/download/sal/SAL-PICTOGRAMA.png
+  // (Last-Modified 04.05.2026), Ordinul ANPC nr. 449/2022 as amended by nr. 270/2026.
+  '/legal/anpc-sal-pictograma.png': '22c8a45600aecb9db935d536691766a99b71f4ceb5153ce34681d8788c15d5ed',
 };
 
 function read(publicPath: string): Buffer {
