@@ -4,6 +4,7 @@ import Hero from '@/components/Hero';
 import FeaturedProducts from '@/components/FeaturedProducts';
 import PartnerBanners from '@/components/PartnerBanners';
 import MideaBanner from '@/components/MideaBanner';
+import MideaSolsticeBanner from '@/components/MideaSolsticeBanner';
 import BannerSlider from '@/components/BannerSlider';
 import Services from '@/components/Services';
 import About from '@/components/About';
@@ -34,6 +35,7 @@ export default function Home() {
         <Hero />
         <Services />
         <MideaBanner />
+        <MideaSolsticeBanner />
         <section className="container mx-auto px-4 py-8">
           <h2 className="mb-4 font-heading text-2xl font-bold text-dark md:text-3xl">
             De ce să alegi Midea Breezeless E?

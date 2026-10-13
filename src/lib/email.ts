@@ -289,3 +289,61 @@ export async function sendContactRequest(d: ContactRequestData): Promise<void> {
     throw new Error(`Resend error: ${result.error.message || 'trimitere eșuată'}`);
   }
 }
+
+export interface MideaSolsticeRevertFailure {
+  slug: string;
+  error?: string;
+  conflict?: boolean;
+  identityMismatch?: boolean;
+}
+
+/**
+ * Alertă prin email (nu doar log) când revenirea automată a prețurilor
+ * campaniei Midea Solstice eșuează pentru cel puțin un produs — admin-ul
+ * trebuie să intervină manual (vezi scripts/midea-solstice-pricing.ts).
+ * Aruncă dacă trimiterea nu poate fi confirmată, la fel ca sendContactRequest;
+ * apelantul (ruta de cron) tratează eroarea fără a opri restul procesării.
+ */
+export async function sendMideaSolsticeRevertAlert(failures: MideaSolsticeRevertFailure[]): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY lipsă — alertă netrimisă.');
+  }
+  if (failures.length === 0) return;
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const when = new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+
+  const rows = failures
+    .map((f) => {
+      const reason = f.identityMismatch
+        ? 'SKU nu corespunde celui așteptat'
+        : f.conflict
+          ? 'preț modificat concurent (probabil din admin) — nicio scriere efectuată'
+          : 'eroare tehnică';
+      return `<tr><td style="padding:6px 0;color:#6b7280;">${escapeHtml(f.slug)}</td><td style="padding:6px 0;">${escapeHtml(reason)}</td><td style="padding:6px 0;">${escapeHtml(f.error ?? '')}</td></tr>`;
+    })
+    .join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="ro"><body style="font-family:sans-serif;color:#111827;">
+  <h2 style="color:#b91c1c;">Revenire preț Midea Solstice — acțiune necesară</h2>
+  <p>Revenirea automată la prețurile normale (după expirarea campaniei) a eșuat pentru ${failures.length} produs(e), la ${escapeHtml(when)}.</p>
+  <table style="border-collapse:collapse;width:100%;font-size:13px;">
+    <tr><th style="text-align:left;padding:6px 0;">Slug</th><th style="text-align:left;padding:6px 0;">Motiv</th><th style="text-align:left;padding:6px 0;">Detaliu</th></tr>
+    ${rows}
+  </table>
+  <p style="margin-top:16px;">Verifică prețul manual în admin sau rulează:<br>
+  <code>npx tsx scripts/midea-solstice-pricing.ts --mode=normal --apply</code></p>
+</body></html>`;
+
+  const result = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
+    subject: `⚠️ Midea Solstice — revenire preț eșuată (${failures.length} produs${failures.length > 1 ? 'e' : ''})`,
+    html,
+  });
+
+  if (result.error) {
+    throw new Error(`Resend error: ${result.error.message || 'trimitere eșuată'}`);
+  }
+}
