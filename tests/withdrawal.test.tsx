@@ -41,13 +41,45 @@ describe('online withdrawal function – OUG 34/2014 art. 11^1', () => {
   });
 
   it('uses a distinct second confirmation function', () => {
+    // Checks the actual wiring (which function each step's action calls),
+    // not the presence of a literal string in the file — the component only
+    // ever references the label through the imported WITHDRAWAL_CONFIRM_LABEL
+    // constant, so searching for the literal text can never match.
     const source = readFileSync(
       path.join(process.cwd(), 'src/app/formular-retragere/FormularRetragereClient.tsx'),
       'utf8',
     );
-    assert.ok(source.includes('data-testid="withdrawal-entry"'));
-    assert.ok(source.includes('data-testid="withdrawal-confirm"'));
-    assert.ok(source.includes(WITHDRAWAL_CONFIRM_LABEL));
+
+    const entryButton = source.match(/<button[^>]*data-testid="withdrawal-entry"[\s\S]{0,500}?<\/button>/)?.[0];
+    const confirmButton = source.match(/<button[^>]*data-testid="withdrawal-confirm"[\s\S]{0,500}?<\/button>/)?.[0];
+    assert.ok(entryButton, 'step 1 "withdrawal-entry" button not found');
+    assert.ok(confirmButton, 'step 2 "withdrawal-confirm" button not found');
+
+    // Step 1 is a plain form submit (type="submit"); its handler lives on the
+    // enclosing <form onSubmit={...}>, not on the button itself.
+    const entryHandler = source.match(/<form[^>]*onSubmit=\{(\w+)\}[\s\S]*?data-testid="withdrawal-entry"/)?.[1];
+    const confirmHandler = confirmButton?.match(/onClick=\{(\w+)\}/)?.[1];
+    assert.ok(entryHandler, 'step 1 submit handler not found');
+    assert.ok(confirmHandler, 'step 2 confirm handler not found');
+    assert.notEqual(confirmHandler, entryHandler, 'the two steps must use distinct handler functions');
+
+    // The confirm step's handler must be the one doing the actual submission.
+    const confirmHandlerBody = source.match(
+      new RegExp(`function ${confirmHandler}\\s*\\([\\s\\S]*?\\n  \\}`),
+    )?.[0];
+    assert.ok(confirmHandlerBody?.includes("fetch('/api/withdrawal'"), 'confirm handler must perform the actual withdrawal submission');
+
+    // The entry step only validates and advances to step 2 — it must not
+    // itself call the withdrawal API (that would collapse the two steps).
+    const entryHandlerBody = source.match(
+      new RegExp(`function ${entryHandler}\\s*\\([\\s\\S]*?\\n  \\}`),
+    )?.[0];
+    assert.ok(entryHandlerBody && !entryHandlerBody.includes("fetch('/api/withdrawal'"), 'entry handler must not submit the withdrawal itself');
+
+    // The confirm button renders the shared label constant (not a duplicated
+    // string), and that constant itself must be a real, non-empty label.
+    assert.match(confirmButton as string, /WITHDRAWAL_CONFIRM_LABEL/);
+    assert.ok(WITHDRAWAL_CONFIRM_LABEL.trim().length > 0, 'WITHDRAWAL_CONFIRM_LABEL must not be empty');
   });
 
   it('durable-medium email contains declaration, contract, reference and transmission timestamp', () => {
