@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/revert-midea-solstice-pricing",
+      "schedule": "15 22 * * *"
+    }
+  ]
+}
