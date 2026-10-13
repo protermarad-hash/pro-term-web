@@ -12,6 +12,8 @@ import {
   sendOrderNotificationToAdmin,
   type OrderEmailData,
 } from '@/lib/email';
+import { assertOrderGuaranteeVerified } from '@/lib/consumer-guarantee-server';
+import { GUARANTEE_CHECK_ERROR_MESSAGE } from '@/lib/guarantee-label-check';
 
 export async function POST(request: Request) {
   const auth = await authenticateRequest(request, { optional: true });
@@ -39,6 +41,26 @@ export async function POST(request: Request) {
   const items = Array.isArray(body.items) ? body.items : [];
   if (items.length === 0) {
     return NextResponse.json({ error: 'Coșul este gol.' }, { status: 400 });
+  }
+  for (const item of items) {
+    const id = (item as Record<string, unknown> | null)?.id;
+    if (!item || typeof item !== 'object' || typeof id !== 'string' || !id.trim()) {
+      return NextResponse.json({ error: 'Date comandă invalide.' }, { status: 400 });
+    }
+  }
+
+  // GARAN fail-closed gate (OUG 34/2014 art. 8 alin. (2)): re-verified here,
+  // server-side, from the database — never trusted from the client — so a
+  // POST sent directly to this endpoint cannot bypass the checkout's
+  // guarantee-label check. A failed/incomplete verification blocks the order.
+  const productIds = Array.from(
+    new Set(items.map((item) => (item as { id: string }).id)),
+  );
+  try {
+    await assertOrderGuaranteeVerified(supabase, productIds);
+  } catch (err) {
+    console.error('[orders] guarantee verification failed:', err instanceof Error ? err.message : err);
+    return NextResponse.json({ error: GUARANTEE_CHECK_ERROR_MESSAGE }, { status: 503 });
   }
 
   const subtotal = Number(body.subtotal) || 0;

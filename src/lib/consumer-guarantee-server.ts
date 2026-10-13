@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   PRODUCT_GUARANTEE_COLUMNS,
   parseProductGuaranteeInfo,
+  getDurabilityLabel,
   type DbProductGuaranteeRow,
   type ProductGuaranteeInfo,
 } from '@/lib/consumer-guarantee';
@@ -55,4 +56,29 @@ export async function fetchProductGuaranteeInfo(
     result.set(row.id, parseProductGuaranteeInfo(row));
   }
   return result;
+}
+
+/**
+ * Order-time GARAN gate (checkout authority, not just the display endpoint).
+ * Re-reads guarantee eligibility for the given product ids directly from the
+ * database — the client never supplies guarantee data, so there is nothing to
+ * trust there — and throws if the result cannot stand in for a passed check:
+ * a DB/read failure (via the `strict` re-read below), or a product marked
+ * eligible whose label data does not validate (same rule `getDurabilityLabel`
+ * already applies for display, reused here instead of re-implemented).
+ * Resolving normally is the only "safe to place the order" outcome; this
+ * mirrors the client's `useGuaranteeLabelCheck` 'ready' state but is the
+ * final authority, run unconditionally in the order handler itself so it
+ * cannot be skipped by calling the API directly.
+ */
+export async function assertOrderGuaranteeVerified(
+  supabase: SupabaseClient,
+  ids: readonly string[],
+): Promise<void> {
+  const info = await fetchProductGuaranteeInfo(supabase, ids, { strict: true });
+  for (const guarantee of Array.from(info.values())) {
+    if (guarantee.durabilityGuaranteeEligible && !getDurabilityLabel(guarantee)) {
+      throw new Error('Guarantee data incomplete for an eligible product.');
+    }
+  }
 }
