@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Pause, Play } from 'lucide-react';
-import type { ImageAsset, VideoAsset } from '@/lib/vaillant-experience';
+import { AI_VIDEO_NOTICE, pickHeroVideo, type HeroVideo, type ImageAsset, type VideoAsset } from '@/lib/vaillant-experience';
 
 interface NetworkInformationLike {
   saveData?: boolean;
@@ -18,18 +18,23 @@ function prefersStaticMedia(): boolean {
 }
 
 /**
- * Hero background: the official key visual (LCP image, preloaded) with a very
- * slow zoom. When a licensed hero video exists it plays muted in a loop on top,
- * except for reduced-motion users and slow / data-saver connections. The pause
- * control stops both the video and the zoom.
+ * Hero background. The official key visual is always rendered first (LCP image,
+ * and the static fallback). When a hero film exists it is chosen per viewport
+ * (portrait on phones, landscape otherwise), plays muted in a loop and fades in
+ * only once it is actually playing — except for reduced-motion users and slow /
+ * data-saver connections, who keep the static image. The pause control stops
+ * both the film and the slow zoom.
  */
-export default function HeroBackdrop({ poster, video }: { poster: ImageAsset; video: VideoAsset | null }) {
+export default function HeroBackdrop({ poster, video }: { poster: ImageAsset; video: HeroVideo | null }) {
   const [paused, setPaused] = useState(false);
-  const [playVideo, setPlayVideo] = useState(false);
+  const [source, setSource] = useState<VideoAsset | null>(null);
+  const [playing, setPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (video && !prefersStaticMedia()) setPlayVideo(true);
+    if (!video || prefersStaticMedia()) return;
+    const portrait = window.matchMedia('(max-width: 767px), (orientation: portrait)').matches;
+    setSource(pickHeroVideo(video, portrait));
   }, [video]);
 
   useEffect(() => {
@@ -37,31 +42,38 @@ export default function HeroBackdrop({ poster, video }: { poster: ImageAsset; vi
     if (!element) return;
     if (paused) element.pause();
     else void element.play().catch(() => setPaused(true));
-  }, [paused, playVideo]);
+  }, [paused, source]);
 
   return (
     <div className={`absolute inset-0 overflow-hidden ${paused ? 'vx-paused' : ''}`}>
       <div className="vx-kenburns absolute inset-0">
         <Image src={poster.src} alt={poster.alt} fill priority sizes="100vw" className="object-cover object-[70%_50%]" />
       </div>
-      {video && playVideo && (
+      {source && (
         <video
           ref={videoRef}
-          className="absolute inset-0 h-full w-full object-cover"
-          poster={video.poster}
+          key={source.mp4}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${playing ? 'opacity-100' : 'opacity-0'}`}
+          poster={source.poster}
           muted
           loop
           playsInline
           autoPlay
           preload="metadata"
           aria-hidden="true"
+          onPlaying={() => setPlaying(true)}
         >
-          {video.webm && <source src={video.webm} type="video/webm" />}
-          <source src={video.mp4} type="video/mp4" />
+          {source.webm && <source src={source.webm} type="video/webm" />}
+          <source src={source.mp4} type="video/mp4" />
         </video>
       )}
       <div className="absolute inset-0 bg-gradient-to-r from-[#06131f]/90 via-[#06131f]/55 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-[#06131f]/70 to-transparent" />
+      {source && playing && video?.aiGenerated && (
+        <p className="absolute bottom-6 left-4 right-20 z-10 text-[11px] text-white/70 md:left-auto md:right-20 md:max-w-sm md:text-right" data-testid="ai-video-notice">
+          {AI_VIDEO_NOTICE}
+        </p>
+      )}
       <button
         type="button"
         onClick={() => setPaused((value) => !value)}

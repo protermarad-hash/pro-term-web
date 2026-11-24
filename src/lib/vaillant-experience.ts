@@ -15,6 +15,24 @@ export interface VideoAsset {
   source: string;
 }
 
+/**
+ * Hero film in two framings. Landscape (16:9) for desktop/tablet, portrait for
+ * phones. `aiGenerated` films show AI_VIDEO_NOTICE: the outdoor unit in a
+ * generated film must never be presented as a genuine Vaillant model.
+ */
+export interface HeroVideo {
+  landscape: VideoAsset;
+  portrait?: VideoAsset;
+  aiGenerated: boolean;
+}
+
+export const AI_VIDEO_NOTICE = 'Film ilustrativ generat cu AI. Echipamentul din film nu reprezintă un model Vaillant.';
+
+/** Portrait framing for narrow / portrait viewports, landscape otherwise. */
+export function pickHeroVideo(video: HeroVideo, portraitViewport: boolean): VideoAsset {
+  return portraitViewport && video.portrait ? video.portrait : video.landscape;
+}
+
 export interface ImageAsset {
   src: string;
   alt: string;
@@ -40,7 +58,13 @@ function image(file: string, alt: string, width: number, height: number, source:
  * film exists — the page then renders the poster image only.
  */
 export const VAILLANT_MEDIA = {
-  heroVideo: null as VideoAsset | null,
+  /**
+   * Google Flow films (landscape 16:9 + portrait) — files to be supplied, then:
+   * public/media/vaillant/video/hero-landscape.mp4 (+ poster .jpg),
+   * public/media/vaillant/video/hero-portrait.mp4 (+ poster .jpg), aiGenerated: true.
+   * Not published to PROD without approval.
+   */
+  heroVideo: null as HeroVideo | null,
   film: null as VideoAsset | null,
   vaillantLogo: image('vaillant-logo.svg', 'Vaillant', 136, 36, PRO_PAGE),
   vaillantLogoWhite: image('vaillant-logo-white.svg', 'Vaillant', 136, 36, PRO_PAGE),

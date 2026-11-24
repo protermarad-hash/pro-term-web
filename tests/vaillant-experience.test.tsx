@@ -171,3 +171,26 @@ describe('official Vaillant material', () => {
     }
   });
 });
+
+describe('hero film integration (Google Flow films, files supplied separately)', () => {
+  it('picks the portrait film on portrait viewports and falls back to landscape', async () => {
+    const { pickHeroVideo } = await import('@/lib/vaillant-experience');
+    const landscape = { mp4: '/l.mp4', poster: '/l.jpg', durationSeconds: 8, source: 'Google Flow' };
+    const portrait = { mp4: '/p.mp4', poster: '/p.jpg', durationSeconds: 8, source: 'Google Flow' };
+    assert.equal(pickHeroVideo({ landscape, portrait, aiGenerated: true }, true), portrait);
+    assert.equal(pickHeroVideo({ landscape, portrait, aiGenerated: true }, false), landscape);
+    assert.equal(pickHeroVideo({ landscape, aiGenerated: true }, true), landscape);
+  });
+
+  it('the AI notice says the equipment is not a Vaillant model', async () => {
+    const { AI_VIDEO_NOTICE } = await import('@/lib/vaillant-experience');
+    assert.match(AI_VIDEO_NOTICE, /generat cu AI/);
+    assert.match(AI_VIDEO_NOTICE, /nu reprezintă un model Vaillant/);
+  });
+
+  it('server render never contains a video element: the static key visual is the first paint', () => {
+    const html = renderToStaticMarkup(<ExperienceHero draft={false} />);
+    assert.ok(!html.includes('<video'));
+    assert.ok(html.includes('hero-arotherm-plus.jpg'));
+  });
+});
