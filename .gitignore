@@ -31,3 +31,6 @@ next-env.d.ts
 
 # backup-uri locale generate de scripturile de campanie (date de produs, nu cod)
 backups/
+
+# liste comerciale locale (prețuri publice aprobate etc.) — nu se versionează
+private/

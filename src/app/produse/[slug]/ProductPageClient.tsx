@@ -34,6 +34,17 @@ import BannerSlider from '@/components/BannerSlider';
 import ProductGuaranteeSection from '@/components/legal/ProductGuaranteeSection';
 import ProductConsumerInfo from '@/components/legal/ProductConsumerInfo';
 import type { ProductGuaranteeInfo } from '@/lib/consumer-guarantee';
+import { EMPTY_COMMERCIAL_DETAILS, QUOTE_ONLY_AVAILABILITY_NOTICE, type ProductCommercialDetails } from '@/lib/product-commercial';
+import { SERIES_COPY, VAILLANT_MEDIA } from '@/lib/vaillant-experience';
+import {
+  ComponentLists,
+  DocumentLinks,
+  PriceWithNotice,
+  ProductIdentity,
+  SystemQuoteButton,
+  equipmentQuoteHref,
+} from '@/components/vaillant/CommercialDetails';
+import { DraftBanner, PowerSelectionNotice, RepairNotice } from '@/components/vaillant/VaillantSections';
 
 const GREE_OFFICIAL_URLS = {
   clivia: 'https://www.gree.ro/gama-produse/rezidentiale/clivia/',
@@ -90,9 +101,17 @@ interface Props {
   product: Product;
   guarantee: ProductGuaranteeInfo;
   related: Product[];
+  commercial?: ProductCommercialDetails;
+  isDraft?: boolean;
 }
 
-export default function ProductPageClient({ product, guarantee, related }: Props) {
+export default function ProductPageClient({
+  product,
+  guarantee,
+  related,
+  commercial = EMPTY_COMMERCIAL_DETAILS,
+  isDraft = false,
+}: Props) {
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
   const [selectedImage, setSelectedImage] = useState<string | null>(
@@ -120,11 +139,16 @@ export default function ProductPageClient({ product, guarantee, related }: Props
   const serviceProduct = availability.isService;
   const whatsappMessage = `Bună ziua, sunt interesat de ${product.name}. Vă rog să îmi trimiteți detalii/ofertă.`;
   const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
+  const quoteOnly = commercial.quoteOnly || product.quoteOnly === true;
+  const isHeatPump = product.category === 'pompe-caldura';
+  const seriesHighlights: readonly string[] =
+    quoteOnly && product.brand === 'Vaillant' && commercial.productLine ? SERIES_COPY[commercial.productLine]?.highlights ?? [] : [];
 
   return (
     <>
       <Header />
       <main className="bg-light-200 pb-20 pt-24">
+        {isDraft && <DraftBanner />}
         <div className="container mx-auto px-4">
           <div className="mb-6 flex items-center gap-2 text-sm text-dark-300">
             <Link href="/" className="transition-colors hover:text-primary">Acasă</Link>
@@ -170,7 +194,7 @@ export default function ProductPageClient({ product, guarantee, related }: Props
                   {product.isBestseller && <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold uppercase text-white">Bestseller</span>}
                 </div>
 
-                <span className="absolute right-4 top-4 rounded-lg bg-white/20 px-3 py-1 font-bold text-white backdrop-blur-sm">
+                <span className={`absolute right-4 top-4 rounded-lg px-3 py-1 font-bold backdrop-blur-sm ${quoteOnly ? 'bg-[#00917e] text-white' : 'bg-white/20 text-white'}`}>
                   {product.energyClass}
                 </span>
               </div>
@@ -197,7 +221,11 @@ export default function ProductPageClient({ product, guarantee, related }: Props
 
             <div>
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{product.brand}</span>
+                {quoteOnly && product.brand === 'Vaillant' ? (
+                  <Image src={VAILLANT_MEDIA.vaillantLogo.src} alt="Vaillant" width={VAILLANT_MEDIA.vaillantLogo.width} height={VAILLANT_MEDIA.vaillantLogo.height} unoptimized className="mr-1 h-7 w-auto" />
+                ) : (
+                  <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">{product.brand}</span>
+                )}
                 {['Midea', 'Gree', 'Yamato'].includes(product.brand) && (
                   <span title={`PRO TERM SRL este dealer autorizat ${product.brand} pentru România`} className="flex cursor-help items-center gap-1 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-bold text-green-700">
                     <ShieldCheck size={11} />
@@ -209,6 +237,46 @@ export default function ProductPageClient({ product, guarantee, related }: Props
 
               <h1 className="mb-3 font-heading text-3xl font-bold text-dark">{product.name}</h1>
 
+              {quoteOnly && (
+                <div className="mb-4">
+                  <ProductIdentity commercial={commercial} />
+                </div>
+              )}
+
+              {quoteOnly && seriesHighlights.length > 0 && (
+                <ul className="mb-6 space-y-2" data-testid="quote-only-benefits">
+                  {seriesHighlights.map((highlight) => (
+                    <li key={highlight} className="flex items-start gap-2 text-dark">
+                      <CheckCircle2 size={18} className="mt-0.5 flex-shrink-0 text-[#00917e]" />
+                      <span>{highlight}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {quoteOnly && (
+                <div className="mb-6 rounded-3xl border border-slate-100 bg-white p-5 shadow-card" data-testid="quote-only-panel">
+                  <PriceWithNotice price={product.price} />
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <SystemQuoteButton slug={product.slug} className="py-4 sm:col-span-2" />
+                    <Link
+                      href={equipmentQuoteHref(product.slug)}
+                      className="flex items-center justify-center gap-2 rounded-lg border-2 border-primary px-5 py-4 font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+                    >
+                      Solicită ofertă doar pentru echipament
+                    </Link>
+                    <a href={phoneHref} className="flex items-center justify-center gap-2 rounded-lg border-2 border-slate-200 px-5 py-4 font-semibold text-dark transition-all hover:border-primary hover:text-primary">
+                      <Phone size={18} />
+                      0749 025 610
+                    </a>
+                  </div>
+                  <p className="mt-3 text-xs text-dark-300">
+                    Produsul nu se comandă direct online: disponibilitatea, configurația și termenul de livrare se confirmă înainte de comandă.
+                  </p>
+                </div>
+              )}
+
+              {!(quoteOnly && product.reviews === 0) && (
               <div className="mb-4 flex items-center gap-2">
                 <div className="flex">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -222,16 +290,25 @@ export default function ProductPageClient({ product, guarantee, related }: Props
                 <span className="text-sm font-semibold text-dark">{product.rating}</span>
                 <span className="text-sm text-dark-300">({product.reviews} recenzii)</span>
               </div>
+              )}
 
               <p className="mb-6 leading-relaxed text-dark-300">{customerDescription || 'Pentru detalii, disponibilitate și recomandarea potrivită spațiului tău, contactează echipa PRO TERM.'}</p>
 
               <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <p className="text-sm font-bold text-dark">{availability.title}</p>
-                {availability.detail && (
+                {quoteOnly ? (
+                  <p className="mt-1 text-sm text-dark-300">{QUOTE_ONLY_AVAILABILITY_NOTICE}</p>
+                ) : availability.detail && (
                   <p className="mt-1 text-sm text-dark-300">{availability.detail}</p>
                 )}
               </div>
 
+              {quoteOnly ? (
+                <div className="mb-6 space-y-4 rounded-2xl bg-white p-5 shadow-card" data-testid="quote-only-components">
+                  <ComponentLists commercial={commercial} />
+                  {isHeatPump && <PowerSelectionNotice />}
+                </div>
+              ) : (
               <div className="mb-6 grid gap-3 sm:grid-cols-3">
                 <div className="rounded-2xl bg-white p-4 shadow-card">
                   <ShieldCheck className="mb-2 text-primary" size={22} />
@@ -249,6 +326,7 @@ export default function ProductPageClient({ product, guarantee, related }: Props
                   <p className="mt-1 text-xs text-dark-300">Confirmare rapidă telefonic</p>
                 </div>
               </div>
+              )}
 
               {product.features.length > 0 && (
                 <ul className="mb-6 space-y-2">
@@ -289,6 +367,7 @@ export default function ProductPageClient({ product, guarantee, related }: Props
                 </div>
               )}
 
+              {quoteOnly ? null : (
               <div className="rounded-3xl border border-slate-100 bg-white p-5 shadow-card">
                 {discountPercent && product.originalPrice && (
                   <div className="mb-3 inline-flex rounded-full bg-red-50 px-4 py-2 text-sm font-extrabold text-red-700">
@@ -352,6 +431,7 @@ export default function ProductPageClient({ product, guarantee, related }: Props
                   Prețul, stocul și disponibilitatea montajului se confirmă înainte de livrare/intervenție.
                 </p>
               </div>
+              )}
 
               <ProductGuaranteeSection productName={product.name} guarantee={guarantee} />
             </div>
@@ -388,7 +468,9 @@ export default function ProductPageClient({ product, guarantee, related }: Props
             <div className="card">
               <h2 className="mb-4 font-heading text-xl font-bold text-dark">Documentație & consultanță</h2>
               <div className="space-y-3">
-                {officialUrl ? (
+                {quoteOnly && <DocumentLinks commercial={commercial} />}
+                {quoteOnly && product.brand === 'Vaillant' && <RepairNotice />}
+                {quoteOnly ? null : officialUrl ? (
                   <a href={officialUrl} target="_blank" rel="noopener noreferrer" className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-primary px-4 py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-white">
                     <ExternalLink size={18} />
                     Pagina oficială producător

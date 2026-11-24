@@ -5,6 +5,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Reserve the scrollbar width up front: avoids a horizontal layout shift when a
+       tall page gets its scrollbar after the first paint. */
+    scrollbar-gutter: stable;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -49,5 +52,25 @@
 
   .input-field {
     @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-dark outline-none placeholder:text-dark-300/50 focus:border-accent focus:ring-2 focus:ring-accent/30 transition-colors;
+  }
+}
+
+/* Vaillant pages: very slow hero zoom (transform only, no layout shift). */
+@keyframes vx-kenburns {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.vx-kenburns {
+  animation: vx-kenburns 24s ease-out both;
+}
+
+.vx-paused .vx-kenburns {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vx-kenburns {
+    animation: none;
   }
 }

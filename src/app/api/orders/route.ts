@@ -13,6 +13,7 @@ import {
   type OrderEmailData,
 } from '@/lib/email';
 import { assertOrderGuaranteeVerified } from '@/lib/consumer-guarantee-server';
+import { findQuoteOnlyProductIds } from '@/lib/product-commercial-server';
 import { GUARANTEE_CHECK_ERROR_MESSAGE } from '@/lib/guarantee-label-check';
 
 export async function POST(request: Request) {
@@ -61,6 +62,19 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error('[orders] guarantee verification failed:', err instanceof Error ? err.message : err);
     return NextResponse.json({ error: GUARANTEE_CHECK_ERROR_MESSAGE }, { status: 503 });
+  }
+
+  // Quote-only products (e.g. Vaillant heat pumps) are sold only through a
+  // validated offer, never through the online checkout — enforced server-side.
+  const quoteOnly = await findQuoteOnlyProductIds(supabase, productIds);
+  if (!quoteOnly.ok) {
+    return NextResponse.json({ error: 'Nu am putut verifica produsele din coș. Te rugăm să încerci din nou.' }, { status: 503 });
+  }
+  if (quoteOnly.quoteOnlyIds.length > 0) {
+    return NextResponse.json(
+      { error: 'Unele produse din coș se comercializează doar pe bază de ofertă și nu pot fi comandate online.' },
+      { status: 422 },
+    );
   }
 
   const subtotal = Number(body.subtotal) || 0;

@@ -6,6 +6,8 @@ import { getSupabaseServiceClient } from '@/lib/supabase-admin';
 import { CATEGORY_LABEL, getProductAvailability, type Product, type StockStatus } from '@/lib/products';
 import { EMPTY_GUARANTEE_INFO } from '@/lib/consumer-guarantee';
 import { fetchProductGuaranteeInfo } from '@/lib/consumer-guarantee-server';
+import { fetchCommercialDetails } from '@/lib/product-commercial-server';
+import { EMPTY_COMMERCIAL_DETAILS, isDraftPreviewEnabled } from '@/lib/product-commercial';
 import ProductPageClient from './ProductPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -17,16 +19,13 @@ const getProductData = cache(async (slug: string) => {
   const supabase = getSupabaseServiceClient();
   if (!supabase) return null;
 
-  const { data } = await supabase
-    .from('products')
-    .select(PRODUCT_COLUMNS)
-    .eq('slug', slug)
-    .eq('active', true)
-    .maybeSingle();
+  // Inactive products are drafts: visible only in development / Vercel Preview
+  // (fail-closed in production), always noindex and flagged with a banner.
+  let productQuery = supabase.from('products').select(PRODUCT_COLUMNS).eq('slug', slug);
+  if (!isDraftPreviewEnabled()) productQuery = productQuery.eq('active', true);
+  const { data } = await productQuery.maybeSingle();
 
   if (!data) return null;
-
-  const product = dbProductToProduct(data);
 
   const { data: relatedData } = await supabase
     .from('products')
@@ -36,12 +35,25 @@ const getProductData = cache(async (slug: string) => {
     .neq('id', data.id)
     .limit(4);
 
-  const guarantees = await fetchProductGuaranteeInfo(supabase, [data.id]);
+  const relatedRows = relatedData ?? [];
+  const [guarantees, commercialDetails] = await Promise.all([
+    fetchProductGuaranteeInfo(supabase, [data.id]),
+    fetchCommercialDetails(supabase, [data.id, ...relatedRows.map((row) => row.id)]),
+  ]);
+
+  // quote_only is read by the tolerant commercial query, so related cards and
+  // the cart also know which products must never be added to the cart.
+  const withQuoteFlag = (row: typeof data) => {
+    const mapped = dbProductToProduct(row);
+    return commercialDetails.get(row.id)?.quoteOnly ? { ...mapped, quoteOnly: true } : mapped;
+  };
 
   return {
-    product,
+    product: withQuoteFlag(data),
+    isDraft: data.active !== true,
+    commercial: commercialDetails.get(data.id) ?? EMPTY_COMMERCIAL_DETAILS,
     guarantee: guarantees.get(data.id) ?? EMPTY_GUARANTEE_INFO,
-    related: (relatedData ?? []).map(dbProductToProduct),
+    related: relatedRows.map(withQuoteFlag),
   };
 });
 
@@ -79,7 +91,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
     };
   }
 
-  const { product } = data;
+  const { product, isDraft } = data;
   const description = buildSeoDescription(product);
   const canonical = `https://pro-term.ro/produse/${params.slug}`;
   const ogImage = product.imageUrl ?? product.galleryImages?.[0];
@@ -95,6 +107,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
       type: 'website',
       ...(ogImage ? { images: [{ url: ogImage, width: 800, height: 800, alt: product.name }] } : {}),
     },
+    ...(isDraft ? { robots: { index: false, follow: false } } : {}),
   };
 }
 
@@ -103,7 +116,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
 
   if (!data) notFound();
 
-  const { product, guarantee, related } = data;
+  const { product, guarantee, related, commercial, isDraft } = data;
   const description = buildSeoDescription(product);
   const canonical = `https://pro-term.ro/produse/${params.slug}`;
   const availability = getProductAvailability(product);
@@ -115,6 +128,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     ...(product.imageUrl ? { image: product.imageUrl } : {}),
     description,
     brand: { '@type': 'Brand', name: product.brand },
+    ...(commercial.manufacturerCode ? { mpn: commercial.manufacturerCode } : {}),
     offers: {
       '@type': 'Offer',
       ...(product.price > 0
@@ -142,7 +156,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
-      <ProductPageClient product={product} guarantee={guarantee} related={related} />
+      <ProductPageClient product={product} guarantee={guarantee} related={related} commercial={commercial} isDraft={isDraft} />
     </>
   );
 }

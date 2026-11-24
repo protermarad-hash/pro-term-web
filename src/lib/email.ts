@@ -5,6 +5,16 @@ import {
   YOUR_EUROPE_LEGAL_GUARANTEE_LABEL,
   YOUR_EUROPE_LEGAL_GUARANTEE_URL,
 } from './consumer-guarantee';
+import {
+  ELECTRICAL_SUPPLY_OPTIONS,
+  EMITTER_OPTIONS,
+  EXISTING_SYSTEM_OPTIONS,
+  HOT_WATER_OPTIONS,
+  INSULATION_OPTIONS,
+  labelFor,
+  offerOptionLabel,
+  type QuoteRequestData,
+} from './quote-request';
 
 const IBAN = 'RO15BTRLRONCRT0CK3829101';
 const ADMIN_EMAIL = 'proterm.arad@gmail.com';
@@ -283,6 +293,77 @@ export async function sendContactRequest(d: ContactRequestData): Promise<void> {
     replyTo: d.email || undefined,
     subject: `Solicitare ofertă — ${d.name}`,
     html: buildContactHtml(d, submittedAt),
+  });
+
+  if (result.error) {
+    throw new Error(`Resend error: ${result.error.message || 'trimitere eșuată'}`);
+  }
+}
+
+function quoteRow(label: string, value: string, preWrap = false) {
+  return `<tr><td style="padding:6px 0;color:#6b7280;width:170px;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:6px 0;font-weight:600;${preWrap ? 'white-space:pre-wrap;' : ''}">${escapeHtml(value)}</td></tr>`;
+}
+
+export function buildQuoteRequestHtml(d: QuoteRequestData, submittedAt: string): string {
+  const rows = [
+    quoteRow('Tip ofertă', offerOptionLabel(d.offerOption)),
+    quoteRow('Produs de interes', d.product || 'Nespecificat'),
+    quoteRow('Nume', d.name),
+    quoteRow('Telefon', d.phone),
+    d.email ? quoteRow('Email', d.email) : '',
+    quoteRow('Localitate', d.locality),
+    quoteRow('Suprafață', `${d.areaSqm} m²`),
+    quoteRow('An construcție', d.constructionYear ? String(d.constructionYear) : 'Nespecificat'),
+    quoteRow('Izolație', labelFor(INSULATION_OPTIONS, d.insulation)),
+    quoteRow('Sistem existent', labelFor(EXISTING_SYSTEM_OPTIONS, d.existingSystem)),
+    quoteRow('Emițători', labelFor(EMITTER_OPTIONS, d.emitters)),
+    quoteRow('Apă caldă menajeră', labelFor(HOT_WATER_OPTIONS, d.hotWater)),
+    quoteRow('Număr persoane', String(d.occupants)),
+    quoteRow('Alimentare electrică', labelFor(ELECTRICAL_SUPPLY_OPTIONS, d.electricalSupply)),
+    d.details ? quoteRow('Detalii', d.details, true) : '',
+    quoteRow('Acord GDPR', 'Da'),
+  ].join('');
+
+  return `<!DOCTYPE html>
+<html lang="ro">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,Helvetica,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
+  <tr><td style="background:#1f2937;padding:24px 40px;">
+    <h1 style="color:#fff;margin:0;font-size:20px;">Cerere ofertă pompă de căldură</h1>
+    <p style="color:#9ca3af;margin:4px 0 0;font-size:13px;">Trimisă la ${escapeHtml(submittedAt)} · necesită validare tehnică și comercială</p>
+  </td></tr>
+  <tr><td style="padding:28px 40px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">${rows}</table>
+  </td></tr>
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+}
+
+/**
+ * Sends a heat pump quote request to the PRO TERM team. Throws if Resend does
+ * not confirm the send, like sendContactRequest. No prices are included: the
+ * "sistem complet" / "la cheie" offers are priced only after validation.
+ */
+export async function sendQuoteRequest(d: QuoteRequestData): Promise<void> {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY lipsă — trimitere indisponibilă.');
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+  const submittedAt = new Date().toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' });
+
+  const result = await resend.emails.send({
+    from: FROM_EMAIL,
+    to: ADMIN_EMAIL,
+    replyTo: d.email || undefined,
+    subject: `Cerere ofertă pompă de căldură (${offerOptionLabel(d.offerOption)}) — ${d.name}, ${d.locality}`,
+    html: buildQuoteRequestHtml(d, submittedAt),
   });
 
   if (result.error) {

@@ -56,6 +56,8 @@ export interface Product {
   stockQty?: number;
   imageUrl?: string;
   galleryImages?: string[];
+  /** Never added to the cart: the public price is shown with quote-request CTAs. */
+  quoteOnly?: boolean;
 }
 
 export const BRAND_GRADIENT: Record<Brand, string> = {

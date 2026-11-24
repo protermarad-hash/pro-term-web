@@ -1,0 +1,4 @@
+# Copiază în private/vaillant-public-prices.csv (exclus din git) și completează.
+# Doar prețuri PUBLICE finale, cu TVA. Fără prețuri de achiziție, marje, discounturi, costuri logistice.
+sku;public_price_with_vat;verified_at;approval_source
+8000022169;0;2026-01-01;Sursa aprobării

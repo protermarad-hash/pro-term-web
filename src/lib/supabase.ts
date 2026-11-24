@@ -29,6 +29,8 @@ export interface DbProduct {
   stock_qty: number | null;
   image_url: string | null;
   gallery_images?: string[] | null;
+  /** Present once migration 20261123120000_product_commercial_details is applied. */
+  quote_only?: boolean | null;
   active: boolean;
   created_at?: string;
   updated_at?: string;
@@ -132,6 +134,7 @@ export function dbProductToProduct(p: DbProduct): Product {
     stockQty: p.stock_qty ?? undefined,
     imageUrl,
     galleryImages,
+    ...(p.quote_only === true ? { quoteOnly: true } : {}),
   };
 }
 

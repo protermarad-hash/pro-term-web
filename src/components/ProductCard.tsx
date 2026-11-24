@@ -6,6 +6,7 @@ import { ShoppingCart, Star, Heart } from 'lucide-react';
 import { useCart } from '@/lib/cart-context';
 import { useFavorites } from '@/lib/favorites-context';
 import { type Product, BRAND_GRADIENT, CATEGORY_LABEL, getProductAvailability } from '@/lib/products';
+import { PRICE_AVAILABILITY_NOTICE } from '@/lib/product-commercial';
 
 function getDiscountPercent(product: Product) {
   if (!product.originalPrice || product.originalPrice <= product.price || product.price <= 0) return null;
@@ -148,11 +149,20 @@ export default function ProductCard({ product }: { product: Product }) {
             )}
           </div>
           {hasPrice && (
-            <p className="mb-3 text-xs text-dark-300">TVA inclus</p>
+            <p className="mb-3 text-xs text-dark-300">
+              TVA inclus{product.quoteOnly ? `. ${PRICE_AVAILABILITY_NOTICE}` : ''}
+            </p>
           )}
           {!hasPrice && <div className="mb-3" />}
 
-          {hasPrice ? (
+          {product.quoteOnly ? (
+            <Link
+              href={`/produse/${product.slug}`}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600"
+            >
+              Detalii și ofertă
+            </Link>
+          ) : hasPrice ? (
             <button
               onClick={() => addToCart(product)}
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-bold text-white transition-colors hover:bg-primary-600 active:scale-95"

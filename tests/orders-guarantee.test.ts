@@ -207,3 +207,37 @@ describe('/api/orders — GARAN server-side fail-closed gate', () => {
     assert.equal(ordersInsertCalled, true);
   });
 });
+
+describe('/api/orders — quote-only products (Vaillant) are never sold online', () => {
+  test('quote_only product sent directly to the API: order refused with 422, nothing inserted', async () => {
+    ordersInsertCalled = false;
+    scenario = {
+      productsError: null,
+      productsRows: [{ id: PLAIN_PRODUCT_ID, durability_guarantee_eligible: false, durability_guarantee_years: null, quote_only: true }],
+    };
+    const res = await POST(
+      makeRequest({
+        ...BASE_FIELDS,
+        items: [{ id: PLAIN_PRODUCT_ID, name: 'Vaillant aroTHERM', price: 19990, quantity: 1 }],
+        subtotal: 19990,
+      }),
+    );
+    assert.equal(res.status, 422);
+    const data = (await res.json()) as { error?: string };
+    assert.match(data.error ?? '', /doar pe bază de ofertă/);
+    assert.equal(ordersInsertCalled, false, 'no order may be created for a quote-only product');
+  });
+
+  test('regular product (quote_only false): order proceeds', async () => {
+    ordersInsertCalled = false;
+    scenario = {
+      productsError: null,
+      productsRows: [{ id: PLAIN_PRODUCT_ID, durability_guarantee_eligible: false, durability_guarantee_years: null, quote_only: false }],
+    };
+    const res = await POST(
+      makeRequest({ ...BASE_FIELDS, items: [{ id: PLAIN_PRODUCT_ID, name: 'AC', price: 1000, quantity: 1 }], subtotal: 1000 }),
+    );
+    assert.equal(res.status, 200);
+    assert.equal(ordersInsertCalled, true);
+  });
+});

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { HEAT_PUMP_CATEGORY, VAILLANT_BRAND, VAILLANT_SERIES } from '@/lib/vaillant-catalog';
 
 const baseUrl = 'https://pro-term.ro';
 
@@ -54,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [{ data: products }, { data: blogPosts }] = await Promise.all([
     supabase
       .from('products')
-      .select('slug, updated_at')
+      .select('slug, brand, category, updated_at')
       .eq('active', true)
       .order('updated_at', { ascending: false }),
     supabase
@@ -78,5 +79,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.55,
   }));
 
-  return [...staticEntries, ...productEntries, ...blogEntries];
+  // /vaillant pages exist (and are indexable) only once a Vaillant heat pump is published.
+  const vaillantLive = (products ?? []).some((p) => p.brand === VAILLANT_BRAND && p.category === HEAT_PUMP_CATEGORY);
+  const vaillantEntries: MetadataRoute.Sitemap = vaillantLive
+    ? [
+        '/vaillant',
+        '/vaillant/pompe-de-caldura',
+        ...VAILLANT_SERIES.map((series) => `/vaillant/pompe-de-caldura/${series.slug}`),
+        '/vaillant/cerere-oferta',
+      ].map((path) => ({ url: `${baseUrl}${path}`, lastModified: now, changeFrequency: 'weekly' as const, priority: 0.75 }))
+    : [];
+
+  return [...staticEntries, ...vaillantEntries, ...productEntries, ...blogEntries];
 }

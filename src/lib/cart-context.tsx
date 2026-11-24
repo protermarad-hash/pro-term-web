@@ -28,6 +28,8 @@ type CartAction =
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD': {
+      // Quote-only products (e.g. Vaillant heat pumps) are never sold through the cart.
+      if (action.product.quoteOnly) return state;
       const existing = state.items.find((i) => i.product.id === action.product.id);
       const items = existing
         ? state.items.map((i) =>

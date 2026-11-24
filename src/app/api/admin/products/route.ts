@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/server-auth';
 import { slugify } from '@/lib/supabase';
 import { buildGuaranteePayload, hasGuaranteeInput } from '@/lib/consumer-guarantee';
+import { getQuoteOnlyPublishBlockers } from '@/lib/product-commercial-server';
 
 const GUARANTEE_MIGRATION_MISSING =
   'Câmpurile de garanție nu există încă în baza de date. Aplică migrația 20261004120000_product_consumer_guarantee_info.sql înainte de a salva aceste informații.';
@@ -170,6 +171,17 @@ export async function PUT(request: Request) {
   const built = buildFullPayload(body);
   if (!built.ok) return built.response;
   const { payload } = built;
+
+  if (payload.active) {
+    const blockers = await getQuoteOnlyPublishBlockers(supabase, id, payload.price);
+    if (blockers.length > 0) {
+      return NextResponse.json(
+        { error: `Produsul nu poate fi activat: ${blockers.join(' ')} Folosește secțiunea „Date comerciale”.` },
+        { status: 422 },
+      );
+    }
+  }
+
   if (!hasGalleryKey(body)) {
     // Key entirely absent from the request: leave the existing gallery untouched
     // instead of wiping it with the [] that buildPayload defaults missing values to.

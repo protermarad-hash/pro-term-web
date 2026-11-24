@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { CATEGORY_LABEL, type Brand, type Category, type StockStatus } from '@/lib/products';
 import { adminFetch } from '@/lib/client-auth-fetch';
+import CommercialDetailsSection from './CommercialDetailsSection';
 import {
   DURABILITY_LABEL_ADMIN_WARNING,
   GUARANTEE_INPUT_KEYS,
@@ -1069,6 +1070,8 @@ export default function AdminClient() {
             </div>
           </aside>
         </div>
+
+        <CommercialDetailsSection />
       </div>
     </main>
   );
