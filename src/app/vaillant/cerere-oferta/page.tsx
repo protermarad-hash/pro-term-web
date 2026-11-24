@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Phone } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import QuoteRequestForm from '@/components/vaillant/QuoteRequestForm';
-import { DraftBanner } from '@/components/vaillant/VaillantSections';
+import { DraftBanner, RepairNotice } from '@/components/vaillant/VaillantSections';
+import { BrandLockup, ConversionSection } from '@/components/vaillant/experience/ExperienceSections';
 import { SITE_URL, breadcrumbJsonLd, getVaillantCatalog, requireVaillantCatalog, showDraftBanner, vaillantRobots } from '../catalog';
 
 export const dynamic = 'force-dynamic';
@@ -55,46 +54,35 @@ export default async function VaillantQuotePage({
         }}
       />
       <Header />
-      <main className="min-h-screen bg-light-200 pb-20 pt-24">
+      <main className="bg-white pt-24">
         {showDraftBanner(catalog) && <DraftBanner />}
 
-        <div className="container mx-auto px-4 pt-10">
-          <nav aria-label="Breadcrumb" className="mb-4 flex flex-wrap items-center gap-2 text-sm text-dark-300">
-            <Link href="/" className="hover:text-primary">Acasă</Link>
-            <span>/</span>
-            <Link href="/vaillant" className="hover:text-primary">Vaillant</Link>
-            <span>/</span>
-            <span className="font-medium text-dark">Cerere ofertă</span>
-          </nav>
-          <div className="grid gap-10 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <h1 className="font-heading text-3xl font-bold text-dark md:text-4xl">Cerere ofertă pompă de căldură Vaillant</h1>
-              <p className="mt-3 max-w-2xl leading-relaxed text-dark-300">
-                Completează datele despre clădire și instalație. Echipa PRO TERM verifică tehnic configurația și revine cu oferta.
-              </p>
-              <div className="card mt-8">
-                <QuoteRequestForm
-                  products={products}
-                  initialProduct={firstParam(searchParams.produs)}
-                  initialOption={firstParam(searchParams.optiune)}
-                />
-              </div>
-            </div>
-            <aside className="space-y-4">
-              <div className="card">
-                <h2 className="font-heading text-lg font-bold text-dark">Ce se întâmplă după trimitere</h2>
-                <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-dark-300">
-                  <li>Analizăm datele despre clădire și instalația existentă.</li>
-                  <li>Te contactăm pentru detaliile lipsă și, dacă e nevoie, pentru o vizită tehnică.</li>
-                  <li>Primești oferta pentru varianta aleasă, după validarea tehnică și comercială.</li>
-                </ol>
-              </div>
-              <a href="tel:+40749025610" className="card flex items-center gap-3 font-semibold text-primary">
-                <Phone size={20} />
-                Preferi telefonic? 0749 025 610
-              </a>
-            </aside>
+        <section className="bg-gradient-to-b from-white to-light-200">
+          <div className="container mx-auto px-4 py-10 md:py-14">
+            <nav aria-label="Breadcrumb" className="mb-6 flex flex-wrap items-center gap-2 text-sm text-dark-300">
+              <Link href="/" className="hover:text-primary">Acasă</Link>
+              <span>/</span>
+              <Link href="/vaillant" className="hover:text-primary">Vaillant</Link>
+              <span>/</span>
+              <span className="font-medium text-dark">Cerere ofertă</span>
+            </nav>
+            <BrandLockup />
+            <h1 className="mt-8 max-w-4xl font-heading text-4xl font-bold leading-tight tracking-tight text-dark md:text-5xl">
+              Cerere ofertă pompă de căldură Vaillant
+            </h1>
+            <p className="mt-4 max-w-3xl text-lg leading-relaxed text-dark-300">
+              Completează datele despre clădire și instalație. Echipa PRO TERM verifică tehnic configurația și revine cu oferta.
+            </p>
           </div>
+        </section>
+
+        <ConversionSection
+          products={products}
+          initialProduct={firstParam(searchParams.produs)}
+          initialOption={firstParam(searchParams.optiune)}
+        />
+        <div className="container mx-auto px-4 pb-16">
+          <RepairNotice />
         </div>
       </main>
       <Footer />
