@@ -4,10 +4,5 @@
       "path": "/api/cron/revert-midea-solstice-pricing",
       "schedule": "15 22 * * *"
     }
-  ],
-  "git": {
-    "deploymentEnabled": {
-      "feature/vaillant-heat-pumps": false
-    }
-  }
+  ]
 }
